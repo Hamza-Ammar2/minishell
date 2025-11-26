@@ -1,0 +1,378 @@
+================================================================================
+                        MINISHELL FUNCTION TREE
+================================================================================
+
+Current Implementation Status: MINIMAL CORE (Basic readline loop)
+
+
+================================================================================
+                            EXECUTION FLOW
+================================================================================
+
+                                START
+                                  |
+                                  v
+                    ┌─────────────────────────┐
+                    │    main()               │
+                    │  (src/main.c)           │
+                    └─────────────────────────┘
+                                  |
+                    ┌─────────────┼─────────────┐
+                    |             |             |
+                    v             v             v
+            ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+            │ init_shell()│ │shell_loop() │ │cleanup_     │
+            │             │ │             │ │  shell()    │
+            └─────────────┘ └─────────────┘ └─────────────┘
+                 (1)             (2)              (3)
+                                  |
+                                  |
+                    ┌─────────────┼─────────────┐
+                    |             |             |
+                    v             v             v
+               ┌──────────┐  ┌──────────┐  ┌──────────┐
+               │readline()│  │add_      │  │ free()   │
+               │          │  │ history()│  │          │
+               └──────────┘  └──────────┘  └──────────┘
+                 (2.1)         (2.2)         (2.3)
+
+
+================================================================================
+                        DETAILED FUNCTION BREAKDOWN
+================================================================================
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ FUNCTION: main()                                                         │
+│ FILE: src/main.c                                                         │
+│ PURPOSE: Entry point of the program                                      │
+└──────────────────────────────────────────────────────────────────────────┘
+
+STEP-BY-STEP:
+─────────────
+
+    1. Declare shell structure
+       t_shell shell;
+       
+    2. Ignore unused parameters
+       (void)argc;
+       (void)argv;
+       (void)envp;
+       
+    3. Initialize shell
+       init_shell(&shell);  ───────────┐
+                                       │
+    4. Start main loop                 │
+       shell_loop(&shell);  ───────────┼─────┐
+                                       │     │
+    5. Cleanup and exit                │     │
+       cleanup_shell(&shell); ─────────┼─────┼────┐
+       return (shell.exit_status);     │     │    │
+                                       │     │    │
+                                       v     v    v
+                                      (1)   (2)  (3)
+
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ FUNCTION: init_shell()                                              [1]  │
+│ FILE: src/init.c                                                         │
+│ PURPOSE: Initialize the shell structure                                  │
+└──────────────────────────────────────────────────────────────────────────┘
+
+INPUT:  t_shell *shell  (pointer to shell structure)
+OUTPUT: void            (modifies shell in place)
+
+STEP-BY-STEP:
+─────────────
+
+    shell->exit_status = 0;
+         │
+         └──> Sets initial exit status to 0 (success)
+
+CURRENT STATE:
+─────────────
+    ✓ exit_status initialized to 0
+    ✗ env          → NOT initialized (NULL/garbage)
+    ✗ envp         → NOT initialized (NULL/garbage)
+    ✗ input        → NOT initialized (NULL/garbage)
+    ✗ stdin_backup → NOT initialized (undefined)
+    ✗ stdout_backup → NOT initialized (undefined)
+
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ FUNCTION: shell_loop()                                              [2]  │
+│ FILE: src/main.c                                                         │
+│ PURPOSE: Main interactive loop - reads and displays user input           │
+└──────────────────────────────────────────────────────────────────────────┘
+
+INPUT:  t_shell *shell  (pointer to shell structure)
+OUTPUT: void            (runs until user exits)
+
+STEP-BY-STEP:
+─────────────
+
+    while (1)  ◄──────────────────────────┐
+        │                                  │
+        │                                  │
+        v                                  │
+    ┌─────────────────────────────────┐   │
+    │ input = readline(PROMPT);       │   │
+    │                                 │   │
+    │ Shows: "minishell$ "            │   │
+    │ Waits for user input            │   │
+    └─────────────────────────────────┘   │
+                │                          │
+                v                          │
+         ┌─────────────┐                  │
+         │ if (!input) │ ──> Ctrl+D       │
+         └─────────────┘     pressed      │
+                │                │         │
+                │                v         │
+           NO   │         printf("exit\n") │
+                │         break; ──────────┼──> EXIT LOOP
+                │                          │
+                v                          │
+         ┌─────────────┐                  │
+         │ if (*input) │ ──> Empty?       │
+         └─────────────┘                  │
+                │                          │
+           YES  │    NO                    │
+                │     └───────────────────>│ (skip, continue loop)
+                v                          │
+    ┌─────────────────────────────────┐   │
+    │ add_history(input);             │   │
+    │                                 │   │
+    │ Saves to readline history       │   │
+    │ (enables ↑↓ arrow keys)         │   │
+    └─────────────────────────────────┘   │
+                │                          │
+                v                          │
+    ┌─────────────────────────────────┐   │
+    │ printf("You typed: %s\n",input);│   │
+    │                                 │   │
+    │ Echoes back the user input      │   │
+    └─────────────────────────────────┘   │
+                │                          │
+                v                          │
+    ┌─────────────────────────────────┐   │
+    │ free(input);                    │   │
+    │                                 │   │
+    │ Frees readline's malloc'd string│   │
+    └─────────────────────────────────┘   │
+                │                          │
+                └──────────────────────────┘
+
+
+EXAMPLE EXECUTION:
+─────────────────
+
+    User types: "hello world" + ENTER
+         │
+         v
+    readline() returns: "hello world" (malloc'd string)
+         │
+         v
+    add_history("hello world")  → Saved to history
+         │
+         v
+    printf("You typed: hello world\n")
+         │
+         v
+    free("hello world")  → Memory cleaned
+         │
+         v
+    Loop continues... prompt appears again
+
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ FUNCTION: cleanup_shell()                                           [3]  │
+│ FILE: src/cleanup.c                                                      │
+│ PURPOSE: Clean up before exit                                            │
+└──────────────────────────────────────────────────────────────────────────┘
+
+INPUT:  t_shell *shell  (pointer to shell structure)
+OUTPUT: void            (cleans up resources)
+
+STEP-BY-STEP:
+─────────────
+
+    (void)shell;
+         │
+         └──> Marks parameter as intentionally unused (avoids warning)
+         
+    rl_clear_history();
+         │
+         └──> Clears readline's internal history
+              (frees all history entries from add_history calls)
+
+CURRENT STATE:
+─────────────
+    ✓ Clears readline history
+    ✗ Does NOT free env       (not initialized anyway)
+    ✗ Does NOT free envp      (not initialized anyway)
+    ✗ Does NOT close fds      (not initialized anyway)
+
+
+================================================================================
+                            DATA FLOW DIAGRAM
+================================================================================
+
+USER INTERACTION:
+────────────────
+
+    User                  Program                    Memory
+     │                       │                          │
+     │  Types "ls"           │                          │
+     ├──────────────────────>│                          │
+     │                       │                          │
+     │                       │ readline()               │
+     │                       ├─────────────────────────>│
+     │                       │                          │
+     │                       │          malloc: "ls"    │
+     │                       │<─────────────────────────┤
+     │                       │                          │
+     │                       │ add_history("ls")        │
+     │                       ├─────────────────────────>│
+     │                       │                          │
+     │  "You typed: ls"      │                          │
+     │<──────────────────────┤                          │
+     │                       │                          │
+     │                       │ free("ls")               │
+     │                       ├─────────────────────────>│
+     │                       │                          │
+     │  Prompt again         │                          │
+     │<──────────────────────┤                          │
+     │                       │                          │
+
+
+================================================================================
+                            MEMORY STATE
+================================================================================
+
+BEFORE init_shell():
+────────────────────
+    shell = {
+        input:         [garbage]
+        env:           [garbage]
+        envp:          [garbage]
+        exit_status:   [garbage]
+        stdin_backup:  [garbage]
+        stdout_backup: [garbage]
+    }
+
+AFTER init_shell():
+───────────────────
+    shell = {
+        input:         [garbage]      ← NOT SET
+        env:           [garbage]      ← NOT SET
+        envp:          [garbage]      ← NOT SET
+        exit_status:   0              ← SET ✓
+        stdin_backup:  [garbage]      ← NOT SET
+        stdout_backup: [garbage]      ← NOT SET
+    }
+
+DURING shell_loop():
+────────────────────
+    Each iteration:
+    1. input = readline(...)  → allocates memory
+    2. add_history(input)     → readline keeps a copy
+    3. printf(...)            → displays
+    4. free(input)            → frees the malloc'd string
+
+
+================================================================================
+                        LIBRARY FUNCTIONS USED
+================================================================================
+
+┌─────────────────┬──────────────┬─────────────────────────────────────────┐
+│ Function        │ Library      │ Purpose                                 │
+├─────────────────┼──────────────┼─────────────────────────────────────────┤
+│ readline()      │ readline     │ Read line with editing & history        │
+│ add_history()   │ readline     │ Add line to history (↑↓ navigation)     │
+│ rl_clear_       │ readline     │ Free all history entries                │
+│  history()      │              │                                         │
+│ printf()        │ stdio        │ Print formatted output                  │
+│ free()          │ stdlib       │ Free allocated memory                   │
+└─────────────────┴──────────────┴─────────────────────────────────────────┘
+
+
+================================================================================
+                        WHAT HAPPENS ON USER INPUT
+================================================================================
+
+SCENARIO 1: Normal Input
+────────────────────────
+
+    User types: "hello world" + ENTER
+         │
+         ├─> readline() allocates: char *input = "hello world"
+         │
+         ├─> add_history("hello world")
+         │   └─> readline stores internal copy for history
+         │
+         ├─> printf("You typed: hello world\n")
+         │
+         └─> free(input)
+             └─> Our allocated string freed
+             └─> History copy still exists (freed in cleanup_shell)
+
+
+SCENARIO 2: Empty Input
+────────────────────────
+
+    User presses: ENTER (empty line)
+         │
+         ├─> readline() returns: char *input = ""
+         │
+         ├─> if (*input) → FALSE (first char is '\0')
+         │   └─> Skip add_history() and printf()
+         │
+         └─> free(input)
+             └─> Free the empty string
+
+
+SCENARIO 3: Ctrl+D (EOF)
+────────────────────────
+
+    User presses: Ctrl+D
+         │
+         ├─> readline() returns: NULL
+         │
+         ├─> if (!input) → TRUE
+         │   ├─> printf("exit\n")
+         │   └─> break;
+         │
+         └─> EXIT LOOP → cleanup_shell() → return to shell
+
+
+================================================================================
+                        CURRENT LIMITATIONS
+================================================================================
+
+✗ Commands are NOT executed (only echoed back)
+✗ No parsing (doesn't split into arguments)
+✗ No pipes, redirections, or special characters
+✗ No built-in commands (cd, echo, etc.)
+✗ No environment variable handling
+✗ No signal handling (Ctrl+C will kill the program)
+✗ No process management (fork, exec, wait)
+
+
+================================================================================
+                        NEXT STEPS TO ADD
+================================================================================
+
+To make this a functional shell, you need to add:
+
+1. Command parsing (split "ls -la" into ["ls", "-la"])
+2. Command execution (fork + execve)
+3. PATH resolution (find where "ls" binary is)
+4. Built-in commands (echo, cd, pwd, export, unset, env, exit)
+5. Environment variable handling (use t_env structure)
+6. Pipes (connect stdout of cmd1 to stdin of cmd2)
+7. Redirections (<, >, >>, <<)
+8. Signal handling (Ctrl+C, Ctrl+\, Ctrl+D)
+9. Quote handling (single and double quotes)
+10. Variable expansion ($VAR, $?)
+
+
+================================================================================

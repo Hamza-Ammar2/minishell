@@ -76,9 +76,9 @@ Start together on core, then divide as outlined above, integrate regularly.
 
 PHASE 1: SETUP & FOUNDATION (Do Together)
 ------------------------------------------
-☐ Set up project structure (folders, Makefile)
-☐ Create main header file (minishell.h)
-☐ Define core data structures
+☑ Set up project structure (folders, Makefile)
+☑ Create main header file (minishell.h)
+☑ Define core data structures
 ☐ Implement basic main loop with readline
 ☐ Set up git repository and workflow
 ☐ Write initial test cases

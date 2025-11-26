@@ -1,0 +1,177 @@
+MINISHELL STRUCT RECOMMENDATIONS
+=================================
+
+This file organizes structs into three categories:
+1. SHARED/CORE STRUCTS - Common data structures used by both parsing and execution
+2. PARSING STRUCTS - Data structures specific to lexing and parsing
+3. EXECUTION STRUCTS - Data structures specific to command execution
+
+
+================================================================================
+SECTION 1: SHARED/CORE STRUCTS (Used by both parsing and execution)
+================================================================================
+
+1.1 TOKEN TYPE ENUM
+-------------------
+typedef enum e_token_type
+{
+    TOKEN_WORD,         // Regular word/command
+    TOKEN_PIPE,         // |
+    TOKEN_REDIR_IN,     // <
+    TOKEN_REDIR_OUT,    // >
+    TOKEN_APPEND,       // >>
+    TOKEN_HEREDOC,      // <<
+    TOKEN_ENV_VAR,      // $VAR
+    TOKEN_SQUOTE,       // Single quote content
+    TOKEN_DQUOTE        // Double quote content
+}   t_token_type;
+
+
+1.2 TOKEN STRUCTURE
+-------------------
+typedef struct s_token
+{
+    char            *value;         // The actual token string
+    int             type;           // Token type (from e_token_type)
+    struct s_token  *next;          // Next token in the list
+}   t_token;
+
+
+1.3 ENVIRONMENT VARIABLE STRUCTURE
+-----------------------------------
+typedef struct s_env
+{
+    char            *key;           // Variable name (e.g., "PATH")
+    char            *value;         // Variable value
+    struct s_env    *next;          // Next environment variable
+}   t_env;
+
+
+1.4 MAIN SHELL STRUCTURE
+------------------------
+typedef struct s_shell
+{
+    char            *input;         // Current input line from readline
+    t_env           *env;           // Environment variables list
+    char            **envp;         // Environment array for execve
+    int             exit_status;    // Last command exit status ($?)
+    int             stdin_backup;   // Backup of original stdin (fd 0)
+    int             stdout_backup;  // Backup of original stdout (fd 1)
+}   t_shell;
+
+
+================================================================================
+SECTION 2: PARSING STRUCTS (Lexer and Parser specific)
+================================================================================
+
+2.1 REDIRECTION STRUCTURE
+-------------------------
+typedef struct s_redir
+{
+    int             type;           // Type: REDIR_IN, REDIR_OUT, APPEND, HEREDOC
+    char            *file;          // Filename or heredoc delimiter
+    struct s_redir  *next;          // Next redirection in list
+}   t_redir;
+
+
+2.2 COMMAND STRUCTURE (Parsed representation)
+----------------------------------------------
+typedef struct s_cmd
+{
+    char            **args;         // Command arguments (NULL-terminated array)
+    t_redir         *redirs;        // List of redirections for this command
+    struct s_cmd    *next;          // Next command in pipeline
+}   t_cmd;
+
+
+2.3 PARSER STATE STRUCTURE
+---------------------------
+typedef struct s_parser
+{
+    t_token         *tokens;        // Head of token list
+    t_token         *current;       // Current token being parsed
+    t_cmd           *cmd_list;      // List of parsed commands
+    t_shell         *shell;         // Pointer to main shell structure
+    int             error;          // Parse error flag
+}   t_parser;
+
+
+2.4 HEREDOC STRUCTURE
+---------------------
+typedef struct s_heredoc
+{
+    char            *delimiter;     // Heredoc delimiter string
+    char            *temp_file;     // Temporary file path
+    int             fd;             // File descriptor for temp file
+    struct s_heredoc *next;         // Next heredoc
+}   t_heredoc;
+
+
+================================================================================
+SECTION 3: EXECUTION STRUCTS (Executor specific)
+================================================================================
+
+3.1 EXECUTION COMMAND STRUCTURE
+--------------------------------
+typedef struct s_exec_cmd
+{
+    char            **args;         // Command arguments
+    char            *cmd_path;      // Full path to executable (resolved)
+    int             infile;         // Input file descriptor
+    int             outfile;        // Output file descriptor
+    int             pipe_in;        // Pipe input fd (from previous command)
+    int             pipe_out;       // Pipe output fd (to next command)
+    pid_t           pid;            // Process ID of executed command
+    struct s_exec_cmd *next;        // Next command in pipeline
+}   t_exec_cmd;
+
+
+3.2 PIPELINE STRUCTURE
+----------------------
+typedef struct s_pipeline
+{
+    t_exec_cmd      *cmds;          // List of commands in pipeline
+    int             **pipes;        // Array of pipe file descriptors
+    pid_t           *pids;          // Array of child process IDs
+    int             num_cmds;       // Number of commands in pipeline
+    int             num_pipes;      // Number of pipes (num_cmds - 1)
+}   t_pipeline;
+
+
+3.3 REDIRECTION EXECUTION STRUCTURE
+------------------------------------
+typedef struct s_exec_redir
+{
+    int             type;           // Type of redirection
+    char            *file;          // Filename for redirection
+    int             fd;             // Opened file descriptor
+    int             original_fd;    // Original fd to restore later
+    struct s_exec_redir *next;      // Next redirection
+}   t_exec_redir;
+
+
+================================================================================
+USAGE GUIDELINES
+================================================================================
+
+SHARED STRUCTS:
+- Used throughout the entire program
+- Parser creates tokens and populates shell data
+- Executor reads from shell data and tokens
+
+PARSING FLOW:
+1. Lexer creates t_token linked list from input string
+2. Parser creates t_cmd linked list with t_redir from tokens
+3. Parser handles quotes, expands variables, processes heredocs
+4. Result: Clean command structure ready for execution
+
+EXECUTION FLOW:
+1. Executor converts t_cmd to t_exec_cmd (resolves paths, opens fds)
+2. Creates t_pipeline with pipes and process management
+3. Executes commands, manages redirections with t_exec_redir
+4. Updates shell->exit_status
+
+RECOMMENDED HEADER ORGANIZATION:
+- minishell.h: All struct definitions + shared function prototypes
+- parsing.h: Parser-specific function prototypes (optional)
+- executor.h: Executor-specific function prototypes (optional)
