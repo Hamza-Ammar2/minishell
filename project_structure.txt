@@ -1,0 +1,259 @@
+================================================================================
+                        MINISHELL PROJECT STRUCTURE
+================================================================================
+
+OVERVIEW
+--------
+A minishell is built in several interconnected stages that process user input
+from raw text to executed commands. Each stage has a specific responsibility.
+
+
+================================================================================
+                            MAIN COMPONENTS
+================================================================================
+
+1. MAIN LOOP
+   - Display prompt
+   - Read user input (readline)
+   - Pass input through the pipeline
+   - Handle exit conditions
+   - Manage history (add_history)
+
+2. LEXER/TOKENIZER
+   - Takes raw input string
+   - Splits into tokens (words, operators, special chars)
+   - Identifies token types:
+     * WORD (command/argument)
+     * PIPE (|)
+     * REDIRECT_IN (<)
+     * REDIRECT_OUT (>)
+     * REDIRECT_APPEND (>>)
+     * REDIRECT_HEREDOC (<<)
+     * OPERATOR (&&, ||) - if implementing bonus
+   - Handles quoted strings (preserves spaces)
+   - Returns array/list of tokens
+
+3. PARSER
+   - Takes token array
+   - Builds command structure/AST
+   - Groups tokens into commands
+   - Identifies pipelines
+   - Validates syntax
+   - Creates command table/linked list
+   - Returns structured command representation
+
+4. EXPANDER
+   - Processes each token for expansions
+   - Handles:
+     * Environment variables ($VAR, $?)
+     * Quote removal (after expansion)
+     * Wildcard expansion (*) - if implementing
+   - Preserves literal strings in single quotes
+   - Expands variables in double quotes
+   - Returns expanded tokens
+
+5. EXECUTOR
+   - Takes parsed command structure
+   - Sets up execution environment
+   - Handles:
+     * Built-in commands (direct execution)
+     * External commands (fork + execve)
+     * Pipes (creating pipe fds, forking)
+     * Redirections (dup2, open files)
+   - Manages process creation and waiting
+   - Updates exit status ($?)
+
+6. BUILT-IN COMMANDS
+   Must implement these commands internally (not via execve):
+   
+   - echo [-n]        : Print arguments
+   - cd [path]        : Change directory (chdir)
+   - pwd              : Print working directory (getcwd)
+   - export [VAR=val] : Set environment variable
+   - unset [VAR]      : Remove environment variable
+   - env              : Display environment variables
+   - exit [n]         : Exit shell with status
+
+7. SIGNAL HANDLING
+   - Ctrl+C (SIGINT)  : Display new prompt, don't exit
+   - Ctrl+D (EOF)     : Exit shell
+   - Ctrl+\ (SIGQUIT) : Do nothing (ignored in interactive mode)
+   - Handle signals differently in:
+     * Interactive mode (waiting for input)
+     * Executing commands
+     * Heredoc mode
+
+8. ENVIRONMENT MANAGEMENT
+   - Store environment variables
+   - Handle modifications (export/unset)
+   - Pass to child processes (execve)
+   - Special variables:
+     * PATH (for command lookup)
+     * HOME (for cd ~)
+     * ? (exit status)
+
+9. ERROR HANDLING
+   - Syntax errors (invalid pipes, redirections)
+   - Command not found
+   - Permission denied
+   - File not found (redirections)
+   - Memory allocation failures
+   - Use perror/strerror for system errors
+
+
+================================================================================
+                            SUGGESTED FILE STRUCTURE
+================================================================================
+
+minishell/
+├── includes/
+│   └── minishell.h          # Main header with structs and prototypes
+│
+├── src/
+│   ├── main.c               # Entry point, main loop
+│   ├── lexer/
+│   │   ├── tokenizer.c      # Split input into tokens
+│   │   └── token_utils.c    # Token manipulation helpers
+│   │
+│   ├── parser/
+│   │   ├── parser.c         # Build command structure
+│   │   ├── syntax_check.c   # Validate syntax
+│   │   └── parser_utils.c   # Helper functions
+│   │
+│   ├── expander/
+│   │   ├── expand_vars.c    # Variable expansion
+│   │   ├── expand_quotes.c  # Quote handling
+│   │   └── expand_utils.c   # Helper functions
+│   │
+│   ├── exec├── utor/
+│   │   executor.c       # Main execution logic
+│   │   ├── pipes.c          # Pipe handling
+│   │   ├── redirections.c   # Redirection setup
+│   │   └── exec_utils.c     # Helper functions
+│   │
+│   ├── builtins/
+│   │   ├── builtin_cd.c
+│   │   ├── builtin_echo.c
+│   │   ├── builtin_pwd.c
+│   │   ├── builtin_export.c
+│   │   ├── builtin_unset.c
+│   │   ├── builtin_env.c
+│   │   ├── builtin_exit.c
+│   │   └── builtin_utils.c
+│   │
+│   ├── signals/
+│   │   └── signals.c        # Signal handler setup
+│   │
+│   ├── env/
+│   │   ├── env_init.c       # Initialize environment
+│   │   ├── env_get.c        # Get variable value
+│   │   ├── env_set.c        # Set/modify variable
+│   │   └── env_utils.c      # Helper functions
+│   │
+│   └── utils/
+│       ├── errors.c         # Error handling
+│       ├── cleanup.c        # Memory cleanup
+│       └── utils.c          # General utilities
+│
+├── Makefile                 # Build system
+└── README.md               # Project documentation
+
+
+================================================================================
+                            EXECUTION FLOW
+================================================================================
+
+1. Start shell → Initialize environment → Setup signals
+
+2. Display prompt → Read input (readline)
+
+3. Input string → Lexer → Tokens
+
+4. Tokens → Parser → Command structure
+
+5. Command structure → Expander → Expanded commands
+
+6. Expanded commands → Executor:
+   
+   For each command in pipeline:
+   - Check if built-in → Execute directly
+   - If external:
+     * Setup redirections
+     * Fork process
+     * Execute with execve
+   
+   For pipes:
+   - Create pipes
+   - Fork for each command
+   - Connect stdin/stdout via pipe fds
+   - Wait for all processes
+
+7. Update exit status → Clean up → Loop back to step 2
+
+
+================================================================================
+                            IMPLEMENTATION ORDER
+================================================================================
+
+Suggested order to build components:
+
+Phase 1 - Basic Shell:
+  1. Main loop with prompt and readline
+  2. Simple tokenizer (no quotes yet)
+  3. Basic parser (single commands, no pipes)
+  4. Simple executor (external commands only)
+  5. Basic error handling
+
+Phase 2 - Built-ins:
+  6. Implement all built-in commands
+  7. Environment variable management
+
+Phase 3 - Advanced Features:
+  8. Quote handling in lexer
+  9. Variable expansion
+  10. Pipe implementation
+  11. Redirections (all types)
+  12. Heredoc
+
+Phase 4 - Polish:
+  13. Signal handling
+  14. Comprehensive error handling
+  15. Memory leak fixes
+  16. Edge case handling
+
+
+================================================================================
+                            KEY CONCEPTS
+================================================================================
+
+PIPES:
+- Create pipe: pipe(int pipefd[2])
+- pipefd[0] = read end, pipefd[1] = write end
+- Use dup2 to redirect stdin/stdout to pipe fds
+- Close unused ends in parent and child
+
+REDIRECTIONS:
+- Open files with appropriate flags
+- Use dup2 to redirect file descriptors
+- Handle multiple redirections (last one wins)
+- Check file permissions and existence
+
+FORK + EXECVE:
+- fork() creates child process
+- Child calls execve to replace with new program
+- Parent waits with wait/waitpid
+- Built-ins must NOT fork (they modify shell state)
+
+QUOTES:
+- Single quotes: Everything literal (no expansion)
+- Double quotes: Expand variables, but preserve spaces
+- No quotes: Expand and split on spaces
+
+EXIT STATUS:
+- 0 = success
+- 1-255 = error codes
+- 130 = terminated by Ctrl+C (SIGINT)
+- 131 = terminated by Ctrl+\ (SIGQUIT)
+- Store in $? for access
+
+================================================================================
