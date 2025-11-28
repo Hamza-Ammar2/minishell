@@ -10,6 +10,31 @@
 
 # define PROMPT "minishell$ "
 
+/* Lukes Parser Structs */
+typedef enum e_token_type
+{
+	TOKEN_WORD,
+	TOKEN_PIPE,
+	TOKEN_REDIRECT_IN,
+	TOKEN_REDIRECT_OUT,
+	TOKEN_REDIRECT_APPEND,
+	TOKEN_REDIRECT_HEREDOC,
+}	t_token_type;
+
+// 2. Token struct
+typedef struct s_token
+{
+    t_token_type    type;
+    char            *value;
+    struct s_token  *next;
+}   t_token;
+
+// 3. Command struct
+typedef struct s_command
+{
+    char    **args;
+}   t_command;
+
 typedef struct s_env
 {
 	char			*key;
@@ -30,5 +55,22 @@ typedef struct s_shell
 void	init_shell(t_shell *shell);
 void	shell_loop(t_shell *shell);
 void	cleanup_shell(t_shell *shell);
+
+/* Tokenizer functions */
+t_token			*tokenize(char *input);
+t_token			*new_token(t_token_type type, char *value);
+void			free_tokens(t_token *tokens);
+void			add_token_to_list(t_token **head, t_token *new_token);
+
+/* Parser functions */
+t_command		*parse(t_token *tokens);
+t_command		*new_command(void);
+void			free_commands(t_command *commands);
+
+/* Helper functions (will need libft or implement these) */
+int				ft_strcmp(const char *s1, const char *s2);
+int				ft_isspace(int c);
+size_t			ft_strlen(const char *s);
+char			*ft_strdup(const char *s);
 
 #endif

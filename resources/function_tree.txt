@@ -2,7 +2,7 @@
                         MINISHELL FUNCTION TREE
 ================================================================================
 
-Current Implementation Status: MINIMAL CORE (Basic readline loop)
+Current Implementation Status: TOKENIZER & PARSER COMPLETE (Ready for Executor)
 
 
 ================================================================================
@@ -26,15 +26,347 @@ Current Implementation Status: MINIMAL CORE (Basic readline loop)
             └─────────────┘ └─────────────┘ └─────────────┘
                  (1)             (2)              (3)
                                   |
+                                  v
+                         ┌────────────────┐
+                         │process_input() │
+                         │                │
+                         └────────────────┘
                                   |
                     ┌─────────────┼─────────────┐
                     |             |             |
                     v             v             v
-               ┌──────────┐  ┌──────────┐  ┌──────────┐
-               │readline()│  │add_      │  │ free()   │
-               │          │  │ history()│  │          │
-               └──────────┘  └──────────┘  └──────────┘
-                 (2.1)         (2.2)         (2.3)
+             ┌───────────┐  ┌──────────┐  ┌──────────┐
+             │tokenize() │  │ parse()  │  │execute() │
+             │           │  │          │  │  (TODO)  │
+             └───────────┘  └──────────┘  └──────────┘
+                  (4)          (5)            (6)
+
+
+================================================================================
+                        DETAILED FUNCTION BREAKDOWN
+================================================================================
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ MODULE 1: MAIN PROGRAM (src/main.c)                                     │
+└──────────────────────────────────────────────────────────────────────────┘
+
+FUNCTION: main()
+────────────────
+  - Entry point
+  - Calls: init_shell(), shell_loop(), cleanup_shell()
+
+FUNCTION: shell_loop()
+──────────────────────
+  - Main loop: reads input with readline()
+  - Checks for EOF (Ctrl+D)
+  - Adds input to history
+  - Calls: process_input()
+
+FUNCTION: process_input()
+──────────────────────────
+  - Tokenizes input
+  - Parses tokens into command structure
+  - Executes command (TODO - Hamza's part)
+  - Frees resources
+
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ MODULE 2: TOKENIZER (src/lexer/tokenizer.c)                             │
+└──────────────────────────────────────────────────────────────────────────┘
+
+FUNCTION: tokenize(char *input) → t_token *
+────────────────────────────────────────────
+  PURPOSE: Convert input string into linked list of tokens
+  
+  CALLS:
+    - is_operator()
+    - process_operator()
+    - process_word()
+  
+  RETURNS: Head of token linked list
+
+FUNCTION: is_operator(char *str) → char *
+──────────────────────────────────────────
+  PURPOSE: Check if character is an operator
+  
+  CHECKS: |, <, <<, >, >>
+  
+  RETURNS: Operator string or NULL
+
+FUNCTION: get_token_type(char *op) → t_token_type
+──────────────────────────────────────────────────
+  PURPOSE: Map operator string to token type enum
+  
+  RETURNS: TOKEN_PIPE, TOKEN_REDIRECT_IN, etc.
+
+FUNCTION: process_operator(t_token **head, char *operator) → int
+─────────────────────────────────────────────────────────────────
+  PURPOSE: Create and add operator token to list
+  
+  CALLS:
+    - get_token_type()
+    - new_token()
+    - add_token_to_list()
+  
+  RETURNS: Operator length (for index advancement)
+
+FUNCTION: process_word(t_token **head, char *input) → int
+───────────────────────────────────────────────────────────
+  PURPOSE: Extract word and add as token to list
+  
+  CALLS:
+    - extract_word()
+    - new_token()
+    - add_token_to_list()
+  
+  RETURNS: Word length (for index advancement)
+
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ MODULE 3: TOKEN UTILITIES (src/lexer/token_utils.c)                     │
+└──────────────────────────────────────────────────────────────────────────┘
+
+FUNCTION: new_token(t_token_type type, char *value) → t_token *
+────────────────────────────────────────────────────────────────
+  PURPOSE: Allocate and initialize a new token node
+  
+  STEPS:
+    1. malloc(sizeof(t_token))
+    2. Set type
+    3. Duplicate value (if not NULL)
+    4. Set next = NULL
+  
+  RETURNS: Pointer to new token
+
+FUNCTION: free_tokens(t_token *tokens) → void
+──────────────────────────────────────────────
+  PURPOSE: Free entire token linked list
+  
+  STEPS:
+    1. Traverse list
+    2. Free token->value
+    3. Free token node
+    4. Move to next
+
+FUNCTION: add_token_to_list(t_token **head, t_token *new_token) → void
+───────────────────────────────────────────────────────────────────────
+  PURPOSE: Append token to end of list
+  
+  STEPS:
+    1. If list empty, set as head
+    2. Else traverse to last node
+    3. Link new token to end
+
+FUNCTION: extract_word(char *input) → char *
+─────────────────────────────────────────────
+  PURPOSE: Extract word string from input
+  
+  STEPS:
+    1. Count chars until space/operator
+    2. Allocate string
+    3. Copy characters
+    4. NULL terminate
+  
+  RETURNS: Allocated word string
+
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ MODULE 4: PARSER (src/parser/parser.c)                                  │
+└──────────────────────────────────────────────────────────────────────────┘
+
+FUNCTION: parse(t_token *tokens) → t_command *
+───────────────────────────────────────────────
+  PURPOSE: Convert token list into command structure
+  
+  CALLS:
+    - new_command()
+    - count_args()
+    - fill_args()
+  
+  RETURNS: Command structure with args array
+
+FUNCTION: count_args(t_token *tokens) → int (static)
+─────────────────────────────────────────────────────
+  PURPOSE: Count consecutive TOKEN_WORD tokens
+  
+  RETURNS: Number of arguments
+
+FUNCTION: fill_args(t_command *cmd, t_token *tokens) → void (static)
+─────────────────────────────────────────────────────────────────────
+  PURPOSE: Copy token values into args array
+  
+  STEPS:
+    1. Traverse TOKEN_WORD tokens
+    2. Duplicate each value into args[i]
+    3. NULL terminate array
+
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ MODULE 5: PARSER UTILITIES (src/parser/parser_utils.c)                  │
+└──────────────────────────────────────────────────────────────────────────┘
+
+FUNCTION: new_command(void) → t_command *
+──────────────────────────────────────────
+  PURPOSE: Allocate and initialize command structure
+  
+  STEPS:
+    1. malloc(sizeof(t_command))
+    2. Set args = NULL
+  
+  RETURNS: Pointer to new command
+
+FUNCTION: free_commands(t_command *commands) → void
+────────────────────────────────────────────────────
+  PURPOSE: Free command structure
+  
+  STEPS:
+    1. Free each string in args array
+    2. Free args array
+    3. Free command structure
+
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ MODULE 6: INITIALIZATION & CLEANUP (src/init.c, src/cleanup.c)          │
+└──────────────────────────────────────────────────────────────────────────┘
+
+FUNCTION: init_shell(t_shell *shell) → void
+────────────────────────────────────────────
+  PURPOSE: Initialize shell structure
+  
+  SETS: exit_status = 0
+
+FUNCTION: cleanup_shell(t_shell *shell) → void
+───────────────────────────────────────────────
+  PURPOSE: Clean up before exit
+  
+  CALLS: rl_clear_history()
+
+
+================================================================================
+                            DATA STRUCTURES
+================================================================================
+
+TOKEN TYPES (enum):
+───────────────────
+  TOKEN_WORD              - Command/argument
+  TOKEN_PIPE              - |
+  TOKEN_REDIRECT_IN       - <
+  TOKEN_REDIRECT_OUT      - >
+  TOKEN_REDIRECT_APPEND   - >>
+  TOKEN_REDIRECT_HEREDOC  - <<
+
+TOKEN STRUCTURE:
+────────────────
+  t_token {
+    t_token_type  type;    // Type of token
+    char         *value;   // String value (NULL for operators)
+    t_token      *next;    // Next token in linked list
+  }
+
+COMMAND STRUCTURE:
+──────────────────
+  t_command {
+    char  **args;          // NULL-terminated array of arguments
+  }
+
+SHELL STRUCTURE:
+────────────────
+  t_shell {
+    char  *input;
+    t_env *env;
+    char  **envp;
+    int    exit_status;
+    int    stdin_backup;
+    int    stdout_backup;
+  }
+
+
+================================================================================
+                            DATA FLOW EXAMPLE
+================================================================================
+
+INPUT: "echo hello world"
+
+STEP 1: TOKENIZATION
+────────────────────
+  tokenize("echo hello world")
+    ↓
+  Calls:
+    - process_word("echo hello world")
+      → Creates TOKEN_WORD:"echo"
+    - process_word("hello world")
+      → Creates TOKEN_WORD:"hello"
+    - process_word("world")
+      → Creates TOKEN_WORD:"world"
+    ↓
+  Result: [TOKEN_WORD:"echo"] → [TOKEN_WORD:"hello"] → [TOKEN_WORD:"world"] → NULL
+
+STEP 2: PARSING
+───────────────
+  parse(tokens)
+    ↓
+  Calls:
+    - count_args(tokens) → returns 3
+    - malloc args array of size 4
+    - fill_args(cmd, tokens)
+      → args[0] = "echo"
+      → args[1] = "hello"
+      → args[2] = "world"
+      → args[3] = NULL
+    ↓
+  Result: t_command { args: ["echo", "hello", "world", NULL] }
+
+STEP 3: EXECUTION (TODO - Hamza)
+─────────────────────────────────
+  execute(cmd, shell)
+    ↓
+  Will:
+    - Fork process
+    - Find /bin/echo in PATH
+    - execve("/bin/echo", cmd->args, envp)
+    - Wait for child process
+
+
+================================================================================
+                        CURRENT CAPABILITIES
+================================================================================
+
+✓ Tokenizes input into words and operators
+✓ Recognizes: |, <, >, >>, <<
+✓ Parses tokens into command structure
+✓ Creates NULL-terminated args array
+✓ Ready for executor to use
+
+LIMITATIONS:
+────────────
+✗ No quote handling (single/double quotes)
+✗ No variable expansion ($VAR, $?)
+✗ Stops at first non-WORD token (no pipes/redirections yet)
+✗ No execution (Hamza's part)
+
+
+================================================================================
+                        NEXT STEPS
+================================================================================
+
+LUKE'S TODO (Parser Enhancement):
+──────────────────────────────────
+1. Add quote handling to tokenizer
+2. Add support for pipes (multiple commands)
+3. Add support for redirections
+4. Add syntax validation
+
+HAMZA'S TODO (Executor):
+────────────────────────
+1. Implement execute() function
+2. Fork and execve for external commands
+3. PATH resolution
+4. Built-in commands (echo, cd, pwd, etc.)
+5. Pipe setup (connect stdin/stdout)
+6. Redirection setup (open files, dup2)
+
+
+================================================================================
 
 
 ================================================================================

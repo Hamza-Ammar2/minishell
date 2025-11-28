@@ -1,0 +1,671 @@
+================================================================================
+                    TOKENIZER & PARSER IMPLEMENTATION GUIDE
+================================================================================
+
+This guide will walk you through implementing the tokenizer and parser for
+minishell, step by step. Follow this order for best results.
+
+
+================================================================================
+                        STEP 1: DEFINE DATA STRUCTURES
+================================================================================
+
+Location: include/minishell.h
+
+First, define the structures you'll need:
+
+1.1 Token Types (enum)
+----------------------
+typedef enum e_token_type
+{
+    TOKEN_WORD,          // Regular word/command/argument
+    TOKEN_PIPE,          // |
+    TOKEN_REDIRECT_IN,   // <
+    TOKEN_REDIRECT_OUT,  // >
+    TOKEN_REDIRECT_APPEND,   // >>
+    TOKEN_REDIRECT_HEREDOC,  // <<
+}   t_token_type;
+
+
+1.2 Token Structure
+-------------------
+typedef struct s_token
+{
+    t_token_type    type;       // Type of token
+    char            *value;     // The actual text (for WORD tokens)
+    struct s_token  *next;      // Next token in list
+}   t_token;
+
+
+1.3 Command Structure
+---------------------
+typedef struct s_command
+{
+    char                **args;         // Array of arguments (NULL terminated)
+    char                *input_file;    // For < redirection (can be NULL)
+    char                *output_file;   // For > or >> redirection (can be NULL)
+    int                 append_mode;    // 1 if >>, 0 if >
+    char                *heredoc_delim; // For << redirection (can be NULL)
+    struct s_command    *next;          // Next command (for pipes)
+}   t_command;
+
+
+1.4 Update t_shell Structure
+----------------------------
+Make sure t_shell has:
+typedef struct s_shell
+{
+    int     exit_status;
+    // Add more fields as needed later (environment, etc.)
+}   t_shell;
+
+
+================================================================================
+                    STEP 2: IMPLEMENT TOKEN UTILITIES
+================================================================================
+
+Location: src/lexer/token_utils.c
+
+2.1 Implement new_token()
+-------------------------
+Purpose: Create a new token node
+
+Pseudocode:
+- Allocate memory for t_token
+- If allocation fails, return NULL
+- Set token->type = type
+- If value is not NULL:
+    * Duplicate the string (use strdup or ft_strdup)
+    * If strdup fails, free token and return NULL
+- Set token->value = duplicated string
+- Set token->next = NULL
+- Return token
+
+Example:
+t_token *token = malloc(sizeof(t_token));
+token->type = TOKEN_WORD;
+token->value = strdup("echo");
+token->next = NULL;
+
+
+2.2 Implement free_tokens()
+---------------------------
+Purpose: Free entire token linked list
+
+Pseudocode:
+- Create a temp pointer
+- While tokens is not NULL:
+    * Save tokens->next in temp
+    * Free tokens->value (if not NULL)
+    * Free tokens
+    * Set tokens = temp
+
+Example loop:
+while (tokens)
+{
+    temp = tokens->next;
+    free(tokens->value);
+    free(tokens);
+    tokens = temp;
+}
+
+
+2.3 Helper: add_token_to_list()
+-------------------------------
+Purpose: Add token to end of list
+
+Pseudocode:
+- If list is empty (*head == NULL):
+    * Set *head = new_token
+- Else:
+    * Find last token in list
+    * Set last->next = new_token
+
+
+================================================================================
+                    STEP 3: IMPLEMENT BASIC TOKENIZER
+================================================================================
+
+Location: src/lexer/tokenizer.c
+
+Start simple - no quotes yet, just basic tokenization.
+
+3.1 Helper: is_operator()
+-------------------------
+Purpose: Check if character is an operator
+
+char *is_operator(char *str)
+{
+    if (*str == '|')
+        return ("|");
+    if (*str == '<' && *(str + 1) == '<')
+        return ("<<");
+    if (*str == '<')
+        return ("<");
+    if (*str == '>' && *(str + 1) == '>')
+        return (">>");
+    if (*str == '>')
+        return (">");
+    return (NULL);
+}
+
+
+3.2 Helper: get_token_type()
+----------------------------
+Purpose: Determine token type from operator string
+
+t_token_type get_token_type(char *op)
+{
+    if (strcmp(op, "|") == 0)
+        return (TOKEN_PIPE);
+    if (strcmp(op, "<") == 0)
+        return (TOKEN_REDIRECT_IN);
+    if (strcmp(op, ">") == 0)
+        return (TOKEN_REDIRECT_OUT);
+    if (strcmp(op, ">>") == 0)
+        return (TOKEN_REDIRECT_APPEND);
+    if (strcmp(op, "<<") == 0)
+        return (TOKEN_REDIRECT_HEREDOC);
+    return (TOKEN_WORD);
+}
+
+
+3.3 Helper: extract_word()
+--------------------------
+Purpose: Extract a word from input until space or operator
+
+Pseudocode:
+- Start from current position
+- Count characters until:
+    * Space
+    * Tab
+    * Operator character (|, <, >)
+    * End of string
+- Allocate string of that length
+- Copy characters into new string
+- Return new string
+
+Example:
+int len = 0;
+while (input[len] && !isspace(input[len]) && !is_operator(&input[len]))
+    len++;
+char *word = strndup(input, len);  // or implement your own
+
+
+3.4 Main Function: tokenize()
+-----------------------------
+Purpose: Convert input string into token list
+
+Pseudocode:
+t_token *tokenize(char *input)
+{
+    t_token *head = NULL;
+    int i = 0;
+    
+    while (input[i])
+    {
+        // Skip whitespace
+        while (input[i] && isspace(input[i]))
+            i++;
+        
+        if (!input[i])
+            break;
+        
+        // Check for operator
+        char *op = is_operator(&input[i]);
+        if (op)
+        {
+            // Create operator token
+            t_token_type type = get_token_type(op);
+            t_token *token = new_token(type, NULL);
+            add_token_to_list(&head, token);
+            i += strlen(op);
+            continue;
+        }
+        
+        // Extract word
+        char *word = extract_word(&input[i]);
+        if (word)
+        {
+            t_token *token = new_token(TOKEN_WORD, word);
+            add_token_to_list(&head, token);
+            i += strlen(word);
+            free(word);  // new_token duplicates it
+        }
+    }
+    
+    return (head);
+}
+
+
+================================================================================
+                    STEP 4: TEST THE TOKENIZER
+================================================================================
+
+4.1 Create Test Function
+------------------------
+Add to main.c temporarily:
+
+void print_tokens(t_token *tokens)
+{
+    while (tokens)
+    {
+        printf("Token type: %d, value: %s\n", 
+               tokens->type, 
+               tokens->value ? tokens->value : "(null)");
+        tokens = tokens->next;
+    }
+}
+
+4.2 Test in shell_loop()
+------------------------
+Replace the printf in shell_loop with:
+
+t_token *tokens = tokenize(input);
+print_tokens(tokens);
+free_tokens(tokens);
+
+4.3 Test Cases
+--------------
+Try these inputs:
+- "echo hello"          → Should create 2 WORD tokens
+- "ls | grep test"      → Should create 3 tokens (WORD, PIPE, WORD, WORD)
+- "cat < file"          → Should create 3 tokens
+- "echo > output"       → Should create 3 tokens
+- "cat << EOF"          → Should create 3 tokens
+
+
+================================================================================
+                    STEP 5: IMPLEMENT PARSER UTILITIES
+================================================================================
+
+Location: src/parser/parser_utils.c
+
+5.1 Implement new_command()
+---------------------------
+Purpose: Create a new command node
+
+Pseudocode:
+- Allocate memory for t_command
+- Set all fields to NULL/0:
+    * args = NULL
+    * input_file = NULL
+    * output_file = NULL
+    * append_mode = 0
+    * heredoc_delim = NULL
+    * next = NULL
+- Return command
+
+
+5.2 Implement free_commands()
+-----------------------------
+Purpose: Free entire command linked list
+
+Pseudocode:
+- While commands is not NULL:
+    * Free args array:
+        - Free each string in args
+        - Free args array itself
+    * Free input_file (if not NULL)
+    * Free output_file (if not NULL)
+    * Free heredoc_delim (if not NULL)
+    * Save next command
+    * Free command node
+    * Move to next
+
+
+5.3 Helper: count_args()
+------------------------
+Purpose: Count how many WORD tokens before operator
+
+int count_args(t_token *tokens)
+{
+    int count = 0;
+    while (tokens && tokens->type == TOKEN_WORD)
+    {
+        count++;
+        tokens = tokens->next;
+    }
+    return (count);
+}
+
+
+================================================================================
+                    STEP 6: IMPLEMENT BASIC PARSER
+================================================================================
+
+Location: src/parser/parser.c
+
+Start simple - handle single commands without pipes.
+
+6.1 Helper: build_args_array()
+------------------------------
+Purpose: Convert WORD tokens into char** array
+
+Pseudocode:
+- Count WORD tokens
+- Allocate array of size (count + 1) for NULL terminator
+- Loop through tokens:
+    * If token is WORD:
+        - Duplicate token->value into array
+        - Increment index
+    * If token is operator:
+        - Break loop
+- Set last element to NULL
+- Return array
+
+
+6.2 Helper: handle_redirection()
+--------------------------------
+Purpose: Process redirection tokens
+
+Pseudocode:
+void handle_redirection(t_command *cmd, t_token *token)
+{
+    // token is the redirection operator
+    // token->next should be the filename
+    
+    if (!token->next || token->next->type != TOKEN_WORD)
+    {
+        // Syntax error - redirection without file
+        return (error);
+    }
+    
+    if (token->type == TOKEN_REDIRECT_IN)
+        cmd->input_file = strdup(token->next->value);
+    else if (token->type == TOKEN_REDIRECT_OUT)
+    {
+        cmd->output_file = strdup(token->next->value);
+        cmd->append_mode = 0;
+    }
+    else if (token->type == TOKEN_REDIRECT_APPEND)
+    {
+        cmd->output_file = strdup(token->next->value);
+        cmd->append_mode = 1;
+    }
+    else if (token->type == TOKEN_REDIRECT_HEREDOC)
+        cmd->heredoc_delim = strdup(token->next->value);
+}
+
+
+6.3 Main Function: parse() - Simple Version
+-------------------------------------------
+Purpose: Convert tokens into command structure (no pipes yet)
+
+Pseudocode:
+t_command *parse(t_token *tokens)
+{
+    if (!tokens)
+        return (NULL);
+    
+    t_command *cmd = new_command();
+    t_token *current = tokens;
+    int arg_index = 0;
+    
+    // Count total WORD tokens (for args array size)
+    int arg_count = 0;
+    t_token *temp = tokens;
+    while (temp && temp->type != TOKEN_PIPE)
+    {
+        if (temp->type == TOKEN_WORD)
+            arg_count++;
+        temp = temp->next;
+    }
+    
+    // Allocate args array
+    cmd->args = malloc(sizeof(char *) * (arg_count + 1));
+    
+    // Process tokens
+    while (current && current->type != TOKEN_PIPE)
+    {
+        if (current->type == TOKEN_WORD)
+        {
+            cmd->args[arg_index++] = strdup(current->value);
+        }
+        else if (current->type >= TOKEN_REDIRECT_IN)
+        {
+            handle_redirection(cmd, current);
+            current = current->next;  // Skip filename token
+        }
+        current = current->next;
+    }
+    
+    cmd->args[arg_index] = NULL;  // NULL terminate
+    return (cmd);
+}
+
+
+================================================================================
+                    STEP 7: TEST THE PARSER
+================================================================================
+
+7.1 Create Test Function
+------------------------
+void print_command(t_command *cmd)
+{
+    int i = 0;
+    printf("Command args: ");
+    while (cmd->args && cmd->args[i])
+    {
+        printf("%s ", cmd->args[i]);
+        i++;
+    }
+    printf("\n");
+    
+    if (cmd->input_file)
+        printf("Input: %s\n", cmd->input_file);
+    if (cmd->output_file)
+        printf("Output: %s (append: %d)\n", cmd->output_file, cmd->append_mode);
+    if (cmd->heredoc_delim)
+        printf("Heredoc delimiter: %s\n", cmd->heredoc_delim);
+}
+
+7.2 Update shell_loop()
+-----------------------
+t_token *tokens = tokenize(input);
+if (tokens)
+{
+    t_command *cmd = parse(tokens);
+    if (cmd)
+    {
+        print_command(cmd);
+        free_commands(cmd);
+    }
+    free_tokens(tokens);
+}
+
+7.3 Test Cases
+--------------
+- "echo hello world"     → args: [echo, hello, world]
+- "cat < input.txt"      → args: [cat], input: input.txt
+- "echo test > out.txt"  → args: [echo, test], output: out.txt
+- "cat < in > out"       → args: [cat], input: in, output: out
+
+
+================================================================================
+                    STEP 8: ADD PIPE SUPPORT (ADVANCED)
+================================================================================
+
+8.1 Update parse() for Pipes
+----------------------------
+This is more complex. You need to:
+- Split tokens on PIPE operators
+- Create multiple commands
+- Link them together with next pointer
+
+Pseudocode:
+t_command *parse(t_token *tokens)
+{
+    t_command *head = NULL;
+    t_command *current_cmd = NULL;
+    t_token *token_start = tokens;
+    
+    while (tokens)
+    {
+        // Process tokens until pipe or end
+        t_command *cmd = parse_single_command(&tokens);
+        
+        // Add to command list
+        if (!head)
+            head = cmd;
+        else
+            current_cmd->next = cmd;
+        current_cmd = cmd;
+        
+        // Skip pipe token
+        if (tokens && tokens->type == TOKEN_PIPE)
+            tokens = tokens->next;
+    }
+    
+    return (head);
+}
+
+
+================================================================================
+                    STEP 9: INTEGRATE WITH MAIN LOOP
+================================================================================
+
+9.1 Update shell_loop in main.c
+-------------------------------
+void shell_loop(t_shell *shell)
+{
+    char *input;
+    
+    while (1)
+    {
+        input = readline(PROMPT);
+        if (!input)
+        {
+            printf("exit\n");
+            break;
+        }
+        if (*input)
+        {
+            add_history(input);
+            
+            // Tokenize
+            t_token *tokens = tokenize(input);
+            if (!tokens)
+            {
+                free(input);
+                continue;
+            }
+            
+            // Parse
+            t_command *commands = parse(tokens);
+            free_tokens(tokens);
+            
+            if (!commands)
+            {
+                free(input);
+                continue;
+            }
+            
+            // TODO: Execute (for now, just print)
+            print_command(commands);
+            
+            // Cleanup
+            free_commands(commands);
+        }
+        free(input);
+    }
+}
+
+
+================================================================================
+                            TESTING CHECKLIST
+================================================================================
+
+Test each feature incrementally:
+
+Phase 1: Basic Tokenization
+☐ Single word: "ls"
+☐ Multiple words: "echo hello world"
+☐ With spaces: "echo    hello    world"
+☐ Pipe: "ls | grep test"
+☐ Redirections: "cat < file", "echo > out"
+
+Phase 2: Basic Parsing
+☐ Simple command: "ls -la"
+☐ With input redirection: "cat < file"
+☐ With output redirection: "echo test > out"
+☐ With both redirections: "cat < in > out"
+☐ Append mode: "echo test >> out"
+
+Phase 3: Multiple Commands
+☐ Two commands with pipe: "ls | grep test"
+☐ Three commands: "ls | grep test | wc -l"
+☐ Pipe with redirections: "cat < in | grep test > out"
+
+
+================================================================================
+                            COMMON PITFALLS
+================================================================================
+
+1. Memory Leaks
+   - Always free tokens after parsing
+   - Always free commands after execution
+   - Free all strings when freeing structures
+
+2. NULL Checks
+   - Check malloc returns
+   - Check for NULL tokens
+   - Check for NULL values before strdup
+
+3. Off-by-One Errors
+   - Remember NULL terminator in args array
+   - Don't forget to increment i in loops
+
+4. Operator Length
+   - >> and << are 2 characters
+   - Single operators are 1 character
+   - Don't forget to advance i correctly
+
+5. Redirection Handling
+   - Check that filename token exists after operator
+   - Handle multiple redirections (last one wins)
+   - Don't forget to skip the filename token
+
+
+================================================================================
+                            NEXT STEPS
+================================================================================
+
+After completing basic tokenizer and parser:
+
+1. Add quote handling to tokenizer
+   - Detect ' and "
+   - Don't split on spaces inside quotes
+   - Mark quote type in tokens
+
+2. Add syntax validation
+   - Check for pipes at start/end
+   - Check for redirections without files
+   - Check for multiple pipes in a row
+
+3. Connect to executor
+   - Your teammate will implement executor
+   - They'll take your command structure
+   - They'll fork/exec and handle pipes
+
+4. Test together
+   - Integrate parser + executor
+   - Test full command execution
+   - Fix bugs together
+
+
+================================================================================
+                            GOOD LUCK!
+================================================================================
+
+Take it step by step. Don't try to implement everything at once.
+Test each function as you write it.
+Ask questions if you get stuck.
+
+Remember: Simple working code > Complex broken code
+
+Start with tokenizer.c and token_utils.c today.
+Get basic tokenization working first.
+Then move to parser tomorrow.
+
+You got this! 💪
