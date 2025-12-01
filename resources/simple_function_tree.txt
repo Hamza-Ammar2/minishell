@@ -1,0 +1,189 @@
+================================================================================
+                    MINISHELL SIMPLE FUNCTION TREE
+================================================================================
+
+1. main()
+   WHY: Entry point of the program
+   HOW: Calls init, loop, and cleanup in sequence
+   
+   ├─> init_shell()
+   │   WHY: Set up initial shell state
+   │   HOW: Sets exit_status to 0
+   │
+   ├─> shell_loop()
+   │   WHY: Main interactive loop - keeps shell running
+   │   HOW: Infinite loop that reads and processes input until exit
+   │   │
+   │   ├─> readline()
+   │   │   WHY: Get user input with editing features
+   │   │   HOW: Displays prompt, waits for input, returns malloc'd string
+   │   │
+   │   ├─> add_history()
+   │   │   WHY: Enable up/down arrow navigation
+   │   │   HOW: Saves input to readline's history buffer
+   │   │
+   │   └─> process_input()
+   │       WHY: Convert input string into executable command
+   │       HOW: Tokenize → Parse → Execute pipeline
+   │       │
+   │       ├─> tokenize()
+   │       │   WHY: Break input into meaningful pieces (tokens)
+   │       │   HOW: Loop through string, identify words and operators
+   │       │   │
+   │       │   ├─> is_operator()
+   │       │   │   WHY: Check if current char is |, <, >, etc.
+   │       │   │   HOW: Compare char with operator list, return operator string
+   │       │   │
+   │       │   ├─> process_operator()
+   │       │   │   WHY: Handle operator tokens
+   │       │   │   HOW: Create token with type, add to list, return length
+   │       │   │   │
+   │       │   │   ├─> get_token_type()
+   │       │   │   │   WHY: Convert operator string to enum type
+   │       │   │   │   HOW: Compare operator, return TOKEN_PIPE/REDIRECT/etc
+   │       │   │   │
+   │       │   │   ├─> new_token()
+   │       │   │   │   WHY: Allocate memory for new token node
+   │       │   │   │   HOW: malloc token, set type/value/next, return pointer
+   │       │   │   │
+   │       │   │   └─> add_token_to_list()
+   │       │   │       WHY: Append token to end of linked list
+   │       │   │       HOW: Traverse to last node, link new token
+   │       │   │
+   │       │   └─> process_word()
+   │       │       WHY: Handle word tokens (commands/arguments)
+   │       │       HOW: Extract word, create token, add to list, return length
+   │       │       │
+   │       │       ├─> extract_word()
+   │       │       │   WHY: Get word string from input
+   │       │       │   HOW: Count chars until space/operator, malloc and copy
+   │       │       │
+   │       │       ├─> new_token()
+   │       │       │   WHY: Create token node for the word
+   │       │       │   HOW: malloc token, set type=TOKEN_WORD, strdup value
+   │       │       │
+   │       │       └─> add_token_to_list()
+   │       │           WHY: Add word token to list
+   │       │           HOW: Traverse to end, link new token
+   │       │
+   │       ├─> parse()
+   │       │   WHY: Convert token list into command structure
+   │       │   HOW: Count args, allocate array, fill with values
+   │       │   │
+   │       │   ├─> new_command()
+   │       │   │   WHY: Allocate memory for command structure
+   │       │   │   HOW: malloc t_command, set args=NULL, return pointer
+   │       │   │
+   │       │   ├─> count_args()
+   │       │   │   WHY: Determine how big args array needs to be
+   │       │   │   HOW: Loop through TOKEN_WORD tokens, increment counter
+   │       │   │
+   │       │   └─> fill_args()
+   │       │       WHY: Copy token values into args array
+   │       │       HOW: Loop through tokens, strdup each value into args[i]
+   │       │
+   │       ├─> execute() [TODO - Hamza's part]
+   │       │   WHY: Run the command
+   │       │   HOW: Fork, execve, wait for process
+   │       │
+   │       ├─> free_commands()
+   │       │   WHY: Prevent memory leaks
+   │       │   HOW: Free each string in args, free args array, free cmd
+   │       │
+   │       └─> free_tokens()
+   │           WHY: Clean up token list
+   │           HOW: Traverse list, free value and node for each token
+   │
+   └─> cleanup_shell()
+       WHY: Clean up before program exits
+       HOW: Calls rl_clear_history() to free readline's memory
+
+
+================================================================================
+                        EXECUTION FLOW SUMMARY
+================================================================================
+
+User types: "echo hello"
+     |
+     v
+1. readline() → Returns "echo hello" (malloc'd)
+     |
+     v
+2. add_history() → Saves "echo hello" for arrow keys
+     |
+     v
+3. tokenize() → Breaks into tokens
+     |
+     ├─> is_operator("echo...") → NULL (not operator)
+     ├─> process_word("echo hello")
+     │   ├─> extract_word() → "echo"
+     │   ├─> new_token(TOKEN_WORD, "echo")
+     │   └─> add_token_to_list()
+     │
+     ├─> is_operator("hello") → NULL
+     └─> process_word("hello")
+         ├─> extract_word() → "hello"
+         ├─> new_token(TOKEN_WORD, "hello")
+         └─> add_token_to_list()
+     |
+     v
+   Result: [TOKEN_WORD:"echo"] → [TOKEN_WORD:"hello"] → NULL
+     |
+     v
+4. parse() → Converts to command structure
+     |
+     ├─> new_command() → Allocates cmd
+     ├─> count_args() → Returns 2
+     ├─> malloc args array (size 3: 2 args + NULL)
+     └─> fill_args() → Copies "echo", "hello" into args
+     |
+     v
+   Result: cmd->args = ["echo", "hello", NULL]
+     |
+     v
+5. execute() → [TODO] Runs the command
+     |
+     v
+6. free_commands() → Frees cmd and args
+     |
+     v
+7. free_tokens() → Frees token list
+     |
+     v
+8. free(input) → Frees "echo hello" string
+     |
+     v
+   Loop back to readline()
+
+
+================================================================================
+                        QUICK REFERENCE
+================================================================================
+
+TOKENIZER FUNCTIONS:
+- tokenize()           Main loop, creates token list
+- is_operator()        Checks if char is |, <, >, etc
+- get_token_type()     Maps operator to enum type
+- process_operator()   Creates and adds operator token
+- process_word()       Creates and adds word token
+- extract_word()       Gets word string from input
+- new_token()          Allocates token node
+- add_token_to_list()  Appends to linked list
+- free_tokens()        Cleans up token list
+
+PARSER FUNCTIONS:
+- parse()              Main function, creates command structure
+- new_command()        Allocates command structure
+- count_args()         Counts TOKEN_WORD tokens
+- fill_args()          Copies values into args array
+- free_commands()      Cleans up command structure
+
+SHELL FUNCTIONS:
+- main()               Entry point
+- init_shell()         Initialize state
+- shell_loop()         Main interactive loop
+- process_input()      Pipeline: tokenize→parse→execute
+- cleanup_shell()      Final cleanup
+
+
+================================================================================
