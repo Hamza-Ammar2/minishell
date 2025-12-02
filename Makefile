@@ -6,7 +6,7 @@
 #    By: lpons <lpons@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/11/26 00:00:00 by minishell         #+#    #+#              #
-#    Updated: 2025/11/26 17:23:47 by lpons            ###   ########.fr        #
+#    Updated: 2025/12/02 19:00:52 by lpons            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,8 +25,8 @@ RESET = \033[0m
 NAME = minishell
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -I$(INC_DIR)
-LDFLAGS = -lreadline
+CFLAGS = -Wall -Wextra -Werror -I$(INC_DIR) -I./libft
+LDFLAGS = -lreadline -L./libft -lft
 
 # ================================ DIRECTORIES ================================ #
 
@@ -38,7 +38,13 @@ INC_DIR = include
 
 SRCS = $(SRC_DIR)/main.c \
        $(SRC_DIR)/init.c \
-       $(SRC_DIR)/cleanup.c
+       $(SRC_DIR)/cleanup.c \
+       $(SRC_DIR)/lexer/tokenizer.c \
+       $(SRC_DIR)/lexer/token_utils.c \
+       $(SRC_DIR)/lexer/quote_tokens.c \
+       $(SRC_DIR)/parser/parser.c \
+       $(SRC_DIR)/parser/parser_utils.c \
+       $(SRC_DIR)/parser/syntax_validator.c
 
 # ================================== OBJECTS ================================== #
 

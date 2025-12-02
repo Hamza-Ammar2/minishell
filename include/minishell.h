@@ -27,6 +27,7 @@ typedef struct s_token
     t_token_type    type;
     char            *value;
     struct s_token  *next;
+	int 			quote_type;
 }   t_token;
 
 // 3. Command struct
@@ -58,14 +59,23 @@ void	cleanup_shell(t_shell *shell);
 
 /* Tokenizer functions */
 t_token			*tokenize(char *input);
-t_token			*new_token(t_token_type type, char *value);
+t_token			*new_token(t_token_type type, char *value, int quote_type);
 void			free_tokens(t_token *tokens);
 void			add_token_to_list(t_token **head, t_token *new_token);
+char			*extract_word(char *input);
+char			*is_operator(char *str);
+t_token_type	get_token_type(char *op);
+
+/* Quote handling functions */
+int				is_quote(char c);
+int				find_closing_quote(const char *str, char quote);
+char			*extract_quoted_word(const char *input, int *i, int *quote_type);
 
 /* Parser functions */
 t_command		*parse(t_token *tokens);
 t_command		*new_command(void);
 void			free_commands(t_command *commands);
+int				validate_syntax(t_token *tokens);
 
 /* Helper functions (will need libft or implement these) */
 int				ft_strcmp(const char *s1, const char *s2);

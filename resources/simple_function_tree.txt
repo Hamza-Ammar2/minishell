@@ -28,7 +28,23 @@
    │       │
    │       ├─> tokenize()
    │       │   WHY: Break input into meaningful pieces (tokens)
-   │       │   HOW: Loop through string, identify words and operators
+   │       │   HOW: Loop through string, identify words, quotes, and operators
+   │       │   │
+   │       │   ├─> is_quote()
+   │       │   │   WHY: Check if current char is a quote (' or ")
+   │       │   │   HOW: Compare char with ASCII 34 (") and 39 ('), return bool
+   │       │   │
+   │       │   ├─> extract_quoted_word()
+   │       │   │   WHY: Extract quoted strings as single tokens
+   │       │   │   HOW: Find closing quote, extract substring with quotes, set quote_type
+   │       │   │   │
+   │       │   │   ├─> find_closing_quote()
+   │       │   │   │   WHY: Locate matching closing quote
+   │       │   │   │   HOW: Loop through string after opening quote, return index or -1
+   │       │   │   │
+   │       │   │   └─> ft_substr()
+   │       │   │       WHY: Extract substring including both quotes
+   │       │   │       HOW: Use libft to allocate and copy substring
    │       │   │
    │       │   ├─> is_operator()
    │       │   │   WHY: Check if current char is |, <, >, etc.
@@ -36,15 +52,15 @@
    │       │   │
    │       │   ├─> process_operator()
    │       │   │   WHY: Handle operator tokens
-   │       │   │   HOW: Create token with type, add to list, return length
+   │       │   │   HOW: Create token with type and quote_type=0, add to list, return length
    │       │   │   │
    │       │   │   ├─> get_token_type()
    │       │   │   │   WHY: Convert operator string to enum type
    │       │   │   │   HOW: Compare operator, return TOKEN_PIPE/REDIRECT/etc
    │       │   │   │
    │       │   │   ├─> new_token()
-   │       │   │   │   WHY: Allocate memory for new token node
-   │       │   │   │   HOW: malloc token, set type/value/next, return pointer
+   │       │   │   │   WHY: Allocate memory for new token node with quote info
+   │       │   │   │   HOW: malloc token, set type/value/quote_type/next, return pointer
    │       │   │   │
    │       │   │   └─> add_token_to_list()
    │       │   │       WHY: Append token to end of linked list
@@ -52,15 +68,15 @@
    │       │   │
    │       │   └─> process_word()
    │       │       WHY: Handle word tokens (commands/arguments)
-   │       │       HOW: Extract word, create token, add to list, return length
+   │       │       HOW: Extract word, create token with quote_type=0, add to list, return length
    │       │       │
    │       │       ├─> extract_word()
-   │       │       │   WHY: Get word string from input
-   │       │       │   HOW: Count chars until space/operator, malloc and copy
+   │       │       │   WHY: Get word string from input (stops at quotes too)
+   │       │       │   HOW: Count chars until space/operator/quote, malloc and copy
    │       │       │
    │       │       ├─> new_token()
    │       │       │   WHY: Create token node for the word
-   │       │       │   HOW: malloc token, set type=TOKEN_WORD, strdup value
+   │       │       │   HOW: malloc token, set type=TOKEN_WORD, strdup value, quote_type=0
    │       │       │
    │       │       └─> add_token_to_list()
    │       │           WHY: Add word token to list
@@ -103,31 +119,33 @@
                         EXECUTION FLOW SUMMARY
 ================================================================================
 
-User types: "echo hello"
+User types: echo 'hello world'
      |
      v
-1. readline() → Returns "echo hello" (malloc'd)
+1. readline() → Returns "echo 'hello world'" (malloc'd)
      |
      v
-2. add_history() → Saves "echo hello" for arrow keys
+2. add_history() → Saves "echo 'hello world'" for arrow keys
      |
      v
-3. tokenize() → Breaks into tokens
+3. tokenize() → Breaks into tokens (now handles quotes!)
      |
+     ├─> is_quote('e') → No
      ├─> is_operator("echo...") → NULL (not operator)
-     ├─> process_word("echo hello")
-     │   ├─> extract_word() → "echo"
-     │   ├─> new_token(TOKEN_WORD, "echo")
+     ├─> process_word("echo 'hello world'")
+     │   ├─> extract_word() → "echo" (stops at quote)
+     │   ├─> new_token(TOKEN_WORD, "echo", 0) → quote_type=0
      │   └─> add_token_to_list()
      │
-     ├─> is_operator("hello") → NULL
-     └─> process_word("hello")
-         ├─> extract_word() → "hello"
-         ├─> new_token(TOKEN_WORD, "hello")
+     ├─> is_quote('\'') → Yes! 
+     └─> extract_quoted_word("'hello world'...")
+         ├─> find_closing_quote("hello world'...") → Returns 11
+         ├─> ft_substr() → Extracts "'hello world'" (with quotes)
+         ├─> new_token(TOKEN_WORD, "'hello world'", 1) → quote_type=1
          └─> add_token_to_list()
      |
      v
-   Result: [TOKEN_WORD:"echo"] → [TOKEN_WORD:"hello"] → NULL
+   Result: [TOKEN_WORD:"echo", quote_type=0] → [TOKEN_WORD:"'hello world'", quote_type=1] → NULL
      |
      v
 4. parse() → Converts to command structure
@@ -135,13 +153,16 @@ User types: "echo hello"
      ├─> new_command() → Allocates cmd
      ├─> count_args() → Returns 2
      ├─> malloc args array (size 3: 2 args + NULL)
-     └─> fill_args() → Copies "echo", "hello" into args
+     └─> fill_args() → Copies "echo", "'hello world'" into args
      |
      v
-   Result: cmd->args = ["echo", "hello", NULL]
+   Result: cmd->args = ["echo", "'hello world'", NULL]
      |
      v
-5. execute() → [TODO] Runs the command
+5. execute() → [TODO - Hamza] Needs to:
+     - Expand variables based on quote_type
+     - Remove quotes after expansion
+     - Run the command
      |
      v
 6. free_commands() → Frees cmd and args
@@ -150,7 +171,7 @@ User types: "echo hello"
 7. free_tokens() → Frees token list
      |
      v
-8. free(input) → Frees "echo hello" string
+8. free(input) → Frees "echo 'hello world'" string
      |
      v
    Loop back to readline()
@@ -161,13 +182,16 @@ User types: "echo hello"
 ================================================================================
 
 TOKENIZER FUNCTIONS:
-- tokenize()           Main loop, creates token list
+- tokenize()           Main loop, creates token list with quote handling
+- is_quote()           Checks if char is ' or " (ASCII 39 or 34)
+- extract_quoted_word() Extracts quoted strings with quote_type
+- find_closing_quote()  Finds matching quote in string
 - is_operator()        Checks if char is |, <, >, etc
 - get_token_type()     Maps operator to enum type
-- process_operator()   Creates and adds operator token
-- process_word()       Creates and adds word token
-- extract_word()       Gets word string from input
-- new_token()          Allocates token node
+- process_operator()   Creates and adds operator token (quote_type=0)
+- process_word()       Creates and adds word token (quote_type=0)
+- extract_word()       Gets word string from input (stops at quotes)
+- new_token()          Allocates token node with quote_type field
 - add_token_to_list()  Appends to linked list
 - free_tokens()        Cleans up token list
 
@@ -176,14 +200,21 @@ PARSER FUNCTIONS:
 - new_command()        Allocates command structure
 - count_args()         Counts TOKEN_WORD tokens
 - fill_args()          Copies values into args array
+- validate_syntax()    Checks for invalid token sequences
 - free_commands()      Cleans up command structure
 
 SHELL FUNCTIONS:
 - main()               Entry point
 - init_shell()         Initialize state
 - shell_loop()         Main interactive loop
-- process_input()      Pipeline: tokenize→parse→execute
+- process_input()      Pipeline: tokenize→validate→parse→execute
 - cleanup_shell()      Final cleanup
+
+QUOTE HANDLING:
+- quote_type = 0       No quotes (normal word)
+- quote_type = 1       Single quotes (no expansion)
+- quote_type = 2       Double quotes (expand variables)
+- Quotes preserved     In token->value until after expansion
 
 
 ================================================================================

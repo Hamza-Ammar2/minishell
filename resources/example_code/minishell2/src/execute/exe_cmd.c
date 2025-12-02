@@ -1,0 +1,148 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exe_cmd.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aorth <aorth@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/10 08:42:59 by aorth             #+#    #+#             */
+/*   Updated: 2025/06/30 14:43:11 by aorth            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../../includes/minishell.h"
+#include <signal.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+int	exe_prep(t_cmd *cmd)
+{
+	int		i_loop;
+	char	*order;
+
+	i_loop = 1;
+	while (cmd)
+	{
+		cmd->node_nbr = i_loop;
+		order = ft_itoa(cmd->node_nbr);
+		if (!order)
+			return (g_exit_status = 12);
+		if (cmd->limiter && *cmd->limiter)
+		{
+			cmd->filename = create_filename("/tmp/heredoc", order, ".tmp");
+			free(order);
+			if (!cmd->filename)
+				return (ft_putstr_fd("malloc error\n", 2), 1);
+			if (handle_heredoc(cmd))
+				return (1);
+		}
+		else
+			free(order);
+		i_loop++;
+		cmd = cmd->next;
+	}
+	return (0);
+}
+
+void	exe_help(int status, t_cmd *cmd, pid_t pid)
+{
+	int					sig;
+	struct sigaction	sa_ignore;
+	struct sigaction	sa_old;
+
+	sa_ignore.sa_handler = SIG_IGN;
+	sigemptyset(&sa_ignore.sa_mask);
+	sa_ignore.sa_flags = 0;
+	sigaction(SIGINT, &sa_ignore, &sa_old);
+	waitpid(pid, &status, 0);
+	sigaction(SIGINT, &sa_old, NULL);
+	if (WIFEXITED(status))
+		g_exit_status = WEXITSTATUS(status);
+	else if (WIFSIGNALED(status))
+	{
+		sig = WTERMSIG(status);
+		if (sig == SIGINT)
+			g_exit_status = 130;
+		else if (sig == SIGQUIT)
+		{
+			g_exit_status = 131;
+			printf("Quit (core dumped)");
+		}
+		ft_putstr_fd("\n", 1);
+	}
+	(closefd(cmd->fd_in), closefd(cmd->fd), closefd(cmd->fd_out));
+}
+
+void	child_cleanup_and_exit(int exit_code, t_data *data, pid_t *pid)
+{
+	child_safe_cleanup(data->cmd);
+	close(STDOUT_FILENO);
+	close(STDIN_FILENO);
+	close(STDERR_FILENO);
+	env_cleaner(data->env);
+	if (pid)
+		free(pid);
+	pid = NULL;
+	if (data)
+		free(data);
+	data = NULL;
+	exit(exit_code);
+}
+
+void	run_notbuiltin(t_cmd *cmd, t_env **env, t_data *data, pid_t *pid)
+{
+	char	*temp;
+
+	temp = NULL;
+	if (!cmd->cmd)
+		child_cleanup_and_exit(0, data, pid);
+	else if (!*cmd->cmd)
+		(undef_cmd(NULL), child_cleanup_and_exit(0, data, pid));
+	if ((*env)->both)
+		ft_export(*env);
+	if (looking_path(cmd, (*env)->exported_envs))
+	{
+		if (ft_strncmp(cmd->cmd, "/bin/", 5) && !ft_strchr(cmd->cmd, '/'))
+			temp = ft_strdup("/bin/");
+		ft_strjoin_free(&temp, cmd->cmd);
+	}
+	else
+		temp = ft_strdup(cmd->cmd);
+	if (execve(temp, cmd->args, (*env)->exported_envs) == -1)
+	{
+		(undef_cmd(cmd->cmd), free(temp));
+		temp = NULL;
+		child_cleanup_and_exit(g_exit_status, data, pid);
+	}
+}
+
+void	exe_cmd(t_cmd *cmd, t_env **env, t_data *data)
+{
+	pid_t	pid;
+	int		status;
+
+	status = 0;
+	if (builtin_parent(cmd, env))
+		return ;
+	pid = fork();
+	if (pid == 0)
+	{
+		signal(SIGINT, SIG_DFL);
+		signal(SIGQUIT, SIG_DFL);
+		if (handle_redir(cmd))
+			child_cleanup_and_exit(g_exit_status, data, NULL);
+		if (cmd->cmd && is_builtin(cmd))
+		{
+			run_builtin(cmd, *env);
+			child_cleanup_and_exit(g_exit_status, data, NULL);
+		}
+		else
+			run_notbuiltin(cmd, env, data, NULL);
+	}
+	else if (pid > 0)
+		exe_help(status, cmd, pid);
+	else
+		perror("Fork failed");
+}
