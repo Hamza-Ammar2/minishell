@@ -137,34 +137,44 @@ Person A - Quote Handling & Parsing:
   - Detect double quotes (with expansion)
   - Preserve spaces in quoted strings
   - Mark tokens with quote type
-☑ Quote removal after expansion [NOTE: Deferred to Person B's expansion phase]
-☑ Update parser to handle quoted tokens
 ☑ Syntax validation for quote matching
+  - Detect unclosed quotes
+  - Validate quote nesting
+☑ Update parser to handle quoted tokens
 ☑ Write comprehensive tests for quote parsing
+☐ Quote removal after expansion [NOTE: Deferred to Person B's expansion phase]
+☐ Handle empty strings from quote removal
 
 Person B - Variable Expansion & Built-ins:
 ☐ Implement variable expansion
   - Expand $VAR in double quotes and unquoted
   - Don't expand in single quotes
   - Handle $? (exit status)
-  - Handle undefined variables
+  - Handle undefined variables (expand to empty string)
+  - Handle $$ (process ID) if required
+☐ Field splitting after expansion
+  - Split expanded variables on IFS (spaces/tabs/newlines)
+  - Don't split inside quotes
 ☐ Write tests for variable expansion
 ☐ Implement cd built-in
   - Handle absolute paths
   - Handle relative paths
   - Handle ~ (HOME)
   - Handle no arguments (go to HOME)
-  - Update PWD and OLDPWD
+  - Handle - (go to OLDPWD)
+  - Update PWD and OLDPWD environment variables
 ☐ Implement export built-in
   - Parse VAR=value
   - Add to environment
   - Handle errors (invalid names)
+  - Handle export without arguments (print all)
 ☐ Implement unset built-in
   - Remove from environment
   - Handle multiple arguments
 ☐ Implement exit built-in
   - Parse numeric argument
-  - Handle errors
+  - Handle non-numeric arguments (error)
+  - Handle too many arguments
   - Clean up and exit
 ☐ Write tests for all built-ins
 
@@ -186,33 +196,6 @@ Status:
     - Tests: 5 additional tests passing (single, double, mixed, empty quotes, unclosed error)
     - Quotes preserved in token->value until expansion (Person B's job)
   Person B: ⏳ NEXT UP (Hamza)
-  - Handle undefined variables
-☐ Write tests for variable expansion
-☐ Implement cd built-in
-  - Handle absolute paths
-  - Handle relative paths
-  - Handle ~ (HOME)
-  - Handle no arguments (go to HOME)
-  - Update PWD and OLDPWD
-☐ Implement export built-in
-  - Parse VAR=value
-  - Add to environment
-  - Handle errors (invalid names)
-☐ Implement unset built-in
-  - Remove from environment
-  - Handle multiple arguments
-☐ Implement exit built-in
-  - Parse numeric argument
-  - Handle errors
-  - Clean up and exit
-☐ Write tests for all built-ins
-
-Integration Point:
-  Test commands with quotes: echo "hello $USER"
-  Test built-ins: cd, export, unset
-  Test: export VAR=test; echo "$VAR"
-
-Time: 3-4 days
 
 
 PHASE 4: PIPES & REDIRECTIONS (Divide Work)
@@ -227,9 +210,14 @@ Person A - Pipeline Parsing:
   - Detect <, >, >>, <<
   - Attach redirection info to commands
   - Validate redirection syntax
+☐ Syntax validation improvements
+  - Validate no double pipes (|| is logical OR, not bash pipe)
+  - Validate redirections have filenames
+  - Validate proper quote matching
+  - Validate no trailing pipes
 ☐ Write tests for parsing pipes and redirections
 
-Person B - Pipes & Redirections Execution:on
+Person B - Pipes & Redirections Execution:
   - Create pipes with pipe()
   - Fork for each command
   - Connect stdin/stdout via dup2
@@ -324,6 +312,50 @@ PHASE 6: TESTING & POLISH (Do Together)
 ☐ Create demo examples
 
 Time: 2-3 days
+
+
+BONUS FEATURES (Optional - If Time Permits)
+--------------------------------------------
+
+☐ Logical Operators (&&, ||)
+  - Parse && (AND) and || (OR) operators
+  - Execute right side only if left side succeeds/fails
+  - Build execution tree (not just linear commands)
+  - Handle operator precedence
+
+☐ Subshells with Parentheses ()
+  - Parse parentheses to group commands
+  - Execute grouped commands in subshell (fork)
+  - Isolate environment changes within subshell
+  - Handle nested parentheses
+
+☐ Wildcard Expansion (*)
+  - Expand * to matching filenames in current directory
+  - Handle patterns like *.c, test*, *file*
+  - Sort results alphabetically
+  - Don't expand in quotes
+
+☐ Advanced Redirections
+  - File descriptor redirections (2>&1, etc.)
+  - Multiple input/output redirections on same command
+  - Ambiguous redirect detection
+
+☐ Job Control
+  - Background processes with &
+  - Job list management
+  - fg and bg built-ins
+
+☐ History Features
+  - Persistent history across sessions
+  - History expansion (!, !!, !n)
+  - Reverse search (Ctrl+R)
+
+☐ Advanced Signal Handling
+  - SIGTERM, SIGTSTP handling
+  - Signal forwarding to child processes
+  - Process group management
+
+Time: Varies by feature (1-5 days each)
 
 
 ================================================================================
