@@ -72,7 +72,7 @@ Purpose: Create a new token node
 
 Pseudocode:
 - Allocate memory for t_token
-- If allocation fails, return NULL
+- If allocation fils, return NULL
 - Set token->type = type
 - If value is not NULL:
     * Duplicate the string (use strdup or ft_strdup)
