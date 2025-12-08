@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: lpons <lpons@student.42.fr>                +#+  +:+       +#+         #
+#    By: haammar <haammar@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/11/26 00:00:00 by minishell         #+#    #+#              #
-#    Updated: 2025/12/02 19:00:52 by lpons            ###   ########.fr        #
+#    Updated: 2025/12/08 20:13:21 by haammar          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -44,7 +44,8 @@ SRCS = $(SRC_DIR)/main.c \
        $(SRC_DIR)/lexer/quote_tokens.c \
        $(SRC_DIR)/parser/parser.c \
        $(SRC_DIR)/parser/parser_utils.c \
-       $(SRC_DIR)/parser/syntax_validator.c
+       $(SRC_DIR)/parser/syntax_validator.c \
+	   $(SRC_DIR)/exec/exec.c \
 
 # ================================== OBJECTS ================================== #
 

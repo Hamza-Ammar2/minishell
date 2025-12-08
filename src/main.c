@@ -56,8 +56,7 @@ void	process_input(char *input, t_shell *shell)
 	cmd = parse(tokens);
 	if (cmd)
 	{
-		// Hamza executres here
-		printf("Command: %s\n", cmd->args[0]);
+		exec(2, cmd->args);
 		free_commands(cmd);
 	}
 	free_tokens(tokens);

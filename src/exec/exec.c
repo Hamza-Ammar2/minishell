@@ -1,8 +1,9 @@
 
 
 #include "../include/minishell.h"
+#include "../libft/libft.h"
 
-char *create_path(char *path, char *cmd)
+static char *create_path(char *path, char *cmd)
 {
     char    *full_path;
     int     i;
@@ -26,7 +27,7 @@ char *create_path(char *path, char *cmd)
     return (full_path[i + j] = '\0', full_path);
 }
 
-char    **get_path(char **paths, char *cmd)
+static char    **get_path(char **paths, char *cmd)
 {
     char    *full_path;
     char    **cmd_args;
@@ -48,8 +49,8 @@ void exec(int argc, char **argv)
     int n_args = argc - 1;
     int fd[2][2];
     int id;
-    int infile = open(argv[1], O_RDONLY);
-    int outfile = open(argv[argc - 1], O_WRONLY | O_TRUNC);
+    /* int infile = open(argv[1], O_RDONLY);
+    int outfile = open(argv[argc - 1], O_WRONLY | O_TRUNC); */
     char *pathy = getenv("PATH"); 
     char **paths = ft_split(pathy, ':');
 
@@ -75,8 +76,8 @@ void exec(int argc, char **argv)
             }
             /* else
                 dup2(outfile, STDOUT_FILENO); */
-            char    **str = get_path(paths, argv[i + 1]);
-            execve(str[0], str, NULL);
+            char    **str = get_path(paths, argv[0]);
+            execve(str[0], argv, NULL);
             perror("execl failed");
             exit(1);
         }
@@ -86,8 +87,7 @@ void exec(int argc, char **argv)
             close(fd[(i+1)%2][1]);
         }
     }
-    close(infile);
-    close(outfile);
+    /* close(infile);
+    close(outfile); */
     while (wait(NULL) > 0);
-    return (0);
 }
