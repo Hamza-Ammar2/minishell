@@ -94,4 +94,7 @@ int				ft_isspace(int c);
 size_t			ft_strlen(const char *s);
 char			*ft_strdup(const char *s);
 
+
+/* Execution part */
+void exec(int argc, char **argv);
 #endif
