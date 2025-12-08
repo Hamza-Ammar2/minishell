@@ -79,26 +79,27 @@ PHASE 1: SETUP & FOUNDATION (Do Together)
 ☑ Set up project structure (folders, Makefile)
 ☑ Create main header file (minishell.h)
 ☑ Define core data structures
-☐ Implement basic main loop with readline
-☐ Set up git repository and workflow
-☐ Write initial test cases
+☑ Implement basic main loop with readline
+☑ Set up git repository and workflow
+☑ Write initial test cases
 
 Time: 1-2 days
+Status: ✅ COMPLETED (Nov 26, 2025)
 
 
 PHASE 2: BASIC SHELL (Divide Work)
 -----------------------------------
 
 Person A - Input Processing & Structure:
-☐ Implement tokenizer (without quotes initially)
+☑ Implement tokenizer (without quotes initially)
   - Split input on spaces and operators
   - Create token linked list
   - Handle basic token types (WORD, PIPE, REDIRECT)
-☐ Implement basic parser
+☑ Implement basic parser
   - Convert tokens to command structure
   - Handle single commands (no pipes yet)
   - Basic syntax validation
-☐ Write unit tests for tokenizer and parser
+☑ Write unit tests for tokenizer and parser
 
 Person B - Execution Logic & Environment:
 ☐ Implement environment management
@@ -117,45 +118,63 @@ Integration Point:
   Test: Simple commands work (ls, echo hello, pwd)
 
 Time: 3-4 days
+Status: 
+  Person A: ✅ COMPLETED (Nov 26, 2025)
+    - Tokenizer: tokenize(), is_operator(), get_token_type()
+    - Token utils: new_token(), free_tokens(), add_token_to_list(), extract_word()
+    - Parser: parse(), new_command(), count_args(), fill_args()
+    - Syntax validator: validate_syntax() with operator checks
+    - Tests: 6 unit tests passing (tokenization, parsing, syntax validation)
+  Person B: ⏳ IN PROGRESS (Hamza)
 
 
 PHASE 3: ADVANCED PARSING (Divide Work)
 ----------------------------------------
 
 Person A - Quote Handling & Parsing:
-☐ Add quote handling to tokenizer
+☑ Add quote handling to tokenizer
   - Detect single quotes (no expansion)
   - Detect double quotes (with expansion)
   - Preserve spaces in quoted strings
   - Mark tokens with quote type
-☐ Quote removal after expansion
-☐ Update parser to handle quoted tokens
-☐ Syntax validation for quote matching
-☐ Write comprehensive tests for quote parsing
+☑ Syntax validation for quote matching
+  - Detect unclosed quotes
+  - Validate quote nesting
+☑ Update parser to handle quoted tokens
+☑ Write comprehensive tests for quote parsing
+☐ Quote removal after expansion [NOTE: Deferred to Person B's expansion phase]
+☐ Handle empty strings from quote removal
 
 Person B - Variable Expansion & Built-ins:
 ☐ Implement variable expansion
   - Expand $VAR in double quotes and unquoted
   - Don't expand in single quotes
   - Handle $? (exit status)
-  - Handle undefined variables
+  - Handle undefined variables (expand to empty string)
+  - Handle $$ (process ID) if required
+☐ Field splitting after expansion
+  - Split expanded variables on IFS (spaces/tabs/newlines)
+  - Don't split inside quotes
 ☐ Write tests for variable expansion
 ☐ Implement cd built-in
   - Handle absolute paths
   - Handle relative paths
   - Handle ~ (HOME)
   - Handle no arguments (go to HOME)
-  - Update PWD and OLDPWD
+  - Handle - (go to OLDPWD)
+  - Update PWD and OLDPWD environment variables
 ☐ Implement export built-in
   - Parse VAR=value
   - Add to environment
   - Handle errors (invalid names)
+  - Handle export without arguments (print all)
 ☐ Implement unset built-in
   - Remove from environment
   - Handle multiple arguments
 ☐ Implement exit built-in
   - Parse numeric argument
-  - Handle errors
+  - Handle non-numeric arguments (error)
+  - Handle too many arguments
   - Clean up and exit
 ☐ Write tests for all built-ins
 
@@ -165,6 +184,18 @@ Integration Point:
   Test: export VAR=test; echo "$VAR"
 
 Time: 3-4 days
+Status:
+  Person A: ✅ COMPLETED (Dec 2, 2025)
+    - is_quote(): Detects ' and " characters (ASCII 39, 34)
+    - find_closing_quote(): Finds matching closing quote
+    - extract_quoted_word(): Extracts quoted strings with quote_type (1=single, 2=double)
+    - Updated extract_word(): Now stops at quotes
+    - Updated new_token(): Added quote_type parameter
+    - Updated tokenize(): Handles quote detection and extraction
+    - Added quote_type field to t_token struct (0=none, 1=single, 2=double)
+    - Tests: 5 additional tests passing (single, double, mixed, empty quotes, unclosed error)
+    - Quotes preserved in token->value until expansion (Person B's job)
+  Person B: ⏳ NEXT UP (Hamza)
 
 
 PHASE 4: PIPES & REDIRECTIONS (Divide Work)
@@ -179,9 +210,14 @@ Person A - Pipeline Parsing:
   - Detect <, >, >>, <<
   - Attach redirection info to commands
   - Validate redirection syntax
+☐ Syntax validation improvements
+  - Validate no double pipes (|| is logical OR, not bash pipe)
+  - Validate redirections have filenames
+  - Validate proper quote matching
+  - Validate no trailing pipes
 ☐ Write tests for parsing pipes and redirections
 
-Person B - Pipes & Redirections Execution:on
+Person B - Pipes & Redirections Execution:
   - Create pipes with pipe()
   - Fork for each command
   - Connect stdin/stdout via dup2
@@ -276,6 +312,50 @@ PHASE 6: TESTING & POLISH (Do Together)
 ☐ Create demo examples
 
 Time: 2-3 days
+
+
+BONUS FEATURES (Optional - If Time Permits)
+--------------------------------------------
+
+☐ Logical Operators (&&, ||)
+  - Parse && (AND) and || (OR) operators
+  - Execute right side only if left side succeeds/fails
+  - Build execution tree (not just linear commands)
+  - Handle operator precedence
+
+☐ Subshells with Parentheses ()
+  - Parse parentheses to group commands
+  - Execute grouped commands in subshell (fork)
+  - Isolate environment changes within subshell
+  - Handle nested parentheses
+
+☐ Wildcard Expansion (*)
+  - Expand * to matching filenames in current directory
+  - Handle patterns like *.c, test*, *file*
+  - Sort results alphabetically
+  - Don't expand in quotes
+
+☐ Advanced Redirections
+  - File descriptor redirections (2>&1, etc.)
+  - Multiple input/output redirections on same command
+  - Ambiguous redirect detection
+
+☐ Job Control
+  - Background processes with &
+  - Job list management
+  - fg and bg built-ins
+
+☐ History Features
+  - Persistent history across sessions
+  - History expansion (!, !!, !n)
+  - Reverse search (Ctrl+R)
+
+☐ Advanced Signal Handling
+  - SIGTERM, SIGTSTP handling
+  - Signal forwarding to child processes
+  - Process group management
+
+Time: Varies by feature (1-5 days each)
 
 
 ================================================================================

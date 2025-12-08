@@ -48,6 +48,11 @@ void	process_input(char *input, t_shell *shell)
 	tokens = tokenize(input);
 	if (!tokens)
 		return ;
+	if (!validate_syntax(tokens))
+	{
+		free_tokens(tokens);
+		return ;
+	}
 	cmd = parse(tokens);
 	if (cmd)
 	{
