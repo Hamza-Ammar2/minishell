@@ -42,10 +42,12 @@ typedef struct s_token
 }   t_token;
 
 // 3. Command struct
-typedef struct s_command
-{
-    char    **args;
-}   t_command;
+   typedef struct s_command
+   {
+       char                **args;           // Command and arguments
+       t_token             *redirects;       // List of redirect tokens (operator + filename pairs)
+       struct s_command    *next;            // Next command in pipeline
+   }   t_command;
 
 typedef struct s_env
 {
@@ -81,6 +83,7 @@ t_token_type	get_token_type(char *op);
 int				is_quote(char c);
 int				find_closing_quote(const char *str, char quote);
 char			*extract_quoted_word(const char *input, int *i, int *quote_type);
+int				process_quote(t_token **head, char *input, int *i);
 
 /* Parser functions */
 t_command		*parse(t_token *tokens);
