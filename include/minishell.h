@@ -42,12 +42,12 @@ typedef struct s_token
 }   t_token;
 
 // 3. Command struct
-   typedef struct s_command
-   {
-       char                **args;           // Command and arguments
-       t_token             *redirects;       // List of redirect tokens (operator + filename pairs)
-       struct s_command    *next;            // Next command in pipeline
-   }   t_command;
+typedef struct s_command
+{
+	char                **args;           // Command and arguments
+	t_token             *redirects;       // List of redirect tokens (operator + filename pairs)
+	struct s_command    *next;            // Next command in pipeline
+}   t_command;
 
 typedef struct s_env
 {
@@ -99,5 +99,8 @@ char			*ft_strdup(const char *s);
 
 
 /* Execution part */
-void exec(int argc, char **argv);
+void    exec(t_command *cmds);
+char    **get_path(char **paths, char *cmd);
+char 	*create_path(char *path, char *cmd);
+void    direct_io(t_command *cmd);
 #endif

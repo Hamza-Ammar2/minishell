@@ -6,7 +6,7 @@
 #    By: haammar <haammar@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/11/26 00:00:00 by minishell         #+#    #+#              #
-#    Updated: 2025/12/08 20:13:21 by haammar          ###   ########.fr        #
+#    Updated: 2025/12/09 20:44:32 by haammar          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,7 +25,7 @@ RESET = \033[0m
 NAME = minishell
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -I$(INC_DIR) -I./libft
+CFLAGS = -Wall -Wextra -Werror -g -I$(INC_DIR) -I./libft
 LDFLAGS = -lreadline -L./libft -lft
 
 # ================================ DIRECTORIES ================================ #
@@ -46,6 +46,7 @@ SRCS = $(SRC_DIR)/main.c \
        $(SRC_DIR)/parser/parser_utils.c \
        $(SRC_DIR)/parser/syntax_validator.c \
 	   $(SRC_DIR)/exec/exec.c \
+	   $(SRC_DIR)/exec/utils.c
 
 # ================================== OBJECTS ================================== #
 
