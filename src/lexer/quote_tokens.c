@@ -68,3 +68,28 @@ char	*extract_quoted_word(const char *input, int *i, int *quote_type)
 	*i += close_pos + 2;
 	return (string);
 }
+
+/*
+** Called from: tokenize() in tokenizer.c
+** Purpose: Process a quoted token and add it to the token list
+** Parameters:
+**   - head: pointer to token list head
+**   - input: full input string
+**   - i: pointer to current position (will be updated)
+** Returns: 1 on success, 0 on failure
+*/
+int	process_quote(t_token **head, char *input, int *i)
+{
+	char	*word;
+	int		quote_type;
+	t_token	*token;
+
+	quote_type = 0;
+	word = extract_quoted_word(input, i, &quote_type);
+	if (!word)
+		return (0);
+	token = new_token(TOKEN_WORD, word, quote_type);
+	add_token_to_list(head, token);
+	free(word);
+	return (1);
+}

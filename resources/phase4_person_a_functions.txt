@@ -1,0 +1,472 @@
+================================================================================
+                    PHASE 4 - PERSON A FUNCTION IMPLEMENTATION PLAN
+                          Pipeline & Redirection Parsing
+================================================================================
+
+OVERVIEW:
+---------
+You need to extend your parser to handle:
+1. Multiple commands separated by pipes (|)
+2. Redirection operators (<, >, >>, <<) with their files
+3. Syntax validation for pipes and redirections
+
+GOAL: Transform token list into linked list of commands with redirections
+
+
+================================================================================
+                        REQUIRED STRUCT MODIFICATIONS
+================================================================================
+
+1. Update t_command struct in minishell.h:
+-------------------------------------------
+   Current:
+   ```c
+   typedef struct s_command
+   {
+       char    **args;
+   }   t_command;
+   ```
+
+   Updated:
+   ```c
+   typedef struct s_command
+   {
+       char                **args;           // Command and arguments
+       t_token             *redirects;       // List of redirect tokens (operator + filename pairs)
+       struct s_command    *next;            // Next command in pipeline
+   }   t_command;
+   ```
+   
+   IMPORTANT: The redirects list contains PAIRS of tokens:
+   - First token: The redirect operator (TOKEN_REDIRECT_IN, TOKEN_REDIRECT_OUT, etc.)
+   - Second token: The filename (TOKEN_WORD with the file path)
+   - Example: For "cat < input.txt > output.txt"
+     redirects → [<]→[input.txt]→[>]→[output.txt]→NULL
+
+
+================================================================================
+                            NEW FUNCTIONS TO CREATE
+================================================================================
+
+FILE: src/parser/pipeline_parser.c (NEW FILE)
+----------------------------------------------
+
+1. count_pipes()
+   Purpose: Count number of pipes in token list
+   Signature: int count_pipes(t_token *tokens);
+   Returns: Number of pipe tokens found
+   Example: "ls | grep test | wc" → returns 2
+   
+   Logic:
+   - Traverse token list
+   - Count TOKEN_PIPE tokens
+   - Return count
+
+2. find_next_pipe()
+   Purpose: Find next pipe token in list
+   Signature: t_token *find_next_pipe(t_token *tokens);
+   Returns: Pointer to first pipe token, or NULL if none
+   Example: [ls]→[-l]→[|]→[grep] → returns pointer to [|]
+   
+   Logic:
+   - Traverse until TOKEN_PIPE found or end of list
+   - Return pointer to pipe token or NULL
+
+3. count_command_args()
+   Purpose: Count arguments before next pipe or end
+   Signature: int count_command_args(t_token *tokens);
+   Returns: Number of words before pipe/end
+   Example: [ls]→[-l]→[|]→[grep] → returns 2 (ls, -l)
+   
+   Logic:
+   - Count TOKEN_WORD tokens
+   - Stop at TOKEN_PIPE or redirection or end
+   - Return count
+
+4. extract_command_tokens()
+   Purpose: Extract tokens for one command (until pipe)
+   Signature: t_token *extract_command_tokens(t_token **tokens);
+   Returns: New token list for one command
+   Modifies: Advances *tokens to after pipe
+   Example: [ls]→[-l]→[|]→[grep]→[test]
+            Returns: [ls]→[-l]
+            Updates tokens to point to: [grep]→[test]
+   
+   Logic:
+   - Create new token list
+   - Copy tokens until pipe or end
+   - Advance original pointer
+   - Return new list
+
+5. parse_pipeline()
+   Purpose: Parse full pipeline into command linked list
+   Signature: t_command *parse_pipeline(t_token *tokens);
+   Returns: Head of command linked list
+   Example: "ls -l | grep test" → cmd1→cmd2→NULL
+   
+   Logic:
+   - Count pipes to know number of commands
+   - For each command segment:
+     * Extract tokens until pipe
+     * Parse single command
+     * Link to previous command
+   - Return head of list
+
+
+FILE: src/parser/redirection_parser.c (NEW FILE)
+-------------------------------------------------
+
+6. find_redirections()
+   Purpose: Count redirection operators in token list
+   Signature: int find_redirections(t_token *tokens);
+   Returns: Number of redirection operators found
+   Example: [cat]→[<]→[file]→[>]→[out] → returns 2
+   
+   Logic:
+   - Traverse token list
+   - Count TOKEN_REDIRECT_IN, TOKEN_REDIRECT_OUT, TOKEN_REDIRECT_APPEND, TOKEN_REDIRECT_HEREDOC
+   - Return count
+
+7. extract_redirections()
+   Purpose: Extract redirect tokens into separate list
+   Signature: t_token *extract_redirections(t_token **tokens);
+   Returns: New token list with ONLY redirect operator+filename pairs
+   Modifies: Removes redirect tokens from original list
+   Example: Input:  [cat]→[<]→[in.txt]→[-n]→[>]→[out.txt]
+            Returns: [<]→[in.txt]→[>]→[out.txt]→NULL
+            Updates tokens to: [cat]→[-n]→NULL
+   
+   Logic:
+   - Create new empty list for redirects
+   - Traverse original token list
+   - When you hit redirect operator:
+     * Copy operator token to redirect list
+     * Copy next token (filename) to redirect list
+     * Remove both from original list
+   - Return redirect list
+
+8. copy_token()
+   Purpose: Duplicate a single token
+   Signature: t_token *copy_token(t_token *token);
+   Returns: New token with copied values
+   Example: Copies token structure and duplicates the value string
+   
+   Logic:
+   - Allocate new token
+   - Copy type and quote_type
+   - Duplicate value string with strdup
+   - Set next to NULL
+   - Return new token
+
+9. remove_token_after()
+   Purpose: Remove a specific token from linked list
+   Signature: void remove_token_after(t_token *prev);
+   Modifies: Removes the token after prev from list
+   Example: [cat]→[<]→[file]→[-n]
+            Call remove_token_after(cat)
+            Result: [cat]→[file]→[-n]
+   
+   Logic:
+   - Save prev->next
+   - Set prev->next = prev->next->next
+   - Free removed token's value and structure
+
+10. parse_redirections()
+    Purpose: Parse redirection tokens and attach to command
+    Signature: void parse_redirections(t_command *cmd, t_token **tokens);
+    Returns: void (modifies cmd structure)
+    Modifies: Sets cmd->redirects field, removes redirect tokens from original list
+    Example: [cat]→[<]→[in]→[>]→[out]→[-n]
+             Sets: cmd->redirects → [<]→[in]→[>]→[out]→NULL
+             Updates tokens to: [cat]→[-n]→NULL
+    
+    Logic:
+    - Call extract_redirections() to get redirect token list
+    - Store result in cmd->redirects
+    - Original token list now only has command words
+
+
+FILE: src/parser/syntax_validator.c (UPDATE EXISTING)
+------------------------------------------------------
+
+11. validate_pipe_syntax()
+    Purpose: Check for valid pipe usage
+    Signature: int validate_pipe_syntax(t_token *tokens);
+    Returns: 1 if valid, 0 if error
+    Checks:
+    - No pipe at start: "| ls" → ERROR
+    - No pipe at end: "ls |" → ERROR
+    - No double pipes: "ls || grep" → ERROR
+    - Token before and after each pipe
+    
+    Logic:
+    - Check first token is not pipe
+    - Check last token is not pipe
+    - For each pipe, verify tokens before and after
+    - Return 1 if all checks pass
+
+12. validate_redirection_syntax()
+    Purpose: Check redirections have filenames
+    Signature: int validate_redirection_syntax(t_token *tokens);
+    Returns: 1 if valid, 0 if error
+    Checks:
+    - Every < has filename after: "cat <" → ERROR
+    - Every > has filename after: "ls >" → ERROR
+    - Every >> has filename after
+    - Every << has delimiter after
+    
+    Logic:
+    - For each redirection token:
+      * Check next token exists
+      * Check next token is WORD type
+    - Return 1 if all checks pass
+
+13. update validate_syntax()
+    Purpose: Add pipeline and redirection checks
+    Signature: int validate_syntax(t_token *tokens);
+    Current checks: Basic operator validation
+    Add calls to:
+    - validate_pipe_syntax()
+    - validate_redirection_syntax()
+
+
+FILE: src/parser/parser_utils.c (UPDATE EXISTING)
+--------------------------------------------------
+
+14. update new_command()
+    Purpose: Initialize new redirection fields
+    Current: Only sets args = NULL
+    Add:
+    ```c
+    cmd->redirects = NULL;
+    cmd->next = NULL;
+    ```
+
+15. update free_commands()
+    Purpose: Free entire command pipeline
+    Current: Only frees one command
+    Update to:
+    - Loop through cmd->next chain
+    - Free redirect_in, redirect_out, heredoc_delim strings
+    - Free args array
+    - Free command struct
+    - Move to next command
+
+16. create print_command() (for debugging)
+    Purpose: Print command structure for testing
+    Signature: void print_command(t_command *cmd);
+    Prints:
+    - All args
+    - Redirections if present
+    - Next command indicator
+    
+    Example output:
+    ```
+    Command 1:
+      args: [ls, -l]
+      redirect_out: output.txt (append: 0)
+      next: yes
+    Command 2:
+      args: [grep, test]
+      redirect_in: NULL
+      redirect_out: NULL
+      next: no
+    ```
+
+
+FILE: src/parser/parser.c (UPDATE EXISTING)
+--------------------------------------------
+
+17. update parse()
+    Purpose: Main entry point for parsing
+    Current: Parses single command
+    Update to:
+    ```c
+    t_command *parse(t_token *tokens)
+    {
+        if (has_pipes(tokens))
+            return (parse_pipeline(tokens));
+        else
+            return (parse_single_command(tokens));
+    }
+    ```
+
+18. create parse_single_command() (refactor current logic)
+    Purpose: Parse one command with redirections
+    Signature: t_command *parse_single_command(t_token *tokens);
+    Returns: Single command with redirections parsed
+    
+    Logic:
+    - Create new command
+    - Parse redirections (removes redirect tokens)
+    - Count remaining args
+    - Fill args array
+    - Return command
+
+19. create has_pipes()
+    Purpose: Quick check if tokens contain pipes
+    Signature: int has_pipes(t_token *tokens);
+    Returns: 1 if pipe found, 0 otherwise
+
+
+================================================================================
+                            IMPLEMENTATION ORDER
+================================================================================
+
+STEP 1: Struct Updates (5 minutes)
+-----------------------------------
+☐ Update t_command struct in minishell.h
+☐ Update new_command() to initialize new fields
+☐ Update function prototypes in minishell.h
+
+STEP 2: Helper Functions (30 minutes)
+--------------------------------------
+☐ Create count_pipes()
+☐ Create find_next_pipe()
+☐ Create count_command_args()
+☐ Create has_pipes()
+
+STEP 3: Redirection Parsing (1 hour)
+-------------------------------------
+☐ Create find_redirections()
+☐ Create extract_redirect_in()
+☐ Create extract_redirect_out()
+☐ Create extract_heredoc()
+☐ Create parse_redirections()
+
+STEP 4: Pipeline Parsing (1 hour)
+----------------------------------
+☐ Create extract_command_tokens()
+☐ Refactor current parse() into parse_single_command()
+☐ Add parse_redirections() call to parse_single_command()
+☐ Create parse_pipeline()
+☐ Update parse() to route to correct function
+
+STEP 5: Syntax Validation (30 minutes)
+---------------------------------------
+☐ Create validate_pipe_syntax()
+☐ Create validate_redirection_syntax()
+☐ Update validate_syntax()
+
+STEP 6: Memory Management (30 minutes)
+---------------------------------------
+☐ Update free_commands() for linked list
+☐ Ensure all malloc'd strings are freed
+☐ Create print_command() for debugging
+
+STEP 7: Testing (1 hour)
+-------------------------
+☐ Test single command (still works)
+☐ Test pipes: "ls | grep test"
+☐ Test redirections: "cat < file > out"
+☐ Test combined: "cat < in | grep x > out"
+☐ Test errors: "ls |", "cat <", "|| grep"
+
+
+================================================================================
+                              TESTING EXAMPLES
+================================================================================
+
+Test 1: Single command (should still work)
+   Input: "ls -l"
+   Result: cmd->args = [ls, -l, NULL]
+           cmd->redirects = NULL
+           cmd->next = NULL
+
+Test 2: Simple pipe
+   Input: "ls | grep test"
+   Result: cmd1->args = [ls, NULL]
+           cmd1->redirects = NULL
+           cmd1->next → cmd2
+           cmd2->args = [grep, test, NULL]
+           cmd2->redirects = NULL
+           cmd2->next = NULL
+
+Test 3: Redirection
+   Input: "cat < input.txt > output.txt"
+   Result: cmd->args = [cat, NULL]
+           cmd->redirects → [<]→[input.txt]→[>]→[output.txt]→NULL
+           cmd->next = NULL
+
+Test 4: Pipe with redirections
+   Input: "cat < file | grep test > out"
+   Result: cmd1->args = [cat, NULL]
+           cmd1->redirects → [<]→[file]→NULL
+           cmd1->next → cmd2
+           cmd2->args = [grep, test, NULL]
+           cmd2->redirects → [>]→[out]→NULL
+           cmd2->next = NULL
+
+Test 5: Multiple pipes
+   Input: "ls -l | grep x | wc -l"
+   Result: cmd1 → cmd2 → cmd3 → NULL
+           (each has args and NULL redirects)
+
+Test 6: Append redirection
+   Input: "echo hello >> file.txt"
+   Result: cmd->args = [echo, hello, NULL]
+           cmd->redirects → [>>]→[file.txt]→NULL
+           cmd->next = NULL
+
+Test 7: Heredoc
+   Input: "cat << EOF"
+   Result: cmd->args = [cat, NULL]
+           cmd->redirects → [<<]→[EOF]→NULL
+           cmd->next = NULL
+
+
+================================================================================
+                              INTEGRATION NOTES
+================================================================================
+
+- Hamza (Person B) will use your command linked list structure
+- Each command in the list will be executed in a pipeline
+- He'll handle the actual file opening and pipe creation
+- Your job: Parse correctly, his job: Execute correctly
+
+- Keep communication open about struct changes
+- Test your parser outputs with print_command()
+- Ensure memory is properly freed (test with valgrind)
+
+
+================================================================================
+                              ESTIMATED TIME
+================================================================================
+
+Total: ~6 hours of focused work
+- Struct updates: 5 min
+- Helper functions: 30 min
+- Redirection parsing: 1 hour
+- Pipeline parsing: 1 hour
+- Syntax validation: 30 min
+- Memory management: 30 min
+- Testing & debugging: 2 hours
+- Integration testing with Hamza: 30 min
+
+Split across 2-3 coding sessions.
+
+
+================================================================================
+                                  SUMMARY
+================================================================================
+
+NEW FILES TO CREATE:
+  - src/parser/pipeline_parser.c
+  - src/parser/redirection_parser.c
+
+FILES TO UPDATE:
+  - include/minishell.h (struct + prototypes)
+  - src/parser/parser.c (refactor parse)
+  - src/parser/parser_utils.c (new_command, free_commands)
+  - src/parser/syntax_validator.c (add checks)
+
+TOTAL NEW FUNCTIONS: 19
+FUNCTIONS TO UPDATE: 3
+
+KEY CONCEPTS:
+  - Linked list for pipeline (cmd->next)
+  - Separate redirection fields in struct
+  - Token manipulation (extracting and removing)
+  - Syntax validation before execution
+
+Good luck! 🚀

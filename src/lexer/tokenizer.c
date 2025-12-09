@@ -124,10 +124,7 @@ t_token	*tokenize(char *input)
 {
 	t_token	*head;
 	char	*operator;
-	char	*word;
-	t_token	*token;
 	int		i;
-	int		quote_type;
 
 	head = NULL;
 	i = 0;
@@ -137,30 +134,15 @@ t_token	*tokenize(char *input)
 			i++;
 		if (!input[i])
 			break ;
-		/* Check if current character is a quote */
+		if (is_quote(input[i]) && !process_quote(&head, input, &i))
+			return (free_tokens(head), NULL);
 		if (is_quote(input[i]))
-		{
-			quote_type = 0;
-			/* Extract quoted string (updates i and quote_type) */
-			word = extract_quoted_word(input, &i, &quote_type);
-			if (!word)
-			{
-				free_tokens(head);
-				return (NULL);
-			}
-			/* Create token with quote_type */
-			token = new_token(TOKEN_WORD, word, quote_type);
-			add_token_to_list(&head, token);
-			free(word);
-			continue;
-		}
+			continue ;
 		operator = is_operator(&input[i]);
 		if (operator)
-		{
 			i += process_operator(&head, operator);
-			continue ;
-		}
-		i += process_word(&head, &input[i]);
+		else
+			i += process_word(&head, &input[i]);
 	}
 	return (head);
 }
