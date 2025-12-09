@@ -20,6 +20,8 @@ t_command	*new_command(void)
 	if (!cmd)
 		return (NULL);
 	cmd->args = NULL;
+	cmd->redirects = NULL;
+	cmd->next = NULL;
 	return (cmd);
 }
 
@@ -38,19 +40,46 @@ t_command	*new_command(void)
 */
 void	free_commands(t_command *commands)
 {
-	int		i;
+	t_command	*next;
+	int			i;
 
-	if (!commands)
-		return ;
-	if (commands->args)
+	while (commands)
 	{
-		i = 0;
-		while (commands->args[i])
+		next = commands->next;
+		if (commands->args)
 		{
-			free(commands->args[i]);
-			i++;
+			i = 0;
+			while (commands->args[i])
+			{
+				free(commands->args[i]);
+				i++;
+			}
+			free(commands->args);
 		}
-		free(commands->args);
+		free_tokens(commands->redirects);
+		free(commands);
+		commands = next;
 	}
-	free(commands);
 }
+
+/*
+** 🔧 What the function Does
+** Gets the last token in a linked list.
+**
+** 🔗 Role in the Program
+** Utility function for finding the end of a token list.
+**
+** 🧩 Step-by-Step
+** 1. Check if list is empty.
+** 2. Traverse to last token.
+** 3. Return pointer to last token.
+*/
+t_token	*get_last_token(t_token *tokens)
+{
+	if (!tokens)
+		return (NULL);
+	while (tokens->next)
+		tokens = tokens->next;
+	return (tokens);
+}
+
