@@ -5,13 +5,13 @@
 ** Checks if token is an operator type.
 **
 ** 🔗 Role in the Program
-** Helper for syntax validation.
+** Helper for syntax validation and parsing.
 **
 ** 🧩 Step-by-Step
 ** 1. Check if token type is any operator.
 ** 2. Return 1 if operator, 0 if not.
 */
-static int	is_operator_token(t_token_type type)
+int	is_operator_token(t_token_type type)
 {
 	return (type == TOKEN_PIPE
 		|| type == TOKEN_REDIRECT_IN
@@ -60,14 +60,12 @@ static int	validate_start(t_token *tokens)
 */
 static int	validate_end(t_token *tokens)
 {
-	t_token	*current;
+	t_token	*last;
 
 	if (!tokens)
 		return (1);
-	current = tokens;
-	while (current->next)
-		current = current->next;
-	if (is_operator_token(current->type))
+	last = get_last_token(tokens);
+	if (is_operator_token(last->type))
 	{
 		printf("minishell: syntax error near unexpected token `newline'\n");
 		return (0);

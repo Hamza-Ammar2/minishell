@@ -3,10 +3,14 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: haammar <haammar@student.42.fr>            +#+  +:+       +#+         #
+#    By: lpons <lpons@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/11/26 00:00:00 by minishell         #+#    #+#              #
+<<<<<<< HEAD
 #    Updated: 2025/12/09 20:44:32 by haammar          ###   ########.fr        #
+=======
+#    Updated: 2025/12/09 21:20:49 by lpons            ###   ########.fr        #
+>>>>>>> 13af7382aea1e791262b2b546c1cbe405b1abe76
 #                                                                              #
 # **************************************************************************** #
 
@@ -45,6 +49,7 @@ SRCS = $(SRC_DIR)/main.c \
        $(SRC_DIR)/parser/parser.c \
        $(SRC_DIR)/parser/parser_utils.c \
        $(SRC_DIR)/parser/syntax_validator.c \
+       $(SRC_DIR)/parser/pipline_parsing.c \
 	   $(SRC_DIR)/exec/exec.c \
 	   $(SRC_DIR)/exec/utils.c
 

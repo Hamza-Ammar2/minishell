@@ -2,26 +2,33 @@
 
 /*
 ** 🔧 What the function Does
-** Counts the number of WORD tokens in sequence.
+** Counts the number of WORD tokens until pipe or end.
 **
 ** 🔗 Role in the Program
 ** Helper to determine args array size during parsing.
 **
 ** 🧩 Step-by-Step
 ** 1. Traverse token list.
-** 2. Count consecutive TOKEN_WORD tokens.
-** 3. Stop at first non-WORD token or end.
+** 2. Count TOKEN_WORD tokens.
+** 3. Skip redirect operators and their filenames.
+** 4. Stop at pipe or end.
 */
-static int	count_args(t_token *tokens)
+int	count_args(t_token *tokens)
 {
 	int		count;
 	t_token	*current;
 
 	count = 0;
 	current = tokens;
-	while (current && current->type == TOKEN_WORD)
+	while (current && current->type != TOKEN_PIPE)
 	{
-		count++;
+		if (current->type == TOKEN_WORD)
+			count++;
+		else if (is_operator_token(current->type) && current->type != TOKEN_PIPE)
+		{
+			if (current->next)
+				current = current->next;
+		}
 		current = current->next;
 	}
 	return (count);
@@ -57,25 +64,22 @@ static void	fill_args(t_command *cmd, t_token *tokens)
 
 /*
 ** 🔧 What the function Does
-** Converts token list into command structure.
+** Parses single command (no pipes).
 **
 ** 🔗 Role in the Program
-** Organizes tokens into executable commands with arguments and redirections.
+** Handles simple commands without pipelines.
 **
 ** 🧩 Step-by-Step
-** 1. Validate token sequence.
-** 2. Create new command structure.
-** 3. Count and allocate args array.
-** 4. Fill args array with token values.
-** 5. Return parsed command structure.
+** 1. Create new command structure.
+** 2. Count and allocate args array.
+** 3. Fill args array with token values.
+** 4. Return parsed command structure.
 */
-t_command	*parse(t_token *tokens)
+static t_command	*parse_single_command(t_token *tokens)
 {
 	t_command	*cmd;
 	int			arg_count;
 
-	if (!tokens)
-		return (NULL);
 	cmd = new_command();
 	if (!cmd)
 		return (NULL);
@@ -88,4 +92,25 @@ t_command	*parse(t_token *tokens)
 	}
 	fill_args(cmd, tokens);
 	return (cmd);
+}
+
+/*
+** 🔧 What the function Does
+** Routes to pipeline or single command parser.
+**
+** 🔗 Role in the Program
+** Main entry point for parsing tokens into commands.
+**
+** 🧩 Step-by-Step
+** 1. Check if tokens contain pipes.
+** 2. Route to parse_pipeline() if pipes exist.
+** 3. Otherwise parse as single command.
+*/
+t_command	*parse(t_token *tokens)
+{
+	if (!tokens)
+		return (NULL);
+	if (count_pipes(tokens) > 0)
+		return (parse_pipeline(tokens));
+	return (parse_single_command(tokens));
 }

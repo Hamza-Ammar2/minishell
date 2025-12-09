@@ -91,6 +91,15 @@ t_command		*new_command(void);
 void			free_commands(t_command *commands);
 int				validate_syntax(t_token *tokens);
 
+/* Pipeline parsing functions */
+t_command		*parse_pipeline(t_token *tokens);
+int				count_pipes(t_token *tokens);
+
+/* Parser utility functions */
+int				is_operator_token(t_token_type type);
+t_token			*get_last_token(t_token *tokens);
+int				count_args(t_token *tokens);
+
 /* Helper functions (will need libft or implement these) */
 int				ft_strcmp(const char *s1, const char *s2);
 int				ft_isspace(int c);
