@@ -95,6 +95,10 @@ int				validate_syntax(t_token *tokens);
 t_command		*parse_pipeline(t_token *tokens);
 int				count_pipes(t_token *tokens);
 
+/* Redirection parsing functions */
+t_token			*extract_redirections(t_token *tokens);
+void			parse_redirections(t_command *cmd, t_token *tokens);
+
 /* Parser utility functions */
 int				is_operator_token(t_token_type type);
 t_token			*get_last_token(t_token *tokens);
