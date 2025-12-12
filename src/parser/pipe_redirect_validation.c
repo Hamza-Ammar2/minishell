@@ -37,13 +37,13 @@ static int	validate_pipe_boundaries(t_token *tokens)
 
 	if (tokens->type == TOKEN_PIPE)
 	{
-		ft_putstr_fd("minishell: syntax error near unexpected token `|'\n", 2);
+		fprintf(stderr, "minishell: syntax error near unexpected token `|'\n");
 		return (0);
 	}
 	last = get_last_token(tokens);
 	if (last->type == TOKEN_PIPE)
 	{
-		ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n", 2);
+		fprintf(stderr, "minishell: syntax error near unexpected token `newline'\n");
 		return (0);
 	}
 	return (1);
@@ -70,7 +70,7 @@ static int	validate_consecutive_pipes(t_token *tokens)
 	{
 		if (current->type == TOKEN_PIPE && current->next->type == TOKEN_PIPE)
 		{
-			ft_putstr_fd("minishell: syntax error near unexpected token `|'\n", 2);
+			fprintf(stderr, "minishell: syntax error near unexpected token `|'\n");
 			return (0);
 		}
 		current = current->next;
@@ -126,13 +126,13 @@ int	validate_redirection_syntax(t_token *tokens)
 			/* Check next token exists */
 			if (!current->next)
 			{
-				ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n", 2);
+				// error message removed
 				return (0);
 			}
 			/* Check next token is a word (filename) */
 			if (current->next->type != TOKEN_WORD)
 			{
-				ft_putstr_fd("minishell: syntax error near unexpected token\n", 2);
+				// error message removed
 				return (0);
 			}
 		}
