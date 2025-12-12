@@ -106,7 +106,7 @@ static void	fill_command_args(t_command *cmd, t_token *tokens)
 			cmd->args[i] = ft_strdup(tmp->value);
 			i++;
 		}
-		else if (is_operator_token(tmp->type) && tmp->type != TOKEN_PIPE)
+		else if (is_redirect_type(tmp->type))
 		{
 			if (tmp->next)
 				tmp = tmp->next;

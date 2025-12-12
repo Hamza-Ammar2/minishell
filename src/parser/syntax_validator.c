@@ -115,7 +115,9 @@ static int	validate_consecutive(t_token *tokens)
 ** 1. Check tokens don't start with operator.
 ** 2. Check tokens don't end with operator.
 ** 3. Check no consecutive operators.
-** 4. Return 1 if all valid, 0 if any invalid.
+** 4. Check pipe syntax is valid.
+** 5. Check redirection syntax is valid.
+** 6. Return 1 if all valid, 0 if any invalid.
 */
 int	validate_syntax(t_token *tokens)
 {
@@ -126,6 +128,39 @@ int	validate_syntax(t_token *tokens)
 	if (!validate_end(tokens))
 		return (0);
 	if (!validate_consecutive(tokens))
+		return (0);
+	if (!validate_pipe_syntax(tokens))
+		return (0);
+	if (!validate_redirection_syntax(tokens))
+		return (0);
+	return (1);
+}
+
+**
+** 🔗 Role in the Program
+** Ensures token sequence is valid before attempting to parse/execute.
+**
+** 🧩 Step-by-Step
+** 1. Check tokens don't start with operator.
+** 2. Check tokens don't end with operator.
+** 3. Check no consecutive operators.
+** 4. Check pipe syntax is valid.
+** 5. Check redirection syntax is valid.
+** 6. Return 1 if all valid, 0 if any invalid.
+*/
+int	validate_syntax(t_token *tokens)
+{
+	if (!tokens)
+		return (1);
+	if (!validate_start(tokens))
+		return (0);
+	if (!validate_end(tokens))
+		return (0);
+	if (!validate_consecutive(tokens))
+		return (0);
+	if (!validate_pipe_syntax(tokens))
+		return (0);
+	if (!validate_redirection_syntax(tokens))
 		return (0);
 	return (1);
 }

@@ -24,7 +24,7 @@ int	count_args(t_token *tokens)
 	{
 		if (current->type == TOKEN_WORD)
 			count++;
-		else if (is_operator_token(current->type) && current->type != TOKEN_PIPE)
+		else if (is_redirect_type(current->type))
 		{
 			if (current->next)
 				current = current->next;

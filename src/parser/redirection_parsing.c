@@ -39,7 +39,7 @@ t_token *extract_redirections(t_token *tokens)
     rdr_tokens = NULL;
     while (tokens)
     {
-        if (is_operator_token(tokens->type) && tokens->type != TOKEN_PIPE)
+        if (is_redirect_type(tokens->type))
         {
             if (!tokens->next)
                 return (NULL);
