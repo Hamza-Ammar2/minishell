@@ -5,15 +5,22 @@
 
 
 static void    rec_exec(char **paths, int fd[2][2], t_command *cmds, int i);
-static int     check_cd(char **cmd);
+static int     check_cd(t_command *cmd);
 static void    exec_single(t_command *cmd, char **paths);
 
-static int     check_cd(char **cmd)
+static int     check_cd(t_command *cmd)
 {
-    if (!(cmd[0][0] == 'c' && cmd[0][1] == 'd'))
+    char    *dir;
+
+    if (!(cmd->args[0][0] == 'c' && cmd->args[0][1] == 'd'))
         return (0);
-    chdir(cmd[1]);
-    perror("chdir failed");
+    dir = cmd->args[1];
+    if (!dir)
+        dir = getenv("HOME");
+    if (chdir(dir) == -1)
+        perror("chdir failed");
+    if (!cmd->args[1])
+        free(dir);
     return (1);
 }
 
@@ -31,11 +38,13 @@ void    exec(t_command *cmds)
 
 static void    exec_single(t_command *cmd, char **paths)
 {
-    char **str;
+    char *str;
 
     direct_io(cmd);
     str = get_path(paths, cmd->args[0]);
-    execve(str[0], cmd->args, NULL);
+    //envise(&cmd->args[1]);
+    //printf("Executing: %s\n", str ? str : cmd->args[0]);
+    execve(str, cmd->args, NULL);
     perror("execl failed");
     exit(1);
 }
@@ -58,7 +67,9 @@ static void    rec_exec(char **paths, int fd[2][2], t_command *cmds, int i)
 {
     int id;
 
-    if (check_cd(cmds->args))
+    if (!cmds)
+        return ;
+    if (check_cd(cmds))
         return (rec_exec(paths, fd, cmds->next, i + 1));
     pipe(fd[i % 2]);
     id = fork();

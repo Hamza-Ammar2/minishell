@@ -109,7 +109,10 @@ char			*ft_strdup(const char *s);
 
 /* Execution part */
 void    exec(t_command *cmds);
-char    **get_path(char **paths, char *cmd);
+char    *get_path(char **paths, char *cmd);
 char 	*create_path(char *path, char *cmd);
 void    direct_io(t_command *cmd);
+void    pwd();
+char    **envise(char **args);
+/* void    export(char *str); */
 #endif

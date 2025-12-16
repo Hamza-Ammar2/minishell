@@ -27,17 +27,15 @@ char *create_path(char *path, char *cmd)
     return (full_path[i + j] = '\0', full_path);
 }
 
-char    **get_path(char **paths, char *cmd)
+char    *get_path(char **paths, char *cmd)
 {
     char    *full_path;
-    char    **cmd_args;
 
-    cmd_args = ft_split(cmd, ' ');
     while (*paths)
     {
-        full_path = create_path(*paths, cmd_args[0]);
+        full_path = create_path(*paths, cmd);
         if (access(full_path, X_OK) == 0)
-            return (free(cmd_args[0]), cmd_args[0] = full_path, cmd_args);
+            return (full_path);
         free(full_path);
         paths++;
     }
@@ -51,8 +49,12 @@ void    direct_io(t_command *cmd)
     t_token *redir;
 
     redir = cmd->redirects;
+    printf("Setting up I/O redirections for command: %s\n", redir ? redir->value : "none");
     while (redir)
     {
+        printf("Processing redirection: %s %s\n",
+            (redir->type == TOKEN_REDIRECT_IN) ? "<" : ">",
+            redir->value);
         if (redir->type == TOKEN_REDIRECT_IN)
         {
             infile = open(redir->value, O_RDONLY);
@@ -61,6 +63,7 @@ void    direct_io(t_command *cmd)
         }
         else if (redir->type == TOKEN_REDIRECT_OUT)
         {
+            printf("Redirecting output to %s\n", redir->value);
             outfile = open(redir->value, O_WRONLY | O_TRUNC | O_CREAT, 0644);
             dup2(outfile, STDOUT_FILENO);
             close(outfile);
