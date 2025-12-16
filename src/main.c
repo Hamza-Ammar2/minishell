@@ -57,7 +57,7 @@ void	process_input(char *input, t_shell *shell)
 	if (cmd)
 	{
 		print_command(cmd);
-		exec(cmd);
+		exec(cmd, shell);
 		free_commands(cmd);
 	}
 	free_tokens(tokens);

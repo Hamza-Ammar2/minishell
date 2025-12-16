@@ -82,7 +82,10 @@ void	print_command(t_command *cmd)
 	i = 0;
 	while (cmd->args && cmd->args[i])
 	{
-		printf("%s", cmd->args[i]);
+		// Print value and quote type
+		printf("\"%s\" (quote:%d)", 
+			cmd->args[i]->value,
+			cmd->args[i]->quote_type);
 		if (cmd->args[i + 1])
 			printf(", ");
 		i++;

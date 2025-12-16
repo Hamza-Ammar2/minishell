@@ -44,7 +44,7 @@ typedef struct s_token
 // 3. Command struct
 typedef struct s_command
 {
-	char                **args;           // Command and arguments
+	t_token				**args;          // Array of pointers to token structs (command and arguments)
 	t_token             *redirects;       // List of redirect tokens (operator + filename pairs)
 	struct s_command    *next;            // Next command in pipeline
 }   t_command;
@@ -116,7 +116,7 @@ char			*ft_strdup(const char *s);
 
 
 /* Execution part */
-void    exec(t_command *cmds);
+void    exec(t_command *cmds, t_shell *shell);
 char    **get_path(char **paths, char *cmd);
 char 	*create_path(char *path, char *cmd);
 void    direct_io(t_command *cmd);

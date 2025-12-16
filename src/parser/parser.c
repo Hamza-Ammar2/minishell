@@ -58,7 +58,10 @@ static void	fill_args(t_command *cmd, t_token *tokens)
 	{
 		if (current->type == TOKEN_WORD)
 		{
-			cmd->args[i] = ft_strdup(current->value);
+			cmd->args[i] = new_token(TOKEN_WORD, current->value,
+				 current->quote_type);
+			if(!cmd->args[i])
+				return;
 			i++;
 		}
 		else if (is_operator_token(current->type))
@@ -95,7 +98,7 @@ static t_command	*parse_single_command(t_token *tokens)
 		return (NULL);
 	parse_redirections(cmd, tokens);
 	arg_count = count_args(tokens);
-	cmd->args = malloc(sizeof(char *) * (arg_count + 1));
+	cmd->args = malloc(sizeof(t_token *) * (arg_count + 1));
 	if (!cmd->args)
 	{
 		free_commands(cmd);

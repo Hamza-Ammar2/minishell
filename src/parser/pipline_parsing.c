@@ -103,7 +103,10 @@ static void	fill_command_args(t_command *cmd, t_token *tokens)
 	{
 		if (tmp->type == TOKEN_WORD)
 		{
-			cmd->args[i] = ft_strdup(tmp->value);
+			// Create new token with quote_type preserved
+			cmd->args[i] = new_token(TOKEN_WORD, tmp->value, tmp->quote_type);
+			if (!cmd->args[i])
+				return;  // Handle allocation failure
 			i++;
 		}
 		else if (is_redirect_type(tmp->type))
@@ -141,7 +144,7 @@ static t_command	*create_pipeline_command(t_token *cmd_tokens)
 		return (NULL);
 	parse_redirections(cmd, cmd_tokens);
 	arg_count = count_args(cmd_tokens);
-	cmd->args = malloc(sizeof(char *) * (arg_count + 1));
+	cmd->args = malloc(sizeof(t_token *) * (arg_count + 1));
 	if (!cmd->args)
 	{
 		free_commands(cmd);
