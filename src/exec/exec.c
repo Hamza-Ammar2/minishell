@@ -5,9 +5,16 @@
 
 
 static void    rec_exec(char **paths, int fd[2][2], t_command *cmds, int i);
+<<<<<<< HEAD
 static int     check_cd(t_command *cmd);
+=======
+static int     check_cd(t_token **cmd);
+>>>>>>> 27b8730405078ab19908595632bf6708a4778941
 static void    exec_single(t_command *cmd, char **paths);
+static char    **convert_args_to_argv(t_token **args);
+static void    free_argv(char **argv);
 
+<<<<<<< HEAD
 static int     check_cd(t_command *cmd)
 {
     char    *dir;
@@ -21,23 +28,74 @@ static int     check_cd(t_command *cmd)
         perror("chdir failed");
     if (!cmd->args[1])
         free(dir);
+=======
+/*
+** Helper function to convert t_token** args to char** argv for execve
+*/
+static char    **convert_args_to_argv(t_token **args)
+{
+    char    **argv;
+    int     i;
+    int     count;
+
+    count = 0;
+    while (args[count])
+        count++;
+    argv = malloc(sizeof(char *) * (count + 1));
+    if (!argv)
+        return (NULL);
+    i = 0;
+    while (args[i])
+    {
+        argv[i] = args[i]->value;
+        i++;
+    }
+    argv[i] = NULL;
+    return (argv);
+}
+
+/*
+** Helper function to free argv array (not values, just the array)
+*/
+static void    free_argv(char **argv)
+{
+    free(argv);
+}
+
+static int     check_cd(t_token **cmd)
+{
+    if (!cmd[0] || !cmd[0]->value)
+        return (0);
+    if (!(cmd[0]->value[0] == 'c' && cmd[0]->value[1] == 'd'))
+        return (0);
+    if (cmd[1] && cmd[1]->value)
+        chdir(cmd[1]->value);
+    perror("chdir failed");
+>>>>>>> 27b8730405078ab19908595632bf6708a4778941
     return (1);
 }
 
-void    exec(t_command *cmds)
+void    exec(t_command *cmds, t_shell *shell)
 {
     int fd[2][2];
     char *path;
     char **paths;
+    int i;
 
+    (void)shell;  // TODO: Use shell for environment and expansion
     path = getenv("PATH");
     paths = ft_split(path, ':');
     rec_exec(paths, fd, cmds, 0);
     while(wait(NULL) > 0);
+    i = 0;
+    while (paths[i])
+        free(paths[i++]);
+    free(paths);
 }
 
 static void    exec_single(t_command *cmd, char **paths)
 {
+<<<<<<< HEAD
     char *str;
 
     direct_io(cmd);
@@ -45,7 +103,17 @@ static void    exec_single(t_command *cmd, char **paths)
     //envise(&cmd->args[1]);
     //printf("Executing: %s\n", str ? str : cmd->args[0]);
     execve(str, cmd->args, NULL);
+=======
+    char **str;
+    char **argv;
+
+    direct_io(cmd);
+    str = get_path(paths, cmd->args[0]->value);
+    argv = convert_args_to_argv(cmd->args);
+    execve(str[0], argv, NULL);
+>>>>>>> 27b8730405078ab19908595632bf6708a4778941
     perror("execl failed");
+    free_argv(argv);
     exit(1);
 }
 

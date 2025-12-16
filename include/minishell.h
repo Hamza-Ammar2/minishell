@@ -44,7 +44,7 @@ typedef struct s_token
 // 3. Command struct
 typedef struct s_command
 {
-	char                **args;           // Command and arguments
+	t_token				**args;          // Array of pointers to token structs (command and arguments)
 	t_token             *redirects;       // List of redirect tokens (operator + filename pairs)
 	struct s_command    *next;            // Next command in pipeline
 }   t_command;
@@ -95,10 +95,18 @@ int				validate_syntax(t_token *tokens);
 t_command		*parse_pipeline(t_token *tokens);
 int				count_pipes(t_token *tokens);
 
+/* Redirection parsing functions */
+t_token			*extract_redirections(t_token *tokens);
+void			parse_redirections(t_command *cmd, t_token *tokens);
+
 /* Parser utility functions */
 int				is_operator_token(t_token_type type);
+int				is_redirect_type(t_token_type type);
 t_token			*get_last_token(t_token *tokens);
 int				count_args(t_token *tokens);
+
+/* Debug functions */
+void			print_command(t_command *cmd);
 
 /* Helper functions (will need libft or implement these) */
 int				ft_strcmp(const char *s1, const char *s2);
@@ -108,8 +116,13 @@ char			*ft_strdup(const char *s);
 
 
 /* Execution part */
+<<<<<<< HEAD
 void    exec(t_command *cmds);
 char    *get_path(char **paths, char *cmd);
+=======
+void    exec(t_command *cmds, t_shell *shell);
+char    **get_path(char **paths, char *cmd);
+>>>>>>> 27b8730405078ab19908595632bf6708a4778941
 char 	*create_path(char *path, char *cmd);
 void    direct_io(t_command *cmd);
 void    pwd();

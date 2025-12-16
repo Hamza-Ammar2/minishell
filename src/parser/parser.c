@@ -24,7 +24,7 @@ int	count_args(t_token *tokens)
 	{
 		if (current->type == TOKEN_WORD)
 			count++;
-		else if (is_operator_token(current->type) && current->type != TOKEN_PIPE)
+		else if (is_redirect_type(current->type))
 		{
 			if (current->next)
 				current = current->next;
@@ -36,15 +36,16 @@ int	count_args(t_token *tokens)
 
 /*
 ** 🔧 What the function Does
-** Fills the args array with token values.
+** Fills the args array with token values, skipping redirects.
 **
 ** 🔗 Role in the Program
 ** Extracts WORD token values into command args array.
 **
 ** 🧩 Step-by-Step
 ** 1. Traverse token list.
-** 2. Copy each WORD token value to args array.
-** 3. NULL-terminate the array.
+** 2. Copy WORD token values to args array.
+** 3. Skip redirect operators and their filenames.
+** 4. NULL-terminate the array.
 */
 static void	fill_args(t_command *cmd, t_token *tokens)
 {
@@ -53,10 +54,21 @@ static void	fill_args(t_command *cmd, t_token *tokens)
 
 	i = 0;
 	current = tokens;
-	while (current && current->type == TOKEN_WORD)
+	while (current)
 	{
-		cmd->args[i] = ft_strdup(current->value);
-		i++;
+		if (current->type == TOKEN_WORD)
+		{
+			cmd->args[i] = new_token(TOKEN_WORD, current->value,
+				 current->quote_type);
+			if(!cmd->args[i])
+				return;
+			i++;
+		}
+		else if (is_operator_token(current->type))
+		{
+			if (current->next)
+				current = current->next;
+		}
 		current = current->next;
 	}
 	cmd->args[i] = NULL;
@@ -71,9 +83,10 @@ static void	fill_args(t_command *cmd, t_token *tokens)
 **
 ** 🧩 Step-by-Step
 ** 1. Create new command structure.
-** 2. Count and allocate args array.
-** 3. Fill args array with token values.
-** 4. Return parsed command structure.
+** 2. Parse and attach redirections.
+** 3. Count and allocate args array.
+** 4. Fill args array with token values.
+** 5. Return parsed command structure.
 */
 static t_command	*parse_single_command(t_token *tokens)
 {
@@ -83,11 +96,12 @@ static t_command	*parse_single_command(t_token *tokens)
 	cmd = new_command();
 	if (!cmd)
 		return (NULL);
+	parse_redirections(cmd, tokens);
 	arg_count = count_args(tokens);
-	cmd->args = malloc(sizeof(char *) * (arg_count + 1));
+	cmd->args = malloc(sizeof(t_token *) * (arg_count + 1));
 	if (!cmd->args)
 	{
-		free(cmd);
+		free_commands(cmd);
 		return (NULL);
 	}
 	fill_args(cmd, tokens);

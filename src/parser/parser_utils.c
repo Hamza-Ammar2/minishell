@@ -51,7 +51,7 @@ void	free_commands(t_command *commands)
 			i = 0;
 			while (commands->args[i])
 			{
-				free(commands->args[i]);
+				free_tokens(commands->args[i]);
 				i++;
 			}
 			free(commands->args);

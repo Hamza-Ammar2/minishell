@@ -54,10 +54,10 @@ void	process_input(char *input, t_shell *shell)
 		return ;
 	}
 	cmd = parse(tokens);
-	cmd->redirects = NULL;
 	if (cmd)
 	{
-		exec(cmd);
+		print_command(cmd);
+		exec(cmd, shell);
 		free_commands(cmd);
 	}
 	free_tokens(tokens);
