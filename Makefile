@@ -41,7 +41,10 @@ SRCS = $(SRC_DIR)/main.c \
        $(SRC_DIR)/parser/debug_print.c \
 	   $(SRC_DIR)/exec/exec.c \
 	   $(SRC_DIR)/exec/utils.c \
-	   $(SRC_DIR)/exec/builtins.c 
+	   $(SRC_DIR)/exec/builtins.c \
+	   $(SRC_DIR)/exec/get_next_line.c \
+	   $(SRC_DIR)/exec/get_next_line_utils.c \
+	   $(SRC_DIR)/exec/utils_str.c 
 
 # ================================== OBJECTS ================================== #
 
