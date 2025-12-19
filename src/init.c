@@ -15,4 +15,9 @@
 void	init_shell(t_shell *shell)
 {
 	shell->exit_status = 0;
+	shell->env = NULL;
+	shell->input = NULL;
+	shell->envp = NULL;
+	shell->stdin_backup = dup(STDIN_FILENO);
+	shell->stdout_backup = dup(STDOUT_FILENO);
 }

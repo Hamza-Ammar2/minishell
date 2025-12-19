@@ -12,10 +12,6 @@
 # include <unistd.h>
 # include <errno.h>
 
-# ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 1024
-# endif
-
 # define PROMPT "minishell$ "
 
 /* Lukes Parser Structs */
@@ -123,14 +119,17 @@ char			*ft_strdup(const char *s);
 char    *get_path(char **paths, char *cmd);
 void    exec(t_command *cmds, t_shell *shell);
 char 	*create_path(char *path, char *cmd);
-void    direct_io(t_command *cmd);
+void    direct_io(t_shell *shell, t_command *cmd);
 void    pwd();
-char 	*do_env(char *str);
-char    *expand_str(char *str, int quote_type);
-/* void    export(char *str); */
+char 	*do_env(t_shell *shell, char *str);
+char    *expand_str(t_shell *shell, char *str, int quote_type);
+void    export(char **args, t_shell *shell);
+void    cd(char **args);
+void	env(t_shell *shell);
+void    echo(char **args);
+void    unset(t_shell *shell, char **args);
 
-/* Get Next Line part */
-char	*get_next_line(int fd);
-char	*find_char(char *s, char c, size_t len);
-char	*append(char *s1, char *s2, size_t l1, size_t l2);
+/* Environment part */
+void    add_env(t_shell *shell, char *key, char *value);
+t_env   *find_env(t_shell *shell, char *key);
 #endif

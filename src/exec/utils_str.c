@@ -4,13 +4,18 @@
 #include "../libft/libft.h"
 
 
-char *do_env(char *str)
+char 	*do_env(t_shell *shell, char *str)
 {
     char    *s;
+    t_env   *env;
 
     if (!str)
         return (NULL);
-    s = getenv(str);
+    env = find_env(shell, str);
+    if (env)
+        return (free(str), ft_strdup(env->value));
+    else
+        s = getenv(str);
     free(str);
     return (s);
 }
@@ -41,13 +46,13 @@ static char *find_end(char *str)
     return (NULL);
 }
 
-char    *expand_str(char *str, int quote_type)
+char    *expand_str(t_shell *shell, char *str, int quote_type)
 {
     char    *start;
     char    *end;
     char    *res;
 
-    if (quote_type == QUOTE_SINGLE)
+    if (!str || quote_type == QUOTE_SINGLE)
         return (str);
     res = NULL;
     start = ft_strchr(str, '$');
@@ -56,10 +61,10 @@ char    *expand_str(char *str, int quote_type)
         end = find_end(start + 1);
         res = join(res, ft_substr(str, 0, start - str));
         if (end)
-            res = join(res, do_env(ft_substr(start + 1, 0, end - start - 1)));
+            res = join(res, do_env(shell, ft_substr(start + 1, 0, end - start - 1)));
         else
         {
-            res = join(res, do_env(ft_strdup(start + 1)));
+            res = join(res, do_env(shell, ft_strdup(start + 1)));
             str = NULL;
             break ;
         }

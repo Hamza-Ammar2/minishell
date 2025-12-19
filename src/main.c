@@ -21,6 +21,7 @@ int	main(int argc, char **argv, char **envp)
 	(void)argv;
 	(void)envp;
 	init_shell(&shell);
+	shell.envp = envp;
 	shell_loop(&shell);
 	cleanup_shell(&shell);
 	return (shell.exit_status);
@@ -59,6 +60,8 @@ void	process_input(char *input, t_shell *shell)
 		print_command(cmd);
 		exec(cmd, shell);
 		free_commands(cmd);
+		dup2(shell->stdin_backup, STDIN_FILENO);
+		dup2(shell->stdout_backup, STDOUT_FILENO);
 	}
 	free_tokens(tokens);
 }

@@ -39,7 +39,7 @@ char    *get_path(char **paths, char *cmd)
         free(full_path);
         paths++;
     }
-    return (NULL);
+    return (cmd);
 }
 
 static int strcmpy(const char *s1, const char *s2)
@@ -56,7 +56,7 @@ static int strcmpy(const char *s1, const char *s2)
     return ((unsigned char)s1[i] - (unsigned char)s2[i]);
 }
 
-static void    here_doc_app(t_token *redir)
+static void    here_doc_app(t_shell *shell, t_token *redir)
 {
     int file;
     char *line;
@@ -70,17 +70,16 @@ static void    here_doc_app(t_token *redir)
     }
     else if (redir->type == TOKEN_REDIRECT_HEREDOC)
     {
-        write(1, "> ", 2);
         pipe(fd);
-        line = expand_str(get_next_line(0), redir->quote_type);
+        line = expand_str(shell, readline("> "), redir->quote_type);
         while (strcmpy(line, redir->value) != 0)
         {
             write(fd[1], line, strlen(line));
+            write(fd[1], "\n", 1);
             free(line);
-            write(1, "> ", 2);
-            line = expand_str(get_next_line(0), redir->quote_type);
+            line = expand_str(shell, readline("> "), redir->quote_type);
             if (!line)
-                write(1, "\n", 1);
+                break ;
         }
         dup2(fd[0], STDIN_FILENO);
         close(fd[1]);
@@ -89,7 +88,7 @@ static void    here_doc_app(t_token *redir)
     }
 }
 
-void    direct_io(t_command *cmd)
+void    direct_io(t_shell *shell, t_command *cmd)
 {
     int file;
     t_token *redir;
@@ -106,11 +105,12 @@ void    direct_io(t_command *cmd)
         else if (redir->type == TOKEN_REDIRECT_OUT)
         {
             file = open(redir->value, O_WRONLY | O_TRUNC | O_CREAT, 0644);
+            printf("Redirecting output to %s\n", redir->value);
             dup2(file, STDOUT_FILENO);
             close(file);
         }
         else
-            here_doc_app(redir);
+            here_doc_app(shell, redir);
         redir = redir->next;
     }
 }
