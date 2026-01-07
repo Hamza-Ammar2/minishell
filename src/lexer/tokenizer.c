@@ -134,10 +134,12 @@ t_token	*tokenize(char *input)
 			i++;
 		if (!input[i])
 			break ;
-		if (is_quote(input[i]) && !process_quote(&head, input, &i))
-			return (free_tokens(head), NULL);
 		if (is_quote(input[i]))
+		{
+			if (!process_quote(&head, input, &i))
+				return (free_tokens(head), NULL);
 			continue ;
+		}
 		operator = is_operator(&input[i]);
 		if (operator)
 			i += process_operator(&head, operator);
