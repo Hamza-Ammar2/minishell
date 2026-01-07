@@ -38,6 +38,7 @@ void    unset(t_shell *shell, char **args)
         args++;
     }
 }
+
 static int exp_one(t_shell *shell, char *arg)
 {
     char    *eq;

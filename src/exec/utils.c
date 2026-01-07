@@ -45,3 +45,8 @@ char    *get_path(char **paths, char *cmd)
     }
     return (cmd);
 }
+void    restore(t_shell *shell)
+{
+    dup2(shell->stdin_backup, STDIN_FILENO);
+    dup2(shell->stdout_backup, STDOUT_FILENO);
+}

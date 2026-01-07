@@ -31,8 +31,8 @@ static void    exec_single(t_command *cmd, t_shell *shell, char **paths)
     if (!args)
         exit(1);
     str = get_path(paths, args[0]);
-    if (!direct_io(shell, cmd))
-        exit(1);
+    /* if (!direct_io(shell, cmd))
+        exit(1); */
     execve(str, args, shell->envp);
     perror("execve failed");
     exit(1);
@@ -52,7 +52,7 @@ int    connect_pipes(t_command *cmd, int fd[3][2])
         if (!fd[2][1])
             close(fd[(i+1)%2][1]);
     }
-    else //if (!fd[2][1])
+    else if (!fd[2][1])
         close(fd[i%2][0]);
     if (cmd->next)
         failed = dup2(fd[i%2][1], STDOUT_FILENO);
@@ -104,16 +104,18 @@ static int    rec_exec(char **paths, int fd[3][2], t_command *cmds, t_shell *she
         return (fd[2][0] = fd[2][0] + 1, rec_exec(paths, fd, cmds->next, shell));
     else if (cb == -1)
         return (close_pipes(cmds, fd), 1);
+    if (!direct_io(shell, cmds))
+        return (close_pipes(cmds, fd), 1);
     fd[2][1] = fork();
     if (fd[2][1] < 0)
         return (close_pipes(cmds, fd), perror("fork failed"), 1);
     if (fd[2][1] == 0)
     {
-        rl_signal_event_hook = NULL;
         if (connect_pipes(cmds, fd) != -1)
             exec_single(cmds, shell, paths);
         exit(1);
     }
+    restore(shell);
     if (close_pipes(cmds, fd))
         return (0);
     return (fd[2][0] = fd[2][0] + 1, rec_exec(paths, fd, cmds->next, shell));

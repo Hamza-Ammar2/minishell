@@ -12,6 +12,7 @@
 # include <unistd.h>
 # include <errno.h>
 # include <signal.h>
+# include <sys/ioctl.h>
 
 # define PROMPT "minishell$ "
 # ifndef BUFFER_SIZE
@@ -127,6 +128,7 @@ int	    direct_io(t_shell *shell, t_command *cmd);
 char 	**wraper(t_token **args, t_shell *shell);
 void	free_splits(char **splits);
 int    	connect_pipes(t_command *cmd, int fd[3][2]);
+void    restore(t_shell *shell);
 
 /* Built-in functions */
 int     check_builtin(t_command *cmds, t_shell *shell, int fd[3][2]);

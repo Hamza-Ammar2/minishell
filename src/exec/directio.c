@@ -19,12 +19,15 @@ static int strcmpy(const char *s1, const char *s2)
     return ((unsigned char)s1[i] - (unsigned char)s2[i]);
 }
 
-static void clean_stuff(int fd[2], char *line)
+static int clean_stuff(t_shell *shell, int fd[2], char *line)
 {
-    close(fd[0]);
+    sig = 0;
+    (void)shell;
+    restore(shell);
     close(fd[1]);
+    close(fd[0]);
     free(line);
-    exit(1);
+    return (2);
 }
 
 static int heredoc(t_shell *shell, t_token *redir)
@@ -41,19 +44,19 @@ static int heredoc(t_shell *shell, t_token *redir)
     if (type == QUOTE_SINGLE || type == QUOTE_DOUBLE)
         type = QUOTE_SINGLE;
     line = expand_str(shell, readline("> "), type);
+    if (sig)
+        return (clean_stuff(shell, fd, line));
     while (strcmpy(line, redir->value) != 0)
     {
         write(fd[1], line, ft_strlen(line));
         write(fd[1], "\n", 1);
-        if (sig)
-            clean_stuff(fd, line);
         free(line);
         line = expand_str(shell, readline("> "), type);
+        if (sig)
+            return (clean_stuff(shell, fd, line));
         if (!line)
             break ;
     }
-    if (sig)
-        clean_stuff(fd, line);
     if (dup2(fd[0], STDIN_FILENO) == -1)
         return (close(fd[1]), close(fd[0]), perror("dup2 failed"), 0);
     return (close(fd[1]), close(fd[0]), free(line), 1);
@@ -75,10 +78,7 @@ static int    here_doc_app(t_shell *shell, t_token *redir)
         close(file);
     }
     else if (redir->type == TOKEN_REDIRECT_HEREDOC)
-    {
-        if (!heredoc(shell, redir))
-            return (0);
-    }
+        return (heredoc(shell, redir));
     return (1);
 }
 
@@ -114,6 +114,7 @@ static int  in_out(t_shell *shell, t_token *redir)
 int    direct_io(t_shell *shell, t_command *cmd)
 {
     t_token *redir;
+    int     hd;
 
     redir = cmd->redirects;
     while (redir)
@@ -122,9 +123,16 @@ int    direct_io(t_shell *shell, t_command *cmd)
         {
             if (!in_out(shell, redir))
                 return (perror("direct_io failed"), 0);
+            redir = redir->next;
+            continue;
         }
-        else if (!here_doc_app(shell, redir))
-            return (perror("direct_here_app failed"), 0);
+        hd = here_doc_app(shell, redir);
+        if (hd != 1)
+        {
+            if (!hd)
+                perror("direct_here_app failed");
+            return (0);
+        }
         redir = redir->next;
     }
     return (1);

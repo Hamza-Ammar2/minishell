@@ -68,11 +68,11 @@ void    echo(char **args)
     }
     while (args[i])
     {
-        printf("%s", args[i]);
+        write(STDOUT_FILENO, args[i], ft_strlen(args[i]));
         if (args[i + 1])
-            printf(" ");
+            write(STDOUT_FILENO, " ", 1);
         i++;
     }
     if (newline)
-        printf("\n");
+        write(STDOUT_FILENO, "\n", 1);
 }
