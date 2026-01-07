@@ -1,0 +1,720 @@
+================================================================================
+              MINISHELL PARSING ARCHITECTURE - COMPLETE THEORY
+================================================================================
+
+                        OVERVIEW OF THE PARSING PIPELINE
+                        
+User Input (string) 
+      ↓
+   LEXER (Tokenization)
+      ↓
+   Token Linked List (with quote_type metadata)
+      ↓
+   SYNTAX VALIDATOR
+      ↓
+   PARSER (Build Command Structures)
+      ↓
+   Command Linked List (t_command** with quote_type preserved)
+      ↓
+   EXECUTOR (Hamza's side - uses quote_type for expansion)
+
+
+================================================================================
+                          PHASE 1: LEXER (TOKENIZATION)
+================================================================================
+
+PURPOSE:
+--------
+Take raw user input string and break it into meaningful pieces (tokens).
+Each token represents a "word", operator, or quoted string.
+Preserve quote information for later expansion.
+
+
+ENTRY POINT:
+-----------
+Function: tokenize(char *input)
+Location: src/lexer/tokenizer.c
+Returns: t_token * (head of linked list)
+
+
+DETAILED FLOW:
+-------------
+
+1. USER TYPES COMMAND
+   Input: 'echo "hello $USER" | grep test > out.txt'
+   
+2. tokenize() STARTS PROCESSING
+   - Initialize empty token list (head = NULL)
+   - Loop through input string character by character
+   
+3. FOR EACH CHARACTER:
+
+   a) SKIP WHITESPACE
+      - While current char is space/tab, advance
+      - Whitespace separates tokens but isn't stored
+   
+   b) CHECK FOR QUOTES
+      - is_quote(input[i]) checks if char is ' or "
+      - If quote found: process_quote() handles it
+      
+      QUOTE PROCESSING (process_quote):
+      --------------------------------
+      - Calls extract_quoted_word()
+        * Finds the closing quote
+        * Extracts string BETWEEN quotes (quotes removed from value)
+        * Sets quote_type: 1 (single) or 2 (double)
+        * Returns the extracted string
+      
+      - Creates new token:
+        * Type: TOKEN_WORD
+        * Value: "hello $USER" (without the quotes themselves)
+        * quote_type: 2 (because it was double quoted)
+      
+      - Adds token to list
+      - Advances position past closing quote
+   
+   c) CHECK FOR OPERATORS
+      - is_operator() checks for: | < > << >>
+      - If operator found: process_operator() handles it
+      
+      OPERATOR PROCESSING:
+      -------------------
+      - get_token_type() converts operator string to enum:
+        * "|"  → TOKEN_PIPE
+        * "<"  → TOKEN_REDIRECT_IN
+        * ">"  → TOKEN_REDIRECT_OUT
+        * ">>" → TOKEN_REDIRECT_APPEND
+        * "<<" → TOKEN_REDIRECT_HEREDOC
+      
+      - Creates token with operator type
+      - Value is NULL (operators don't have values)
+      - Adds to list
+   
+   d) EXTRACT REGULAR WORD
+      - If not quote or operator: process_word()
+      - extract_word() reads until:
+        * Whitespace
+        * Operator
+        * Quote
+        * End of string
+      
+      - Creates TOKEN_WORD with:
+        * Value: the extracted word
+        * quote_type: 0 (not quoted)
+
+
+TOKEN UTILITIES:
+---------------
+
+new_token(type, value, quote_type)
+   - Allocates t_token struct
+   - Duplicates the value string (ft_strdup)
+   - Sets type and quote_type
+   - Initializes next pointer to NULL
+
+add_token_to_list(head, new_token)
+   - If list empty: new_token becomes head
+   - Otherwise: traverse to end and append
+
+free_tokens(tokens)
+   - Walk the linked list
+   - Free each token's value
+   - Free each token struct
+
+
+RESULT AFTER TOKENIZATION:
+--------------------------
+Input:  'echo "hello $USER" | grep test > out.txt'
+
+Token List:
+   [TOKEN_WORD: "echo" (quote:0)]
+      ↓
+   [TOKEN_WORD: "hello $USER" (quote:2)]  ← Note: quote_type preserved!
+      ↓
+   [TOKEN_PIPE: NULL (quote:0)]
+      ↓
+   [TOKEN_WORD: "grep" (quote:0)]
+      ↓
+   [TOKEN_WORD: "test" (quote:0)]
+      ↓
+   [TOKEN_REDIRECT_OUT: NULL (quote:0)]
+      ↓
+   [TOKEN_WORD: "out.txt" (quote:0)]
+      ↓
+   NULL
+
+
+KEY INSIGHT:
+-----------
+The quote_type field is CRITICAL:
+- quote_type = 0 (QUOTE_NONE): Expand $VAR + word split spaces
+- quote_type = 1 (QUOTE_SINGLE): NO expansion, literal string
+- quote_type = 2 (QUOTE_DOUBLE): Expand $VAR, but NO word split
+
+This information is preserved through parsing to executor!
+
+
+================================================================================
+                     PHASE 2: SYNTAX VALIDATION
+================================================================================
+
+PURPOSE:
+--------
+Check if the token sequence is valid BEFORE trying to parse it.
+Catch syntax errors early with clear error messages.
+
+
+ENTRY POINT:
+-----------
+Function: validate_syntax(t_token *tokens)
+Location: src/parser/syntax_validator.c
+Returns: int (1 = valid, 0 = invalid)
+
+
+CHECKS PERFORMED:
+----------------
+
+1. validate_start(tokens)
+   - First token can't be an operator
+   - Invalid: "| echo hello"
+   - Invalid: "> file"
+   - Valid: "echo hello | cat"
+
+2. validate_end(tokens)
+   - Last token can't be an operator
+   - Invalid: "echo hello |"
+   - Invalid: "cat <"
+   - Valid: "echo hello > file"
+
+3. validate_consecutive(tokens)
+   - No two operators in a row
+   - Invalid: "cat < > file"
+   - Invalid: "echo | | grep"
+   - Valid: "cat < file | grep test"
+
+4. Additional checks in pipe_redirect_validation.c:
+   - validate_pipe_boundaries(): No pipes at start/end
+   - validate_consecutive_pipes(): No || (that's logical OR, not supported)
+
+
+RESULT:
+-------
+If validation passes: Continue to parsing
+If validation fails: Print error, free tokens, return
+
+
+================================================================================
+                       PHASE 3: PARSER (BUILD COMMANDS)
+================================================================================
+
+PURPOSE:
+--------
+Transform the flat token list into structured command objects.
+Separate commands by pipes, extract arguments and redirections.
+PRESERVE quote_type in the command structure for later expansion.
+
+
+ENTRY POINT:
+-----------
+Function: parse(t_token *tokens)
+Location: src/parser/parser.c
+Returns: t_command * (head of command linked list)
+
+
+HIGH-LEVEL LOGIC:
+----------------
+
+1. Check if input contains pipes:
+   - count_pipes(tokens) → number of pipe operators
+   
+2. Route to appropriate parser:
+   - If pipes > 0: parse_pipeline(tokens)
+   - If pipes = 0: parse_single_command(tokens)
+
+
+PARSING A SINGLE COMMAND:
+-------------------------
+
+Function: parse_single_command(tokens)
+
+Steps:
+1. Create new command structure:
+   new_command() allocates t_command with NULL fields
+
+2. Parse redirections:
+   parse_redirections(cmd, tokens)
+   - Scans for redirect operators (<, >, >>, <<)
+   - Extracts filename that follows each operator
+   - Creates merged redirect tokens with:
+     * Type: TOKEN_REDIRECT_IN/OUT/APPEND/HEREDOC
+     * Value: filename
+     * quote_type: preserved from filename token
+   - Stores in cmd->redirects linked list
+
+3. Count arguments:
+   count_args(tokens)
+   - Counts TOKEN_WORD tokens
+   - Skips redirect operators and their filenames
+   - Returns count for array allocation
+
+4. Allocate args array:
+   cmd->args = malloc(sizeof(t_token *) * (count + 1))
+   - Creates array of token POINTERS
+   - +1 for NULL terminator
+
+5. Fill args array:
+   fill_args(cmd, tokens)
+   - Loop through tokens
+   - For each TOKEN_WORD:
+     * Create NEW token with new_token()
+     * Copy value and quote_type
+     * Store pointer in args array
+   - Skip operators and redirect filenames
+   - NULL-terminate array
+
+6. Return command
+
+
+PARSING A PIPELINE:
+------------------
+
+Function: parse_pipeline(tokens)
+
+Purpose: Handle multiple commands separated by pipes
+Example: "ls -la | grep test | wc -l"
+
+Steps:
+1. Create working copy of token pointer
+2. Loop while tokens remain:
+   
+   a) Extract tokens for one command:
+      extract_command_tokens(&token_copy)
+      - Creates COPY of tokens up to next pipe
+      - Advances token_copy past the pipe
+      - Returns: linked list of tokens for this command
+   
+   b) Create command from those tokens:
+      create_pipeline_command(cmd_tokens)
+      - Same as parse_single_command()
+      - Parses redirections
+      - Counts args
+      - Fills args array
+      - Returns: t_command *
+   
+   c) Free the copied tokens:
+      free_tokens(cmd_tokens)
+   
+   d) Link command to chain:
+      link_command(&head, &current, new_cmd)
+      - If first command: head = new_cmd
+      - Otherwise: current->next = new_cmd
+      - Update current pointer
+
+3. Return head of command list
+
+
+COMMAND STRUCTURE:
+-----------------
+
+typedef struct s_command
+{
+    t_token   **args;        // Array of token pointers
+    t_token    *redirects;   // Linked list of redirects
+    struct s_command *next;  // Next command (for pipelines)
+}   t_command;
+
+
+EXAMPLE TRANSFORMATION:
+----------------------
+
+Input tokens:
+   [echo] [hello] [|] [cat]
+
+After parse_pipeline():
+
+Command 1:
+   args: [token("echo", quote:0), token("hello", quote:0), NULL]
+   redirects: NULL
+   next: → Command 2
+
+Command 2:
+   args: [token("cat", quote:0), NULL]
+   redirects: NULL
+   next: NULL
+
+
+WITH QUOTES EXAMPLE:
+-------------------
+
+Input: echo "hello $USER" > file
+
+Tokens:
+   [echo (quote:0)] ["hello $USER" (quote:2)] [>] [file (quote:0)]
+
+After parsing:
+
+Command:
+   args: [
+      token("echo", quote:0),
+      token("hello $USER", quote:2),  ← quote_type PRESERVED!
+      NULL
+   ]
+   redirects: [token_REDIRECT_OUT("file", quote:0)] → NULL
+   next: NULL
+
+
+================================================================================
+                    WHY PRESERVE quote_type IN COMMANDS?
+================================================================================
+
+CRITICAL REASON:
+---------------
+Variable expansion happens LATER (during/before execution).
+The executor needs to know the quote context to expand correctly.
+
+Example with $USER = "John Doe":
+
+1. echo $USER
+   - Token: value="$USER", quote_type=0
+   - Expand: "John Doe"
+   - Word split: ["John", "Doe"]
+   - Output: John Doe
+
+2. echo "$USER"
+   - Token: value="$USER", quote_type=2
+   - Expand: "John Doe"
+   - NO word split (double quotes)
+   - Output: John Doe
+
+3. echo '$USER'
+   - Token: value="$USER", quote_type=1
+   - NO expansion (single quotes)
+   - Output: $USER
+
+
+EXECUTOR WILL DO:
+----------------
+for each token in cmd->args:
+   if (token->quote_type == QUOTE_SINGLE):
+      // Keep literal, no expansion
+      final_value = token->value
+   
+   else if (token->quote_type == QUOTE_DOUBLE):
+      // Expand but keep as one word
+      final_value = expand_variables(token->value)
+   
+   else: // QUOTE_NONE
+      // Expand AND word split
+      final_value = expand_variables(token->value)
+      final_array = word_split(final_value)
+
+
+================================================================================
+                         COMPLETE FUNCTION CALL TREE
+================================================================================
+
+main()
+ └─ init_shell()
+ └─ shell_loop()
+     └─ readline()  ← Get user input
+     └─ add_history()
+     └─ process_input()
+         │
+         ├─ tokenize()  ← LEXER
+         │   ├─ ft_isspace()
+         │   ├─ is_quote()
+         │   │   └─ process_quote()
+         │   │       └─ extract_quoted_word()
+         │   │           ├─ find_closing_quote()
+         │   │           └─ ft_substr()
+         │   │       └─ new_token()
+         │   │       └─ add_token_to_list()
+         │   ├─ is_operator()
+         │   │   └─ process_operator()
+         │   │       ├─ get_token_type()
+         │   │       ├─ new_token()
+         │   │       └─ add_token_to_list()
+         │   └─ process_word()
+         │       ├─ extract_word()
+         │       ├─ new_token()
+         │       └─ add_token_to_list()
+         │
+         ├─ validate_syntax()  ← VALIDATION
+         │   ├─ validate_start()
+         │   │   └─ is_operator_token()
+         │   ├─ validate_end()
+         │   │   ├─ get_last_token()
+         │   │   └─ is_operator_token()
+         │   ├─ validate_consecutive()
+         │   │   └─ is_operator_token()
+         │   └─ validate_pipe_syntax()
+         │       ├─ validate_pipe_boundaries()
+         │       └─ validate_consecutive_pipes()
+         │
+         ├─ parse()  ← PARSER
+         │   ├─ count_pipes()
+         │   │
+         │   ├─ parse_pipeline() [if pipes > 0]
+         │   │   ├─ extract_command_tokens()
+         │   │   │   ├─ new_token()
+         │   │   │   └─ add_token_to_list()
+         │   │   ├─ create_pipeline_command()
+         │   │   │   ├─ new_command()
+         │   │   │   ├─ parse_redirections()
+         │   │   │   │   └─ extract_redirections()
+         │   │   │   │       ├─ is_redirect_type()
+         │   │   │   │       ├─ create_redirect_token()
+         │   │   │   │       │   └─ new_token()
+         │   │   │   │       └─ add_token_to_list()
+         │   │   │   ├─ count_args()
+         │   │   │   │   └─ is_redirect_type()
+         │   │   │   └─ fill_command_args()
+         │   │   │       ├─ new_token()
+         │   │   │       └─ is_redirect_type()
+         │   │   ├─ free_tokens()
+         │   │   └─ link_command()
+         │   │
+         │   └─ parse_single_command() [if no pipes]
+         │       ├─ new_command()
+         │       ├─ parse_redirections()
+         │       │   └─ extract_redirections()
+         │       ├─ count_args()
+         │       └─ fill_args()
+         │           └─ new_token()
+         │
+         ├─ print_command()  ← DEBUG
+         │   └─ print_redirects()
+         │       └─ get_redirect_name()
+         │
+         ├─ exec()  ← EXECUTOR (Hamza's side)
+         │
+         └─ free_commands()  ← CLEANUP
+             ├─ free_tokens() [for each arg]
+             └─ free_tokens() [for redirects]
+
+
+================================================================================
+                           DATA STRUCTURES IN DETAIL
+================================================================================
+
+t_token (Fundamental Unit)
+--------------------------
+struct s_token
+{
+    t_token_type  type;        // TOKEN_WORD, TOKEN_PIPE, etc.
+    char         *value;       // The actual string (malloc'd)
+    struct s_token *next;      // Next token in list
+    int           quote_type;  // 0=none, 1=single, 2=double
+}
+
+Purpose: Represents one piece of input
+Lifetime: Created in tokenize(), freed after parsing
+Memory: value is malloc'd, must be freed
+
+
+t_command (Execution Unit)
+--------------------------
+struct s_command
+{
+    t_token         **args;       // NULL-terminated array of token pointers
+    t_token          *redirects;  // Linked list of redirect tokens
+    struct s_command *next;       // Next command in pipeline
+}
+
+Purpose: Represents one executable command
+Lifetime: Created in parse(), freed after execution
+Memory: 
+   - args array is malloc'd
+   - Each args[i] is a token (created with new_token)
+   - redirects is a linked list of tokens
+   - All must be freed
+
+
+t_shell (Global State)
+---------------------
+struct s_shell
+{
+    char  *input;         // Current input line
+    t_env *env;           // Environment variables
+    char  **envp;         // Environment array
+    int    exit_status;   // Last command's exit status
+    int    stdin_backup;  // Saved stdin fd
+    int    stdout_backup; // Saved stdout fd
+}
+
+Purpose: Holds shell state across commands
+Lifetime: Created in main(), freed at exit
+
+
+================================================================================
+                            MEMORY MANAGEMENT FLOW
+================================================================================
+
+ALLOCATION TIMELINE:
+-------------------
+
+1. readline() allocates input string
+   → User types command
+   → readline returns malloc'd string
+   → Stored temporarily in shell_loop()
+
+2. tokenize() creates token list
+   → Each token malloc'd
+   → Each token->value malloc'd (ft_strdup)
+   → Tokens linked together
+
+3. parse() creates command structures
+   → new_command() mallocs t_command
+   → args array malloc'd
+   → Each args[i] is NEW token (malloc'd + value malloc'd)
+   → Redirects list contains NEW tokens
+
+4. exec() uses commands
+   → Reads args and redirects
+   → May expand variables (creates new strings)
+   → Executes commands
+
+5. Cleanup:
+   → free_commands() frees:
+      * Each args[i] (token and value)
+      * Args array
+      * Each redirect (token and value)
+      * Command struct
+   → free_tokens() frees original token list
+   → free(input) in shell_loop()
+
+
+KEY INSIGHT - DOUBLE STORAGE:
+-----------------------------
+Tokens are stored TWICE:
+1. Original token list from tokenize()
+2. Copied tokens in command->args[]
+
+Why? Because:
+- Original tokens are temporary (for parsing)
+- Command tokens are permanent (for execution)
+- This allows freeing original list after parsing
+- Command tokens can be modified during expansion
+
+
+================================================================================
+                         WHAT'S MISSING (PHASE 5+)
+================================================================================
+
+YOUR CURRENT CODE:
+------------------
+✅ Tokenization (with quote_type)
+✅ Syntax validation
+✅ Command parsing
+✅ Quote preservation
+✅ Pipeline parsing
+✅ Redirection parsing
+
+STILL NEEDED (Future Phases):
+-----------------------------
+❌ Variable expansion ($USER, $?, etc.)
+❌ Word splitting (unquoted expansions)
+❌ Quote removal (after expansion)
+❌ Heredoc processing
+❌ Signal handling ← PHASE 5 (Your next task!)
+❌ Built-in commands (Hamza's side)
+❌ Proper execution (Hamza's side)
+
+
+================================================================================
+                          PUTTING IT ALL TOGETHER
+================================================================================
+
+Let's trace one complete example:
+
+USER TYPES: echo "hello $USER" | grep ll
+
+STEP 1 - TOKENIZATION:
+----------------------
+tokenize() processes character by character:
+   - Sees 'e' → extract_word() → "echo"
+   - Creates: [TOKEN_WORD: "echo" (quote:0)]
+   
+   - Sees '"' → process_quote() → extract_quoted_word()
+   - Extracts "hello $USER" (without quotes)
+   - Creates: [TOKEN_WORD: "hello $USER" (quote:2)]
+   
+   - Sees '|' → process_operator()
+   - Creates: [TOKEN_PIPE: NULL]
+   
+   - Sees 'g' → extract_word() → "grep"
+   - Creates: [TOKEN_WORD: "grep" (quote:0)]
+   
+   - Sees 'l' → extract_word() → "ll"
+   - Creates: [TOKEN_WORD: "ll" (quote:0)]
+
+Result: Linked list of 5 tokens
+
+STEP 2 - VALIDATION:
+-------------------
+validate_syntax() checks:
+   ✅ First token is WORD (not operator)
+   ✅ Last token is WORD (not operator)
+   ✅ No consecutive operators
+   ✅ Pipe has commands on both sides
+
+Result: Valid!
+
+STEP 3 - PARSING:
+----------------
+parse() sees pipes, calls parse_pipeline():
+
+Loop 1: Extract tokens before pipe
+   - extract_command_tokens() copies: [echo] ["hello $USER"]
+   - create_pipeline_command() builds:
+     * new_command()
+     * parse_redirections() → none
+     * count_args() → 2
+     * Allocate args[3]
+     * fill_command_args() →
+       args[0] = new_token("echo", quote:0)
+       args[1] = new_token("hello $USER", quote:2)  ← QUOTE TYPE!
+       args[2] = NULL
+   - Command 1 created!
+
+Loop 2: Extract tokens after pipe
+   - extract_command_tokens() copies: [grep] [ll]
+   - create_pipeline_command() builds:
+     * args[0] = new_token("grep", quote:0)
+     * args[1] = new_token("ll", quote:0)
+     * args[2] = NULL
+   - Command 2 created!
+
+Link commands: Command 1->next = Command 2
+
+STEP 4 - EXECUTION (Hamza's side):
+---------------------------------
+exec() receives command chain:
+
+For Command 1:
+   - Reads args[0]->value = "echo"
+   - Reads args[1]->value = "hello $USER"
+   - Checks args[1]->quote_type = 2 (double quote)
+   - Expands $USER but keeps as one word
+   - If USER="John", expands to "hello John"
+   - Executes: echo "hello John"
+
+Pipe connects to Command 2:
+   - Input from Command 1
+   - Executes: grep ll
+   - Output: "hello John" (if it contains 'll')
+
+
+================================================================================
+                            END OF THEORY DOCUMENT
+================================================================================
+
+This document covered:
+✅ Complete lexer/parser architecture
+✅ Function call tree
+✅ Data flow through the pipeline
+✅ Why quote_type is preserved
+✅ Memory management
+✅ Complete worked example
+
+Next Phase: Signal Handling (SIGINT, SIGQUIT, Ctrl+D)
