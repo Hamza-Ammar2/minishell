@@ -70,6 +70,38 @@ char	*extract_quoted_word(const char *input, int *i, int *quote_type)
 }
 
 /*
+** Called from: process_quote() below
+** Purpose: Concatenate adjacent quoted strings (no space between)
+** Example: "hello""world" becomes one token "helloworld"
+** Parameters:
+**   - word: the first extracted quoted word
+**   - input: full input string
+**   - i: pointer to current position (will be updated)
+** Returns: concatenated string or NULL on error
+*/
+static char	*concat_adjacent_quotes(char *word, char *input, int *i)
+{
+	char	*next_word;
+	char	*temp;
+	int		quote_type;
+
+	while (input[*i] && is_quote(input[*i]))
+	{
+		quote_type = 0;
+		next_word = extract_quoted_word(input, i, &quote_type);
+		if (!next_word)
+			return (free(word), NULL);
+		temp = ft_strjoin(word, next_word);
+		free(word);
+		free(next_word);
+		if (!temp)
+			return (NULL);
+		word = temp;
+	}
+	return (word);
+}
+
+/*
 ** Called from: tokenize() in tokenizer.c
 ** Purpose: Process a quoted token and add it to the token list
 ** Parameters:
@@ -86,6 +118,9 @@ int	process_quote(t_token **head, char *input, int *i)
 
 	quote_type = 0;
 	word = extract_quoted_word(input, i, &quote_type);
+	if (!word)
+		return (0);
+	word = concat_adjacent_quotes(word, input, i);
 	if (!word)
 		return (0);
 	token = new_token(TOKEN_WORD, word, quote_type);
