@@ -109,6 +109,7 @@ static int    rec_exec(char **paths, int fd[3][2], t_command *cmds, t_shell *she
         return (close_pipes(cmds, fd), perror("fork failed"), 1);
     if (fd[2][1] == 0)
     {
+        rl_signal_event_hook = NULL;
         if (connect_pipes(cmds, fd) != -1)
             exec_single(cmds, shell, paths);
         exit(1);

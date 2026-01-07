@@ -3,7 +3,7 @@
 #include "../include/minishell.h"
 #include "../libft/libft.h"
 
-extern sig_atomic_t sig[2];
+extern t_sig g_sig;
 
 static int strcmpy(const char *s1, const char *s2)
 {
@@ -19,33 +19,41 @@ static int strcmpy(const char *s1, const char *s2)
     return ((unsigned char)s1[i] - (unsigned char)s2[i]);
 }
 
+static void sigint_handler_hd(int sig)
+{
+    (void)sig;
+    write(STDOUT_FILENO, "\n", 1);
+    close(g_sig.fd[0]);
+    close(g_sig.fd[1]);
+    exit(1);
+}
+
 static int heredoc(t_shell *shell, t_token *redir)
 {
-    int fd[2];
     char *line;
     int type;
 
-    sig[1] = 1;
-    if (pipe(fd) == -1)
+    if (pipe(g_sig.fd) == -1)
         return (perror("heredoc pipe failed"), 0);
     if (dup2(shell->stdin_backup, STDIN_FILENO) == -1)
         return (perror("dup2 failed"), 0);
+    signal(SIGINT, sigint_handler_hd);
     type = redir->quote_type;
     if (type == QUOTE_SINGLE || type == QUOTE_DOUBLE)
         type = QUOTE_SINGLE;
     line = expand_str(shell, readline("> "), type);
     while (strcmpy(line, redir->value) != 0)
     {
-        write(fd[1], line, strlen(line));
-        write(fd[1], "\n", 1);
+        write(g_sig.fd[1], line, strlen(line));
+        write(g_sig.fd[1], "\n", 1);
         free(line);
         line = expand_str(shell, readline("> "), type);
         if (!line)
             break ;
     }
-    if (dup2(fd[0], STDIN_FILENO) == -1)
+    if (dup2(g_sig.fd[0], STDIN_FILENO) == -1)
         return (perror("dup2 failed"), 0);
-    return (close(fd[1]), close(fd[0]), free(line), 1);
+    return (close(g_sig.fd[1]), close(g_sig.fd[0]), free(line), 1);
 }
 
 static int    here_doc_app(t_shell *shell, t_token *redir)

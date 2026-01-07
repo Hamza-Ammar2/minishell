@@ -1,6 +1,6 @@
 #include "../include/minishell.h"
 
-volatile sig_atomic_t	sig = 0;
+volatile t_sig g_sig = {{0, 0}, 0};
 
 /*
 ** 🔧 What the function Does
@@ -84,13 +84,13 @@ void	process_input(char *input, t_shell *shell)
 
 static void	handle_sig(int s)
 {
-	sig = s;
+	g_sig.sig = s;
 }
 
 static int	sig_hook(void)
 {
-	if (sig) {
-		sig = 0;
+	if (g_sig.sig) {
+		g_sig.sig = 0;
 		write(STDOUT_FILENO, "\n", 1);
 		rl_on_new_line();
 		rl_replace_line("", 0);
