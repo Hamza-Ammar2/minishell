@@ -11,6 +11,8 @@ char 	*do_env(t_shell *shell, char *str)
 
     if (!str)
         return (NULL);
+    if (ft_strcmp(str, "?") == 0)
+        return ((char []) {(char) (shell->exit_status + '0'), '\0'});
     env = find_env(shell, str);
     if (env)
         return (free(str), ft_strdup(env->value));
@@ -37,6 +39,8 @@ static char *join(char *s1, char *s2)
 
 static char *find_end(char *str)
 {
+    if (*str == '?')
+        return (str + 1);
     while (*str)
     {
         if (!ft_isalnum(*str) && *str != '_')
@@ -71,6 +75,5 @@ char    *expand_str(t_shell *shell, char *str, int quote_type)
         str = end;
         start = ft_strchr(str, '$');
     }
-    res = join(res, str);
-    return (res);
+    return (res = join(res, str), res);
 }

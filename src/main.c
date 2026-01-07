@@ -1,5 +1,7 @@
 #include "../include/minishell.h"
 
+volatile sig_atomic_t	sig = 0;
+
 /*
 ** 🔧 What the function Does
 ** Entry point of the minishell program.
@@ -19,7 +21,6 @@ int	main(int argc, char **argv, char **envp)
 
 	(void)argc;
 	(void)argv;
-	(void)envp;
 	init_shell(&shell);
 	shell.envp = envp;
 	shell_loop(&shell);
@@ -60,8 +61,8 @@ void	process_input(char *input, t_shell *shell)
 		print_command(cmd);
 		exec(cmd, shell);
 		free_commands(cmd);
-		dup2(shell->stdin_backup, STDIN_FILENO);
-		dup2(shell->stdout_backup, STDOUT_FILENO);
+		/* dup2(shell->stdin_backup, STDIN_FILENO);
+		dup2(shell->stdout_backup, STDOUT_FILENO); */
 	}
 	free_tokens(tokens);
 }
@@ -80,13 +81,43 @@ void	process_input(char *input, t_shell *shell)
 ** 4. Process the input.
 ** 5. Free input and repeat.
 */
+
+static void	handle_sig(int s)
+{
+	sig = s;
+}
+
+static int	sig_hook(void)
+{
+	if (sig) {
+		sig = 0;
+		write(STDOUT_FILENO, "\n", 1);
+		rl_on_new_line();
+		rl_replace_line("", 0);
+		rl_redisplay();
+		rl_done = 1;
+		return 1;
+    }
+    return 0;
+}
+
 void	shell_loop(t_shell *shell)
 {
 	char	*input;
+	struct sigaction sa;
 
+	sa.sa_handler = handle_sig;
+	rl_signal_event_hook = sig_hook;
+	if (sigaction(SIGINT, &sa, NULL) == -1) {
+        perror("sigaction");
+        exit(EXIT_FAILURE);
+    }
 	while (1)
 	{
-		input = readline(PROMPT);
+		if (isatty(STDIN_FILENO))
+			input = readline(PROMPT);
+		else
+			input = (get_next_line(STDIN_FILENO));
 		if (!input)
 		{
 			printf("exit\n");
@@ -94,7 +125,8 @@ void	shell_loop(t_shell *shell)
 		}
 		if (*input)
 		{
-			add_history(input);
+			if (isatty(STDIN_FILENO))
+				add_history(input);
 			process_input(input, shell);
 		}
 		free(input);

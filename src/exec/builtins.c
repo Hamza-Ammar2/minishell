@@ -34,39 +34,6 @@ void    cd(char **args)
         perror("chdir failed");
 }
 
-void    export(char **args, t_shell *shell)
-{
-    char    *eq;
-    char    *key;
-    char    *value;
-    t_env   *env;
-
-    while (*args)
-    {
-        eq = ft_strchr(*args, '=');
-        if (eq)
-        {
-            key = ft_substr(*args, 0, eq - *args);
-            value = ft_strdup(eq + 1);
-        }
-        else
-        {
-            key = ft_strdup(*args);
-            value = NULL;
-        }
-        env = find_env(shell, key);
-        if (env && eq)
-        {
-            free(env->value);
-            env->value = value;
-            free(key);
-        }
-        else
-            add_env(shell, key, value);
-        args++;
-    }
-}
-
 void    env(t_shell *shell)
 {
     t_env   *current;
@@ -108,35 +75,4 @@ void    echo(char **args)
     }
     if (newline)
         printf("\n");
-}
-
-void    unset(t_shell *shell, char **args)
-{
-    t_env   *current;
-    t_env   *prev;
-    t_env   *to_delete;
-
-    while (*args)
-    {
-        current = shell->env;
-        prev = NULL;
-        while (current)
-        {
-            if (ft_strcmp(current->key, *args) == 0)
-            {
-                to_delete = current;
-                if (prev)
-                    prev->next = current->next;
-                else
-                    shell->env = current->next;
-                free(to_delete->key);
-                free(to_delete->value);
-                free(to_delete);
-                break ;
-            }
-            prev = current;
-            current = current->next;
-        }
-        args++;
-    }
 }

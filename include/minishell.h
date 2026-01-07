@@ -11,8 +11,12 @@
 # include <sys/wait.h>
 # include <unistd.h>
 # include <errno.h>
+# include <signal.h>
 
 # define PROMPT "minishell$ "
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 10
+# endif
 
 /* Lukes Parser Structs */
 typedef enum e_token_type
@@ -119,17 +123,27 @@ char			*ft_strdup(const char *s);
 char    *get_path(char **paths, char *cmd);
 void    exec(t_command *cmds, t_shell *shell);
 char 	*create_path(char *path, char *cmd);
-void    direct_io(t_shell *shell, t_command *cmd);
-void    pwd();
-char 	*do_env(t_shell *shell, char *str);
-char    *expand_str(t_shell *shell, char *str, int quote_type);
+int	    direct_io(t_shell *shell, t_command *cmd);
+char 	**wraper(t_token **args, t_shell *shell);
+void	free_splits(char **splits);
+int    	connect_pipes(t_command *cmd, int fd[3][2]);
+
+/* Built-in functions */
+int     check_builtin(t_command *cmds, t_shell *shell, int fd[3][2]);
 void    export(char **args, t_shell *shell);
 void    cd(char **args);
 void	env(t_shell *shell);
 void    echo(char **args);
 void    unset(t_shell *shell, char **args);
+void    pwd();
 
 /* Environment part */
-void    add_env(t_shell *shell, char *key, char *value);
+int    add_env(t_shell *shell, char *key, char *value);
 t_env   *find_env(t_shell *shell, char *key);
+char 	*do_env(t_shell *shell, char *str);
+char    *expand_str(t_shell *shell, char *str, int quote_type);
+
+char	*get_next_line(int fd);
+char	*find_char(char *s, char c, size_t len);
+char	*append(char *s1, char *s2, size_t l1, size_t l2);
 #endif
