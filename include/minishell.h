@@ -70,12 +70,6 @@ typedef struct s_shell
 	int		stdout_backup;
 }	t_shell;
 
-typedef struct s_sig
-{
-	int		fd[2];
-	sig_atomic_t	sig;
-}	t_sig;
-
 void	init_shell(t_shell *shell);
 void	shell_loop(t_shell *shell);
 void	cleanup_shell(t_shell *shell);
