@@ -79,31 +79,31 @@ static int	process_operator(t_token **head, char *operator)
 
 /*
 ** 🔧 What the function Does
-** Processes and adds a word token to the list.
+** Processes and adds a complete word token to the list.
+** Handles adjacent quoted/unquoted parts as a single word.
 **
 ** 🔗 Role in the Program
 ** Helper to handle word tokens during tokenization.
 **
 ** 🧩 Step-by-Step
-** 1. Extract word from input.
-** 2. Create word token.
+** 1. Extract complete word (all adjacent parts).
+** 2. Create word token with quote type.
 ** 3. Add to token list.
-** 4. Free temporary word and return length.
+** 4. Free temporary word.
 */
-static int	process_word(t_token **head, char *input)
+static int	process_complete_word(t_token **head, char *input, int *i)
 {
 	t_token	*token;
 	char	*word;
-	int		len;
+	int		quote_type;
 
-	word = extract_word(input);
+	word = extract_complete_word(input, i, &quote_type);
 	if (!word)
 		return (0);
-	token = new_token(TOKEN_WORD, word, 0);
+	token = new_token(TOKEN_WORD, word, quote_type);
 	add_token_to_list(head, token);
-	len = ft_strlen(word);
 	free(word);
-	return (len);
+	return (1);
 }
 
 /*
@@ -134,17 +134,16 @@ t_token	*tokenize(char *input)
 			i++;
 		if (!input[i])
 			break ;
-		if (is_quote(input[i]))
-		{
-			if (!process_quote(&head, input, &i))
-				return (free_tokens(head), NULL);
-			continue ;
-		}
 		operator = is_operator(&input[i]);
 		if (operator)
+		{
 			i += process_operator(&head, operator);
+		}
 		else
-			i += process_word(&head, &input[i]);
+		{
+			if (!process_complete_word(&head, input, &i))
+				return (free_tokens(head), NULL);
+		}
 	}
 	return (head);
 }

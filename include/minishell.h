@@ -88,7 +88,7 @@ t_token_type	get_token_type(char *op);
 int				is_quote(char c);
 int				find_closing_quote(const char *str, char quote);
 char			*extract_quoted_word(const char *input, int *i, int *quote_type);
-int				process_quote(t_token **head, char *input, int *i);
+char			*extract_complete_word(const char *input, int *i, int *quote_type);
 
 /* Parser functions */
 t_command		*parse(t_token *tokens);
