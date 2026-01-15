@@ -14,6 +14,8 @@ void    exec(t_command *cmds, t_shell *shell)
     char **paths;
     int last_pid;
 
+    if (!cmds)
+        return ;
     if (!cmds->next)
     {
         if (ft_exit(cmds->args, shell) == 1)
