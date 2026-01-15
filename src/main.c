@@ -1,6 +1,6 @@
 #include "../include/minishell.h"
 
-volatile sig_atomic_t sig = 0;
+extern sig_atomic_t sig;
 
 /*
 ** 🔧 What the function Does
@@ -46,7 +46,6 @@ void	process_input(char *input, t_shell *shell)
 	t_token		*tokens;
 	t_command	*cmd;
 
-	(void)shell;
 	tokens = tokenize(input);
 	if (!tokens)
 		return ;
@@ -58,11 +57,9 @@ void	process_input(char *input, t_shell *shell)
 	cmd = parse(tokens);
 	if (cmd)
 	{
-		print_command(cmd);
+		//print_command(cmd);
 		exec(cmd, shell);
 		free_commands(cmd);
-		/* dup2(shell->stdin_backup, STDIN_FILENO);
-		dup2(shell->stdout_backup, STDOUT_FILENO); */
 	}
 	free_tokens(tokens);
 }
@@ -82,37 +79,13 @@ void	process_input(char *input, t_shell *shell)
 ** 5. Free input and repeat.
 */
 
-static void	handle_sig(int s)
-{
-	sig = s;
-}
-
-static int	sig_hook(void)
-{
-	if (sig) {
-		rl_replace_line("", 0);
-		ioctl(STDIN_FILENO, TIOCSTI, "\n");
-		rl_done = 1;
-		/* rl_on_new_line();
-		rl_replace_line("", 0);
-		rl_redisplay();
-		rl_done = 1; */
-		return 1;
-    }
-    return 0;
-}
 
 void	shell_loop(t_shell *shell)
 {
 	char	*input;
-	struct sigaction sa;
-
-	sa.sa_handler = handle_sig;
-	rl_signal_event_hook = sig_hook;
-	if (sigaction(SIGINT, &sa, NULL) == -1) {
-        perror("sigaction");
-        exit(EXIT_FAILURE);
-    }
+	
+	if (!init_sig())
+		return ;
 	while (1)
 	{
 		if (isatty(STDIN_FILENO))

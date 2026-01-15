@@ -61,7 +61,7 @@ static void	fill_args(t_command *cmd, t_token *tokens)
 			cmd->args[i] = new_token(TOKEN_WORD, current->value,
 				 current->quote_type);
 			if(!cmd->args[i])
-				return;
+				return ;
 			i++;
 		}
 		else if (is_operator_token(current->type))

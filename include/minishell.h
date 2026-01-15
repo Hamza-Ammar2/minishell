@@ -13,6 +13,7 @@
 # include <errno.h>
 # include <signal.h>
 # include <sys/ioctl.h>
+# include <sys/stat.h>
 
 # define PROMPT "minishell$ "
 # ifndef BUFFER_SIZE
@@ -124,20 +125,34 @@ char			*ft_strdup(const char *s);
 char    *get_path(char **paths, char *cmd);
 void    exec(t_command *cmds, t_shell *shell);
 char 	*create_path(char *path, char *cmd);
-int	    direct_io(t_shell *shell, t_command *cmd);
+int	    direct_io(t_shell *shell, t_command *cmd, int fd[3][2]);
 char 	**wraper(t_token **args, t_shell *shell);
 void	free_splits(char **splits);
 int    	connect_pipes(t_command *cmd, int fd[3][2]);
-void    restore(t_shell *shell);
+int  close_pipes(t_command *cmds, int fd[3][2]);
+int    restore(t_shell *shell);
+
+/* Utils */
+int     get_status(int last_pid);
+int    here_doc(t_shell *shell, t_token *redir, int fd[3][2]);
+int exit_exec(char **args, char *str);
 
 /* Built-in functions */
+int 	do_builtin(t_command *cmds, t_shell *shell, int fd[3][2]);
 int     check_builtin(t_command *cmds, t_shell *shell, int fd[3][2]);
-void    export(char **args, t_shell *shell);
-void    cd(char **args);
-void	env(t_shell *shell);
-void    echo(char **args);
-void    unset(t_shell *shell, char **args);
-void    pwd();
+int    export(char **args, t_shell *shell);
+int    cd(char **args);
+int	   env(char **args, t_shell *shell);
+int    echo(char **args);
+int    unset(t_shell *shell, char **args);
+int    pwd(char **args);
+int    ft_exit(t_token **args, t_shell *shell);
+int 	is_dir(char *path);
+
+/* Signal handling */
+void	handle_sig(int s);
+int		sig_hook(void);
+int 	init_sig(void);
 
 /* Environment part */
 int    add_env(t_shell *shell, char *key, char *value);

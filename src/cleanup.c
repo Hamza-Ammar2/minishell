@@ -13,6 +13,7 @@
 */
 void	cleanup_shell(t_shell *shell)
 {
-	(void)shell;
+	close(shell->stdin_backup);
+	close(shell->stdout_backup);
 	rl_clear_history();
 }

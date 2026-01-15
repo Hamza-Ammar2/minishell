@@ -3,18 +3,24 @@
 #include "../include/minishell.h"
 #include "../libft/libft.h"
 
-void    pwd()
+int    pwd(char **args)
 {
     char    *cwd;
 
+    if (args && args[0])
+    {
+        fprintf(stderr, "pwd: too many arguments\n");
+        return (1);
+    }
     cwd = getcwd(NULL, 0);
     if (!cwd)
-        perror("getcwd failed");
+        return (perror("getcwd failed\n"), 1);
     printf("%s\n", cwd);
     free(cwd);
+    return (0);
 }
 
-void    cd(char **args)
+int    cd(char **args)
 {
     char    *dir;
     int     c;
@@ -27,18 +33,26 @@ void    cd(char **args)
         c++;
     if (c > 1)
     {
-        perror("cd: too many arguments\n");
-        return ;
+        fprintf(stderr, "cd: too many arguments\n");
+        return (1);
     }
+    if (!is_dir(dir))
+        return (1);
     if (chdir(dir) == -1)
-        perror("chdir failed");
+        return (perror("chdir failed\n"), 1);
+    return (0);
 }
 
-void    env(t_shell *shell)
+int    env(char **args, t_shell *shell)
 {
     t_env   *current;
     char    **env;
 
+    if (args && args[0])
+    {
+        fprintf(stderr, "env: too many arguments\n");
+        return (1);
+    }
     current = shell->env;
     env = shell->envp;
     while (env && *env)
@@ -52,9 +66,10 @@ void    env(t_shell *shell)
             printf("%s=%s\n", current->key, current->value);
         current = current->next;
     }
+    return (0);
 }
 
-void    echo(char **args)
+int    echo(char **args)
 {
     int     newline;
     int     i;
@@ -69,10 +84,11 @@ void    echo(char **args)
     while (args[i])
     {
         write(STDOUT_FILENO, args[i], ft_strlen(args[i]));
-        if (args[i + 1])
+        if (args[i + 1] && *args[i])
             write(STDOUT_FILENO, " ", 1);
         i++;
     }
     if (newline)
         write(STDOUT_FILENO, "\n", 1);
+    return (0);
 }

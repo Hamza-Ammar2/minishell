@@ -33,20 +33,26 @@ char    *get_path(char **paths, char *cmd)
 {
     char    *full_path;
 
+    if (access(full_path, F_OK) == 0)
+        return (cmd);
     while (*paths)
     {
         full_path = create_path(*paths, cmd);
         if (!full_path)
             return (NULL);
-        if (access(full_path, X_OK) == 0)
+        if (access(full_path, F_OK) == 0)
             return (full_path);
         free(full_path);
         paths++;
     }
-    return (cmd);
+    return (NULL);
 }
-void    restore(t_shell *shell)
+
+int    restore(t_shell *shell)
 {
-    dup2(shell->stdin_backup, STDIN_FILENO);
-    dup2(shell->stdout_backup, STDOUT_FILENO);
+    if (dup2(shell->stdin_backup, STDIN_FILENO) == -1)
+        return (perror("restore: dup2 failed"), 1);
+    if (dup2(shell->stdout_backup, STDOUT_FILENO) == -1)
+        return (perror("restore: dup2 failed"), 1);
+    return (0);
 }

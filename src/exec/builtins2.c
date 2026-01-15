@@ -30,13 +30,14 @@ static void del_one(t_shell *shell, char *arg)
     }
 }
 
-void    unset(t_shell *shell, char **args)
+int    unset(t_shell *shell, char **args)
 {
     while (*args)
     {
         del_one(shell, *args);
         args++;
     }
+    return (0);
 }
 
 static int exp_one(t_shell *shell, char *arg)
@@ -86,18 +87,24 @@ static int  isvalid_key(char *str)
     return (1);
 }
 
-void    export(char **args, t_shell *shell)
+int    export(char **args, t_shell *shell)
 {
+    int     valid;
+
+    valid = 0;
     while (*args)
     {
         if (!isvalid_key(*args))
         {
-            perror("export: not a valid identifier");
+            printf("export: not a valid identifier");
             args++;
+            valid = 1;
             continue;
         }
         if (!exp_one(shell, *args))
-            return ;
+            return (1);
+        valid = 0;
         args++;
     }
+    return (valid);
 }

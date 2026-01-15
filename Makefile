@@ -29,6 +29,7 @@ INC_DIR = include
 SRCS = $(SRC_DIR)/main.c \
        $(SRC_DIR)/init.c \
        $(SRC_DIR)/cleanup.c \
+	   $(SRC_DIR)/signal_stuff.c \
        $(SRC_DIR)/lexer/tokenizer.c \
        $(SRC_DIR)/lexer/token_utils.c \
        $(SRC_DIR)/lexer/quote_tokens.c \
@@ -49,7 +50,10 @@ SRCS = $(SRC_DIR)/main.c \
 	   $(SRC_DIR)/exec/directio.c \
 	   $(SRC_DIR)/exec/exec_func_utils.c \
 	   $(SRC_DIR)/exec/get_next_line.c \
-	   $(SRC_DIR)/exec/get_next_line_utils.c 
+	   $(SRC_DIR)/exec/get_next_line_utils.c \
+	   $(SRC_DIR)/exec/exec_utils.c \
+	   $(SRC_DIR)/exec/here_doc_stuff.c \
+	   $(SRC_DIR)/exec/builtins3.c
 
 # ================================== OBJECTS ================================== #
 
