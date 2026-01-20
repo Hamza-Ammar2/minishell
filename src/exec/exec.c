@@ -26,7 +26,7 @@ void    exec(t_command *cmds, t_shell *shell)
     }
     fd[2][0] = 0;
     fd[2][1] = 0;
-    path = getenv("PATH");
+    path = find_env(shell, "PATH")->value;
     paths = ft_split(path, ':');
     last_pid = rec_exec(paths, fd, cmds, shell);
     shell->exit_status = last_pid;
@@ -66,7 +66,7 @@ static void    exec_single(t_command *cmd, t_shell *shell, int fd[3][2], char **
     ft_exit(cmd->args, shell);
     str = get_path(paths, args[0]);
     exit_exec(args, str);
-    execve(str, args, shell->envp);
+    execve(str, args, env2arr(shell->env));
     perror("execve failed");
     exit(1);
 }

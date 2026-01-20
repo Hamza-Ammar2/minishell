@@ -1,5 +1,6 @@
 
 #include "../include/minishell.h"
+#include "../libft/libft.h"
 
 /*
 ** 🔧 What the function Does
@@ -11,9 +12,27 @@
 ** 🧩 Step-by-Step
 ** 1. Clear readline history.
 */
+
+void	free_env(t_env *env)
+{
+	t_env	*current;
+	t_env	*next;
+
+	current = env;
+	while (current)
+	{
+		next = current->next;
+		free(current->key);
+		free(current->value);
+		free(current);
+		current = next;
+	}
+}
+
 void	cleanup_shell(t_shell *shell)
 {
 	close(shell->stdin_backup);
 	close(shell->stdout_backup);
+	free_env(shell->env);
 	rl_clear_history();
 }

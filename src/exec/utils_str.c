@@ -6,7 +6,7 @@
 
 char 	*do_env(t_shell *shell, char *str)
 {
-    char    *s;
+    //char    *s;
     t_env   *env;
 
     if (!str)
@@ -18,10 +18,10 @@ char 	*do_env(t_shell *shell, char *str)
     env = find_env(shell, str);
     if (env)
         return (free(str), ft_strdup(env->value));
-    else
-        s = getenv(str);
+    /* else
+        s = getenv(str); */
     free(str);
-    return (s);
+    return (NULL);
 }
 
 static char *join(char *s1, char *s2)

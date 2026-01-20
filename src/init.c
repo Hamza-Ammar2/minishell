@@ -1,6 +1,7 @@
 
 
 #include "../include/minishell.h"
+#include "../libft/libft.h"
 
 /*
 ** 🔧 What the function Does
@@ -12,12 +13,102 @@
 ** 🧩 Step-by-Step
 ** 1. Set exit status to 0 (success).
 */
-void	init_shell(t_shell *shell)
+
+t_env	*arr2env(char **envp)
+{
+	t_env	*head;
+	t_env	*current;
+	char	**split;
+	int		i;
+
+	head = NULL;
+	i = 0;
+	while (envp && envp[i])
+	{
+		split = ft_split(envp[i], '=');
+		if (!split)
+			return (NULL);
+		current = malloc(sizeof(t_env));
+		if (!current)
+			return (free_splits(split), NULL);
+		current->key = ft_strdup(split[0]);
+		current->value = ft_strdup(ft_strchr(envp[i], '=') + 1);
+		current->next = head;
+		head = current;
+		free_splits(split);
+		i++;
+	}
+	return (head);
+}
+
+static void	fill_join(char *str1, char *str2, char *joined)
+{
+	size_t	i;
+	size_t	j;
+
+	i = 0;
+	j = 0;
+	while (str1[i])
+	{
+		joined[i] = str1[i];
+		i++;
+	}
+	joined[i] = '=';
+	i++;
+	while (str2[j])
+	{
+		joined[i + j] = str2[j];
+		j++;
+	}
+	joined[i + j] = '\0';
+}
+
+static char	**get_arr(t_env *env, char **envp)
+{
+	t_env	*current;
+	int		i;
+
+	current = env;
+	i = 0;
+	while (current)
+	{
+		envp[i] = malloc(sizeof(char) * (ft_strlen(current->key)
+					+ ft_strlen(current->value) + 2));
+		if (!envp[i])
+			return (free_splits(envp), NULL);
+		fill_join(current->key, current->value, envp[i]);
+		i++;
+		current = current->next;
+	}
+	envp[i] = NULL;
+	return (envp);
+}
+
+char	**env2arr(t_env *env)
+{
+	t_env	*current;
+	char	**envp;
+	int		size;
+
+	size = 0;
+	current = env;
+	while (current)
+	{
+		size++;
+		current = current->next;
+	}
+	envp = malloc(sizeof(char *) * (size + 1));
+	if (!envp)
+		return (NULL);
+	return (get_arr(env, envp));
+}
+
+void	init_shell(t_shell *shell, char **envp)
 {
 	shell->exit_status = 0;
-	shell->env = NULL;
+	shell->env = arr2env(envp);
 	shell->input = NULL;
-	shell->envp = NULL;
+	shell->envp = envp;
 	shell->stdin_backup = dup(STDIN_FILENO);
 	shell->stdout_backup = dup(STDOUT_FILENO);
 }

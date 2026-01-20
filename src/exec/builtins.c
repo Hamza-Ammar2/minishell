@@ -46,7 +46,7 @@ int    cd(char **args)
 int    env(char **args, t_shell *shell)
 {
     t_env   *current;
-    char    **env;
+    //char    **env;
 
     if (args && args[0])
     {
@@ -54,12 +54,12 @@ int    env(char **args, t_shell *shell)
         return (1);
     }
     current = shell->env;
-    env = shell->envp;
+    /* env = shell->envp;
     while (env && *env)
     {
         printf("%s\n", *env);
         env++;
-    }
+    } */
     while (current)
     {
         if (current->value)

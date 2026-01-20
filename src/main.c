@@ -21,8 +21,7 @@ int	main(int argc, char **argv, char **envp)
 
 	(void)argc;
 	(void)argv;
-	init_shell(&shell);
-	shell.envp = envp;
+	init_shell(&shell, envp);
 	shell_loop(&shell);
 	cleanup_shell(&shell);
 	return (shell.exit_status);
