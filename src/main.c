@@ -50,6 +50,7 @@ void	process_input(char *input, t_shell *shell)
 		return ;
 	if (!validate_syntax(tokens))
 	{
+		shell->exit_status = 2; // FIXED: Set exit status to 2 for syntax errors (bash behavior)
 		free_tokens(tokens);
 		return ;
 	}

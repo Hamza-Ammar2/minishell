@@ -1,0 +1,7 @@
+echo hel""lo
+echo "hello there"
+echo hel lo
+echo "hello"world
+echo a""b""c
+echo ''test
+exit

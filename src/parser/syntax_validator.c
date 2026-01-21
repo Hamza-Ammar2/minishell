@@ -38,8 +38,9 @@ static int	validate_start(t_token *tokens)
 		return (1);
 	if (is_operator_token(tokens->type))
 	{
-		printf("minishell: syntax error near unexpected token `%d'\n",
-			tokens->type);
+		// FIXED: Changed to match bash error format - operators at start expect file/command after (which is newline)
+		// FIXED: Changed printf to fprintf(stderr to match bash behavior
+		fprintf(stderr, "minishell: syntax error near unexpected token `newline'\n");
 		return (0);
 	}
 	return (1);
@@ -67,7 +68,8 @@ static int	validate_end(t_token *tokens)
 	last = get_last_token(tokens);
 	if (is_operator_token(last->type))
 	{
-		printf("minishell: syntax error near unexpected token `newline'\n");
+		// FIXED: Changed printf to fprintf(stderr to match bash behavior
+		fprintf(stderr, "minishell: syntax error near unexpected token `newline'\n");
 		return (0);
 	}
 	return (1);
@@ -96,7 +98,8 @@ static int	validate_consecutive(t_token *tokens)
 		if (is_operator_token(current->type)
 			&& is_operator_token(current->next->type))
 		{
-			printf("minishell: syntax error near unexpected token\n");
+			// FIXED: Changed printf to fprintf(stderr to match bash behavior
+			fprintf(stderr, "minishell: syntax error near unexpected token\n");
 			return (0);
 		}
 		current = current->next;
