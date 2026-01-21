@@ -7,10 +7,23 @@
 static int    rec_exec(char **paths, int fd[3][2], t_command *cmds, t_shell *shell);
 static void    exec_single(t_command *cmd, t_shell *shell, int fd[3][2], char **paths);
 
+static char **get_paths(t_shell *shell)
+{
+    char *path;
+    char **paths;
+    t_env *env_node;
+
+    env_node = find_env(shell, "PATH");
+    if (!env_node || !env_node->value)
+        return (NULL);
+    path = env_node->value;
+    paths = ft_split(path, ':');
+    return (paths);
+}
+
 void    exec(t_command *cmds, t_shell *shell)
 {
     int fd[3][2];
-    char *path;
     char **paths;
     int last_pid;
 
@@ -26,8 +39,7 @@ void    exec(t_command *cmds, t_shell *shell)
     }
     fd[2][0] = 0;
     fd[2][1] = 0;
-    path = find_env(shell, "PATH")->value;
-    paths = ft_split(path, ':');
+    paths = get_paths(shell);
     last_pid = rec_exec(paths, fd, cmds, shell);
     shell->exit_status = last_pid;
     if (last_pid != 1 && last_pid != -1 && last_pid != 0)
@@ -69,38 +81,6 @@ static void    exec_single(t_command *cmd, t_shell *shell, int fd[3][2], char **
     execve(str, args, env2arr(shell->env));
     perror("execve failed");
     exit(1);
-}
-
-int    connect_pipes(t_command *cmd, int fd[3][2])
-{
-    int i;
-    int failed;
-
-    i = fd[2][0];
-    failed = 0;
-    if (i > 0)
-        failed = dup2(fd[(i+1)%2][0], STDIN_FILENO);
-    if (cmd->next)
-        failed = dup2(fd[i%2][1], STDOUT_FILENO);
-    if (failed == -1)
-        perror("dup2: connecting pipes failed");
-    return (failed);
-}
-
-int  close_pipes(t_command *cmds, int fd[3][2])
-{
-    if (fd[2][0] > 0)
-    {
-        close(fd[(fd[2][0]+1)%2][0]);
-        close(fd[(fd[2][0]+1)%2][1]);
-    }
-    if (!cmds->next || fd[2][1] < 0)
-    {
-        close(fd[fd[2][0]%2][0]);
-        close(fd[fd[2][0]%2][1]);
-        return (1);
-    }
-    return (0);
 }
 
 static int    rec_exec(char **paths, int fd[3][2], t_command *cmds, t_shell *shell)

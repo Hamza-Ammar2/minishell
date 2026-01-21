@@ -53,7 +53,8 @@ SRCS = $(SRC_DIR)/main.c \
 	   $(SRC_DIR)/exec/get_next_line_utils.c \
 	   $(SRC_DIR)/exec/exec_utils.c \
 	   $(SRC_DIR)/exec/here_doc_stuff.c \
-	   $(SRC_DIR)/exec/builtins3.c
+	   $(SRC_DIR)/exec/builtins3.c \
+	   $(SRC_DIR)/exec/pipe.c
 
 # ================================== OBJECTS ================================== #
 
