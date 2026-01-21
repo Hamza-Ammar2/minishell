@@ -89,22 +89,22 @@ static int  isvalid_key(char *str)
 
 int    export(char **args, t_shell *shell)
 {
-    int     valid;
+    int     exit_status;
 
-    valid = 0;
+    exit_status = 0; // FIX: Track if any errors occurred
     while (*args)
     {
         if (!isvalid_key(*args))
         {
-            printf("export: not a valid identifier");
+            // FIX: Print to stderr (fd 2) not stdout, add newline, include the invalid arg
+            fprintf(stderr, "export: `%s': not a valid identifier\n", *args);
             args++;
-            valid = 1;
-            continue;
+            exit_status = 1; // FIX: Mark that we had an error
+            continue; // FIX: Continue processing other args but return error at end
         }
         if (!exp_one(shell, *args))
             return (1);
-        valid = 0;
         args++;
     }
-    return (valid);
+    return (exit_status); // FIX: Return 1 if any validation failed, 0 if all succeeded
 }
