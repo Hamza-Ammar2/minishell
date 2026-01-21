@@ -11,7 +11,8 @@ char 	*do_env(t_shell *shell, char *str)
 
     if (!str)
         return (NULL);
-    if (!ft_isalnum(str[0]) && str[0] != '_' && str[0] != '?')
+    // FIX: Handle edge case where $ is followed by invalid char or nothing
+    if (!str[0] || (!ft_isalnum(str[0]) && str[0] != '_' && str[0] != '?'))
         return (ft_strdup("$"));
     if (str[0] == '?')
         return (ft_itoa(shell->exit_status));
@@ -21,7 +22,9 @@ char 	*do_env(t_shell *shell, char *str)
     /* else
         s = getenv(str); */
     free(str);
-    return (NULL);
+    // FIX: Return empty string instead of NULL when variable not found
+    // This matches bash behavior where undefined variables expand to empty string
+    return (ft_strdup(""));
 }
 
 static char *join(char *s1, char *s2)
