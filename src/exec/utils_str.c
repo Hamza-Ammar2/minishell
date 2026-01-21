@@ -4,6 +4,9 @@
 #include "../libft/libft.h"
 
 
+// LEAK FIX: This function now properly frees the input 'str' parameter in ALL code paths.
+// Previously, 'str' was only freed in some cases, causing leaks when expanding variables
+// like $?, $INVALID_CHAR, or undefined variables.
 char 	*do_env(t_shell *shell, char *str)
 {
     //char    *s;
@@ -12,10 +15,13 @@ char 	*do_env(t_shell *shell, char *str)
     if (!str)
         return (NULL);
     // FIX: Handle edge case where $ is followed by invalid char or nothing
+    // LEAK FIX: Free str before returning to prevent memory leak
     if (!str[0] || (!ft_isalnum(str[0]) && str[0] != '_' && str[0] != '?'))
-        return (ft_strdup("$"));
+        return (free(str), ft_strdup("$"));
+    // LEAK FIX: Free str before returning exit status to prevent memory leak
+    // This was a major leak source when $? was used in variable expansion
     if (str[0] == '?')
-        return (ft_itoa(shell->exit_status));
+        return (free(str), ft_itoa(shell->exit_status));
     env = find_env(shell, str);
     if (env)
         return (free(str), ft_strdup(env->value));
@@ -27,18 +33,21 @@ char 	*do_env(t_shell *shell, char *str)
     return (ft_strdup(""));
 }
 
+// LEAK FIX: This helper function now frees BOTH input strings after joining.
+// Previously only freed s1, causing s2 to leak. This was a critical leak because
+// expand_str calls join() with newly allocated strings from do_env() and ft_substr().
+// Strategy: Since join creates a new combined string, both inputs are no longer needed.
 static char *join(char *s1, char *s2)
 {
     char    *res;
-    char    *tmp;
 
     if (!s2)
         return (s1);
     if (!s1)
-        return (ft_strdup(s2));
-    tmp = s1;
+        return (s2);
     res = ft_strjoin(s1, s2);
-    free(tmp);
+    free(s1);  // Free the accumulated result string
+    free(s2);  // LEAK FIX: Free the newly added string (from do_env/ft_substr)
     return (res);
 }
 
@@ -68,17 +77,27 @@ char    *expand_str(t_shell *shell, char *str, int quote_type)
     while (start)
     {
         end = find_end(start + 1);
-        res = join(res, ft_substr(str, 0, start - str));
+        // LEAK FIX: Skip empty prefix to avoid allocating/freeing empty strings
+        // This optimization prevents unnecessary allocation when $ is at start
+        if (start - str > 0)
+            res = join(res, ft_substr(str, 0, start - str));
         if (end)
+            // All allocations here are freed by join() and do_env()
             res = join(res, do_env(shell, ft_substr(start + 1, 0, end - start - 1)));
         else
         {
+            // Last variable expansion - no more text after this
             res = join(res, do_env(shell, ft_strdup(start + 1)));
-            str = NULL;
+            str = NULL;  // Mark str as consumed
             break ;
         }
-        str = end;
+        str = end;  // Move to remaining text after variable
         start = ft_strchr(str, '$');
     }
-    return (res = join(res, str), res);
+    // LEAK FIX: Handle remaining text after last variable expansion
+    // Check str != NULL to avoid segfault from ft_strdup(NULL)
+    // The duplicated string will be freed by join()
+    if (str)
+        res = join(res, ft_strdup(str));
+    return (res);
 }
