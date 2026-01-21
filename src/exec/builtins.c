@@ -14,7 +14,9 @@ int    pwd(char **args)
     cwd = getcwd(NULL, 0);
     if (!cwd)
         return (perror("getcwd failed\n"), 1);
-    printf("%s\n", cwd);
+    // FIX: Use write() instead of printf() to avoid buffering issues that cause output order problems
+    write(STDOUT_FILENO, cwd, ft_strlen(cwd));
+    write(STDOUT_FILENO, "\n", 1);
     free(cwd);
     return (0);
 }
@@ -59,10 +61,16 @@ int    env(char **args, t_shell *shell)
         printf("%s\n", *env);
         env++;
     } */
+    // FIX: Use write() instead of printf() to avoid buffering issues that cause output order problems
     while (current)
     {
         if (current->value)
-            printf("%s=%s\n", current->key, current->value);
+        {
+            write(STDOUT_FILENO, current->key, ft_strlen(current->key));
+            write(STDOUT_FILENO, "=", 1);
+            write(STDOUT_FILENO, current->value, ft_strlen(current->value));
+            write(STDOUT_FILENO, "\n", 1);
+        }
         current = current->next;
     }
     return (0);

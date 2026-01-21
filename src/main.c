@@ -82,23 +82,27 @@ void	process_input(char *input, t_shell *shell)
 void	shell_loop(t_shell *shell)
 {
 	char	*input;
+	int		is_interactive;
 	
+	is_interactive = isatty(STDIN_FILENO);
 	if (!init_sig())
 		return ;
 	while (1)
 	{
-		if (isatty(STDIN_FILENO))
+		if (is_interactive)
 			input = readline(PROMPT);
 		else
 			input = (get_next_line(STDIN_FILENO));
 		if (!input)
 		{
-			printf("exit\n");
+			// FIX: Only print "exit" in interactive mode to prevent tester issues
+			if (is_interactive)
+				printf("exit\n");
 			break ;
 		}
 		if (*input)
 		{
-			if (isatty(STDIN_FILENO))
+			if (is_interactive)
 				add_history(input);
 			process_input(input, shell);
 		}

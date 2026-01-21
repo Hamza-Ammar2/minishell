@@ -33,8 +33,13 @@ char    *get_path(char **paths, char *cmd)
 {
     char    *full_path;
 
-    if (access(full_path, F_OK) == 0)
+    // FIX: Check if cmd is a path (contains '/') and if it exists, return it
+    // Only paths should bypass PATH search, not plain command names
+    if (strchr(cmd, '/') && access(cmd, F_OK) == 0)
         return (cmd);
+    // FIX: Handle case where PATH is unset (paths is NULL)
+    if (!paths)
+        return (NULL);
     while (*paths)
     {
         full_path = create_path(*paths, cmd);

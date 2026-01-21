@@ -45,6 +45,10 @@ int     check_builtin(t_command *cmds, t_shell *shell, int fd[3][2])
     int i;
 
     args = wraper(cmds->args, shell);
+    // FIX: If all tokens expanded to empty strings, args[0] will be NULL
+    // In this case, there's no command to execute, just return success
+    if (!args || !args[0])
+        return (free_splits(args), 0);
     i = pce(cmds, shell, fd, args);
     if (i == -1 || i == 1)
         return (free_splits(args), i);
@@ -70,7 +74,9 @@ void    free_splits(char **splits)
 char **wraper(t_token **args, t_shell *shell)
 {
     int     count;
+    int     j;
     char    **args_array;
+    char    *expanded;
 
     count = 0;
     while (args[count])
@@ -79,14 +85,23 @@ char **wraper(t_token **args, t_shell *shell)
     if (!args_array)
         return (perror("could not create arguments list"), NULL);
     int i = 0;
+    j = 0;
+    // FIX: Skip empty expanded tokens (e.g., undefined variables) to match bash behavior
     while (i < count)
     {
-        args_array[i] = expand_str(shell, args[i]->value, args[i]->quote_type);
-        if (!args_array[i])
+        expanded = expand_str(shell, args[i]->value, args[i]->quote_type);
+        if (!expanded)
             return (perror("could not create arguments list"), free_splits(args_array), NULL);
-        //printf("ARG[%d]: %s\n", i, args_array[i]);
+        // FIX: Only add non-empty strings to args_array (bash removes empty unquoted expansions)
+        if (expanded[0] != '\0')
+        {
+            args_array[j] = expanded;
+            j++;
+        }
+        else
+            free(expanded); // FIX: Free empty string since we're not adding it to array
         i++;
     }
-    args_array[count] = NULL;
+    args_array[j] = NULL;
     return (args_array);
 }
