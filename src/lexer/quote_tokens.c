@@ -42,8 +42,9 @@ int	find_closing_quote(const char *str, char quote)
 **   - input: full input string
 **   - i: pointer to current position (will be updated)
 **   - quote_type: pointer to store 1 (single) or 2 (double)
-** Returns: allocated string with quotes, or NULL on error
+** Returns: allocated string WITH QUOTES INCLUDED as literals, or NULL on error
 ** Example: extract_quoted_word(input, &i, &quote_type)
+** FIX: Keep quotes as literal characters - exec will handle quote removal
 */
 char	*extract_quoted_word(const char *input, int *i, int *quote_type)
 {
@@ -62,7 +63,8 @@ char	*extract_quoted_word(const char *input, int *i, int *quote_type)
 		ft_putstr_fd("minishell: syntax error: unclosed quote\n", 2);
 		return (NULL);
 	}
-	string = ft_substr(input, *i + 1, close_pos);
+	// FIX: Include quotes in the string (start at *i, length is close_pos + 2)
+	string = ft_substr(input, *i, close_pos + 2);
 	if (!string)
 		return (NULL);
 	*i += close_pos + 2;
