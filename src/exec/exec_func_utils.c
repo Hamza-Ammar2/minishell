@@ -71,6 +71,32 @@ void    free_splits(char **splits)
     free(splits);
 }
 
+// #PF Tilde expansion function - expands ~ to HOME at start of string
+// Only expands if:  1. String starts with '~'
+//                   2. Not in single quotes (QUOTE_SINGLE)
+//                   3. Followed by '/' or end of string
+static char *expand_tilde(t_shell *shell, char *str, int quote_type)
+{
+    t_env   *home_env;
+    char    *expanded;
+
+    // #PF Don't expand in single quotes or if doesn't start with ~
+    if (!str || quote_type == QUOTE_SINGLE || str[0] != '~')
+        return (ft_strdup(str));
+    // #PF Only expand ~ or ~/path, not ~user
+    if (str[1] != '\0' && str[1] != '/')
+        return (ft_strdup(str));
+    // #PF Get HOME environment variable
+    home_env = find_env(shell, "HOME");
+    if (!home_env || !home_env->value)
+        return (ft_strdup(str)); // #PF If no HOME, keep tilde as-is
+    // #PF Join HOME with rest of path (skip the ~)
+    expanded = ft_strjoin(home_env->value, str + 1);
+    if (!expanded)
+        return (perror("expand_tilde: malloc failed"), NULL);
+    return (expanded);
+}
+
 char **wraper(t_token **args, t_shell *shell)
 {
     int     count;
@@ -89,17 +115,23 @@ char **wraper(t_token **args, t_shell *shell)
     // FIX: Skip empty expanded tokens (e.g., undefined variables) to match bash behavior
     while (i < count)
     {
-        expanded = expand_str(shell, args[i]->value, args[i]->quote_type);
+        // #PF Apply tilde expansion first, before variable expansion
+        expanded = expand_tilde(shell, args[i]->value, args[i]->quote_type);
         if (!expanded)
             return (perror("could not create arguments list"), free_splits(args_array), NULL);
+        // #PF Then apply variable expansion on the tilde-expanded string
+        char *final = expand_str(shell, expanded, args[i]->quote_type);
+        free(expanded); // #PF Free intermediate tilde-expanded string
+        if (!final)
+            return (perror("could not create arguments list"), free_splits(args_array), NULL);
         // FIX: Only add non-empty strings to args_array (bash removes empty unquoted expansions)
-        if (expanded[0] != '\0')
+        if (final[0] != '\0')
         {
-            args_array[j] = expanded;
+            args_array[j] = final;
             j++;
         }
         else
-            free(expanded); // FIX: Free empty string since we're not adding it to array
+            free(final); // FIX: Free empty string since we're not adding it to array
         i++;
     }
     args_array[j] = NULL;

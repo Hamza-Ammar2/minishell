@@ -1,0 +1,20 @@
+diff --git a/src/exec/builtins2.c b/src/exec/builtins2.c
+index 5913cc3..39ab700 100644
+--- a/src/exec/builtins2.c
++++ b/src/exec/builtins2.c
+@@ -94,6 +94,15 @@ int    export(char **args, t_shell *shell)
+     exit_status = 0; // FIX: Track if any errors occurred
+     while (*args)
+     {
++        // #PF Fix: Check for options (starting with '-') before validation
++        // Options should return exit code 2, invalid identifiers return 1
++        if ((*args)[0] == '-')
++        {
++            fprintf(stderr, "export: -%c: invalid option\n", (*args)[1]);
++            args++;
++            exit_status = 2; // #PF Options return 2 (bash behavior)
++            continue;
++        }
+         if (!isvalid_key(*args))
+         {
+             // FIX: Print to stderr (fd 2) not stdout, add newline, include the invalid arg
