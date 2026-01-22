@@ -80,10 +80,10 @@ static int  isvalid_key(char *str)
             return (0);
         str++;
     }
-    if (!*str)
+    /* if (!*str)
         return (1);
     else if (ft_strchr(str + 1, '='))
-        return (0);
+        return (0); */
     return (1);
 }
 

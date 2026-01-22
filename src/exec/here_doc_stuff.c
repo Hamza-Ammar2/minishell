@@ -28,23 +28,29 @@ static int clean_stuff(t_shell *shell, int fd[2], char *line)
     return (2);
 }
 
+static char *get_exp(t_shell *shell, char *raw_line, int type)
+{
+    char *line;
+
+    if (!raw_line)
+        return (NULL);
+    line = expand_str(shell, raw_line, type);
+    if (sig)
+    {
+        free(raw_line);
+        return (NULL);
+    }
+    free(raw_line);
+    return (line);
+}
+
 static int  here_doc_read(t_shell *shell, char *value, int type, int fd[2])
 {
     char *line;
-    char *raw_line;
 
     // FIX: In non-interactive mode, heredocs can't work properly because stdin is shared
     // between main loop and heredoc reading. Skip heredoc and create empty pipe.
-    if (!isatty(STDIN_FILENO))
-    {
-        close(fd[1]);
-        if (dup2(fd[0], STDIN_FILENO) == -1)
-            return (perror("dup2 failed"), close(fd[0]), -1);
-        return (1);
-    }
-
-    raw_line = readline("> ");
-    line = expand_str(shell, raw_line, type);
+    line = get_exp(shell, readline("> "), type);
     if (sig)
         return (clean_stuff(shell, fd, line));
     while (strcmpy(line, value) != 0)
@@ -52,16 +58,14 @@ static int  here_doc_read(t_shell *shell, char *value, int type, int fd[2])
         write(fd[1], line, ft_strlen(line));
         write(fd[1], "\n", 1);
         free(line);
-        raw_line = readline("> ");
-        line = expand_str(shell, raw_line, type);
+        line = get_exp(shell, readline("> "), type);
         if (sig)
             return (clean_stuff(shell, fd, line));
         if (!line)
             break ;
     }
-    //close(fd[1]);
     if (dup2(fd[0], STDIN_FILENO) == -1)
-        return (perror("dup2 failed222"), -1);
+        return (perror("dup2 failed"), -1);
     return (free(line), 1);
 }
 
@@ -78,6 +82,12 @@ static int    heredoc(t_shell *shell, t_token *redir, int fd[3][2])
     type = redir->quote_type;
     if (type == QUOTE_SINGLE || type == QUOTE_DOUBLE)
         type = QUOTE_SINGLE;
+    if (!isatty(STDIN_FILENO))
+    {
+        if (dup2(fd[i][0], STDIN_FILENO) == -1)
+            return (perror("dup2 failed"), -1);
+        return (1);
+    }
     return (here_doc_read(shell, redir->value, type, fd[i]));
 }
 

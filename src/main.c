@@ -21,6 +21,8 @@ int	main(int argc, char **argv, char **envp)
 
 	(void)argc;
 	(void)argv;
+	if (!init_sig())
+		return (1);
 	init_shell(&shell, envp);
 	shell_loop(&shell);
 	cleanup_shell(&shell);
@@ -47,10 +49,14 @@ void	process_input(char *input, t_shell *shell)
 
 	tokens = tokenize(input);
 	if (!tokens)
+	{
+		shell->exit_status = 2;
 		return ;
+	}
 	if (!validate_syntax(tokens))
 	{
 		free_tokens(tokens);
+		shell->exit_status = 2;
 		return ;
 	}
 	cmd = parse(tokens);
@@ -85,17 +91,14 @@ void	shell_loop(t_shell *shell)
 	int		is_interactive;
 	
 	is_interactive = isatty(STDIN_FILENO);
-	if (!init_sig())
-		return ;
 	while (1)
 	{
 		if (is_interactive)
 			input = readline(PROMPT);
 		else
-			input = (get_next_line(STDIN_FILENO));
+			input = get_next_line(STDIN_FILENO);
 		if (!input)
 		{
-			// FIX: Only print "exit" in interactive mode to prevent tester issues
 			if (is_interactive)
 				printf("exit\n");
 			break ;

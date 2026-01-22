@@ -21,33 +21,9 @@ int    pwd(char **args)
     return (0);
 }
 
-int    cd(char **args)
-{
-    char    *dir;
-    int     c;
-
-    dir = args[0];
-    if (!dir)
-        dir = getenv("HOME");
-    c = 0;
-    while (args[c])
-        c++;
-    if (c > 1)
-    {
-        fprintf(stderr, "cd: too many arguments\n");
-        return (1);
-    }
-    if (!is_dir(dir))
-        return (1);
-    if (chdir(dir) == -1)
-        return (perror("chdir failed\n"), 1);
-    return (0);
-}
-
 int    env(char **args, t_shell *shell)
 {
     t_env   *current;
-    //char    **env;
 
     if (args && args[0])
     {
@@ -55,12 +31,6 @@ int    env(char **args, t_shell *shell)
         return (1);
     }
     current = shell->env;
-    /* env = shell->envp;
-    while (env && *env)
-    {
-        printf("%s\n", *env);
-        env++;
-    } */
     // FIX: Use write() instead of printf() to avoid buffering issues that cause output order problems
     while (current)
     {

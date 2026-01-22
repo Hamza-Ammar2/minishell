@@ -38,7 +38,7 @@ static int	validate_start(t_token *tokens)
 		return (1);
 	if (is_operator_token(tokens->type))
 	{
-		printf("minishell: syntax error near unexpected token `%d'\n",
+		fprintf(stderr, "minishell: syntax error near unexpected token `%d'\n",
 			tokens->type);
 		return (0);
 	}
@@ -67,7 +67,7 @@ static int	validate_end(t_token *tokens)
 	last = get_last_token(tokens);
 	if (is_operator_token(last->type))
 	{
-		printf("minishell: syntax error near unexpected token `newline'\n");
+		fprintf(stderr, "minishell: syntax error near unexpected token `newline'\n");
 		return (0);
 	}
 	return (1);
@@ -96,7 +96,7 @@ static int	validate_consecutive(t_token *tokens)
 		if (is_operator_token(current->type)
 			&& is_operator_token(current->next->type))
 		{
-			printf("minishell: syntax error near unexpected token\n");
+			fprintf(stderr, "minishell: syntax error near unexpected token\n");
 			return (0);
 		}
 		current = current->next;

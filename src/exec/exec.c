@@ -29,6 +29,8 @@ void    exec(t_command *cmds, t_shell *shell)
 
     if (!cmds)
         return ;
+    if (pipe(fd[1]) == -1)
+        return (perror("pipe failed"));
     if (!cmds->next)
     {
         if (ft_exit(cmds->args, shell) == 1)
@@ -53,11 +55,8 @@ static void close_child(int fd[3][2])
     int i;
 
     i = fd[2][0];
-    if (i > 0)
-    {
-        close(fd[(i+1)%2][0]);
-        close(fd[(i+1)%2][1]);
-    }
+    close(fd[(i+1)%2][0]);
+    close(fd[(i+1)%2][1]);
     close(fd[i%2][0]);
     close(fd[i%2][1]);
 }
@@ -74,7 +73,6 @@ static void    exec_single(t_command *cmd, t_shell *shell, int fd[3][2], char **
     args = wraper(cmd->args, shell);
     if (!args)
         (close_child(fd), exit(1));
-    // FIX: If all tokens expanded to empty, args[0] will be NULL - just exit successfully
     if (!args[0])
         (close_child(fd), free_splits(args), exit(0));
     close_child(fd);

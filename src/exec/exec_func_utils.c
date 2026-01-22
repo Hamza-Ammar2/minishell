@@ -15,7 +15,7 @@ static int  pce(t_command *cmds, t_shell *shell, int fd[3][2], char **args)
     if (ft_strcmp(args[0], "pwd") == 0)
         fd[2][1] = pwd(&args[1]);
     else if (ft_strcmp(args[0], "cd") == 0)
-        fd[2][1] = cd(&args[1]);
+        fd[2][1] = cd(&args[1], shell);
     else
         fd[2][1] = export(&args[1], shell);
     return (1);

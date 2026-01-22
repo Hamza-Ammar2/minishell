@@ -141,7 +141,7 @@ int exit_exec(char **args, char *str);
 int 	do_builtin(t_command *cmds, t_shell *shell, int fd[3][2]);
 int     check_builtin(t_command *cmds, t_shell *shell, int fd[3][2]);
 int    export(char **args, t_shell *shell);
-int    cd(char **args);
+int    cd(char **args, t_shell *shell);
 int	   env(char **args, t_shell *shell);
 int    echo(char **args);
 int    unset(t_shell *shell, char **args);
@@ -163,7 +163,15 @@ char 	*do_env(t_shell *shell, char *str);
 char    *expand_str(t_shell *shell, char *str, int quote_type);
 void	free_env(t_env *env);
 
+
+/* Get Next Line */
 char	*get_next_line(int fd);
 char	*find_char(char *s, char c, size_t len);
 char	*append(char *s1, char *s2, size_t l1, size_t l2);
+
+/* ft_fprintf */
+int		print_ptr(int fd, unsigned long ptr, char type);
+int		print_num(int fd, long n);
+int		print_str(int fd, char *s);
+int		ft_fprintf(int fd, const char *s, ...);
 #endif
