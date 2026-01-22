@@ -93,13 +93,13 @@ char **wraper(t_token **args, t_shell *shell)
         if (!expanded)
             return (perror("could not create arguments list"), free_splits(args_array), NULL);
         // FIX: Only add non-empty strings to args_array (bash removes empty unquoted expansions)
-        if (expanded[0] != '\0')
-        {
-            args_array[j] = expanded;
-            j++;
-        }
+        /* if (expanded[0] != '\0')
+        { */
+        args_array[j] = expanded;
+        j++;
+        /* }
         else
-            free(expanded); // FIX: Free empty string since we're not adding it to array
+            free(expanded);  */// FIX: Free empty string since we're not adding it to array
         i++;
     }
     args_array[j] = NULL;

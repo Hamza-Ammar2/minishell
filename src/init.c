@@ -14,33 +14,6 @@
 ** 1. Set exit status to 0 (success).
 */
 
-t_env	*arr2env(char **envp)
-{
-	t_env	*head;
-	t_env	*current;
-	char	**split;
-	int		i;
-
-	head = NULL;
-	i = 0;
-	while (envp && envp[i])
-	{
-		split = ft_split(envp[i], '=');
-		if (!split)
-			return (NULL);
-		current = malloc(sizeof(t_env));
-		if (!current)
-			return (free_splits(split), NULL);
-		current->key = ft_strdup(split[0]);
-		current->value = ft_strdup(ft_strchr(envp[i], '=') + 1);
-		current->next = head;
-		head = current;
-		free_splits(split);
-		i++;
-	}
-	return (head);
-}
-
 static void	fill_join(char *str1, char *str2, char *joined)
 {
 	size_t	i;
@@ -106,7 +79,8 @@ char	**env2arr(t_env *env)
 void	init_shell(t_shell *shell, char **envp)
 {
 	shell->exit_status = 0;
-	shell->env = arr2env(envp);
+	shell->env = NULL;
+	export(envp, shell);
 	shell->input = NULL;
 	shell->envp = envp;
 	shell->stdin_backup = dup(STDIN_FILENO);

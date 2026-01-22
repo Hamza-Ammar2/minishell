@@ -9,7 +9,6 @@
 // like $?, $INVALID_CHAR, or undefined variables.
 char 	*do_env(t_shell *shell, char *str)
 {
-    //char    *s;
     t_env   *env;
 
     if (!str)
@@ -56,18 +55,7 @@ static char *find_end(char *str)
     return (NULL);
 }
 
-/* static char *get_start(char *str)
-{
-    while (*str)
-    {
-        if (ft_isalnum(*str) || *str == '_' || *str == '?')
-            return (str);
-        str++;
-    }
-    return (NULL);
-} */
-
-char    *expand_str(t_shell *shell, char *str, int quote_type)
+char    *expand_quo(t_shell *shell, char *str, int quote_type)
 {
     char    *start;
     char    *end;

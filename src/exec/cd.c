@@ -29,12 +29,12 @@ static char *get_dir(char *arg, t_shell *shell)
     return (dir);
 }
 
-static int  update_oldpwd(t_shell *shell)
+static int  update_pwd(t_shell *shell, char *pwd)
 {
     t_env   *old;
     char    *oldpwd;
 
-    old = find_env(shell, "OLDPWD");
+    old = find_env(shell, pwd);
     oldpwd = getcwd(NULL, 0);
     if (!oldpwd)
         return (perror("cd: getcwd failed"), 1);
@@ -43,7 +43,7 @@ static int  update_oldpwd(t_shell *shell)
         old = malloc(sizeof(t_env));
         if (!old)
             return (perror("cd: malloc failed"), 1);
-        old->key = ft_strdup("OLDPWD");
+        old->key = ft_strdup(pwd);
         old->value = oldpwd;
         old->next = shell->env;
         shell->env = old;
@@ -69,11 +69,11 @@ int    cd(char **args, t_shell *shell)
         c++;
     if (c > 1)
         return (free(dir), fprintf(stderr, "cd: too many arguments\n"), 1);
-    if (update_oldpwd(shell) == 1)
+    if (update_pwd(shell, "OLDPWD") == 1)
         return (free(dir), 1);
     if (!is_dir(dir))
         return (free(dir), 1);
     if (chdir(dir) == -1)
         return (free(dir), perror("chdir failed\n"), 1);
-    return (free(dir), 0);
+    return (free(dir), update_pwd(shell, "PWD"), 0);
 }

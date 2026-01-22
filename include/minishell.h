@@ -156,11 +156,11 @@ int 	init_sig(void);
 
 /* Environment part */
 char	**env2arr(t_env *env);
-t_env	*arr2env(char **envp);
 int    add_env(t_shell *shell, char *key, char *value);
 t_env   *find_env(t_shell *shell, char *key);
 char 	*do_env(t_shell *shell, char *str);
 char    *expand_str(t_shell *shell, char *str, int quote_type);
+char    *expand_quo(t_shell *shell, char *str, int quote_type);
 void	free_env(t_env *env);
 
 

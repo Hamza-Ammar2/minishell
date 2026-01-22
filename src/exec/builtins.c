@@ -61,7 +61,7 @@ int    echo(char **args)
     while (args[i])
     {
         write(STDOUT_FILENO, args[i], ft_strlen(args[i]));
-        if (args[i + 1] && *args[i])
+        if (args[i + 1] /* && *args[i] */)
             write(STDOUT_FILENO, " ", 1);
         i++;
     }
