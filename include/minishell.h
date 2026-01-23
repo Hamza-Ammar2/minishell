@@ -72,7 +72,8 @@ typedef struct s_shell
 	int		stdout_backup;
 }	t_shell;
 
-void	init_shell(t_shell *shell, char **envp);
+int		init_shell(t_shell *shell, char **argv, char **envp);
+int		init_lvl(t_shell *shell);
 void	shell_loop(t_shell *shell);
 void	cleanup_shell(t_shell *shell);
 
@@ -156,6 +157,7 @@ int 	init_sig(void);
 
 /* Environment part */
 char	**env2arr(t_env *env);
+int 	exp_one(t_shell *shell, char *arg);
 int    add_env(t_shell *shell, char *key, char *value);
 t_env   *find_env(t_shell *shell, char *key);
 char 	*do_env(t_shell *shell, char *str);

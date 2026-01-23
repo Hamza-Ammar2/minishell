@@ -45,8 +45,6 @@ int     check_builtin(t_command *cmds, t_shell *shell, int fd[3][2])
     int i;
 
     args = wraper(cmds->args, shell);
-    // FIX: If all tokens expanded to empty strings, args[0] will be NULL
-    // In this case, there's no command to execute, just return success
     if (!args || !args[0])
         return (free_splits(args), 0);
     i = pce(cmds, shell, fd, args);
@@ -59,16 +57,19 @@ int     check_builtin(t_command *cmds, t_shell *shell, int fd[3][2])
     return (0);
 }
 
-void    free_splits(char **splits)
+static char    *tilde(char *str, t_shell *shell)
 {
-    int i;
+    t_env   *home_env;
+    char    *home;
 
-    if (!splits)
-        return ;
-    i = 0;
-    while (splits[i])
-        free(splits[i++]);
-    free(splits);
+    home_env = find_env(shell, "HOME");
+    if (home_env)
+        home = home_env->value;
+    else
+        home = "";
+    if (*str == '~' && (str[1] == '\0' || str[1] == '/'))
+        return (ft_strjoin(home, str + 1));
+    return (str);
 }
 
 char **wraper(t_token **args, t_shell *shell)
@@ -76,7 +77,6 @@ char **wraper(t_token **args, t_shell *shell)
     int     count;
     int     j;
     char    **args_array;
-    char    *expanded;
 
     count = 0;
     while (args[count])
@@ -84,23 +84,13 @@ char **wraper(t_token **args, t_shell *shell)
     args_array = malloc(sizeof(char *) * (count + 1));
     if (!args_array)
         return (perror("could not create arguments list"), NULL);
-    int i = 0;
     j = 0;
-    // FIX: Skip empty expanded tokens (e.g., undefined variables) to match bash behavior
-    while (i < count)
+    while (j < count)
     {
-        expanded = expand_str(shell, args[i]->value, args[i]->quote_type);
-        if (!expanded)
+        args_array[j] = expand_str(shell, tilde(args[j]->value, shell), args[j]->quote_type);
+        if (!args_array[j])
             return (perror("could not create arguments list"), free_splits(args_array), NULL);
-        // FIX: Only add non-empty strings to args_array (bash removes empty unquoted expansions)
-        /* if (expanded[0] != '\0')
-        { */
-        args_array[j] = expanded;
         j++;
-        /* }
-        else
-            free(expanded);  */// FIX: Free empty string since we're not adding it to array
-        i++;
     }
     args_array[j] = NULL;
     return (args_array);

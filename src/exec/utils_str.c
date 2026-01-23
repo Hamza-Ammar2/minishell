@@ -55,6 +55,18 @@ static char *find_end(char *str)
     return (NULL);
 }
 
+void    free_splits(char **splits)
+{
+    int i;
+
+    if (!splits)
+        return ;
+    i = 0;
+    while (splits[i])
+        free(splits[i++]);
+    free(splits);
+}
+
 char    *expand_quo(t_shell *shell, char *str, int quote_type)
 {
     char    *start;

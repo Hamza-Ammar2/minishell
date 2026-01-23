@@ -76,13 +76,22 @@ char	**env2arr(t_env *env)
 	return (get_arr(env, envp));
 }
 
-void	init_shell(t_shell *shell, char **envp)
+int	init_shell(t_shell *shell, char **argv, char **envp)
 {
+	char	*arg;
+
 	shell->exit_status = 0;
 	shell->env = NULL;
-	export(envp, shell);
+	if (export(envp, shell) != 0)
+		return (0);
+	if (!init_lvl(shell))
+		return (0);
 	shell->input = NULL;
 	shell->envp = envp;
 	shell->stdin_backup = dup(STDIN_FILENO);
 	shell->stdout_backup = dup(STDOUT_FILENO);
+	arg = ft_strjoin("_=", argv[0]);
+	if (!arg)
+		return (0);
+	return (exp_one(shell, arg));
 }

@@ -1,4 +1,7 @@
+
+
 #include "../include/minishell.h"
+#include "../libft/libft.h"
 
 extern sig_atomic_t sig;
 
@@ -23,7 +26,8 @@ int	main(int argc, char **argv, char **envp)
 	(void)argv;
 	if (!init_sig())
 		return (1);
-	init_shell(&shell, envp);
+	if (!init_shell(&shell, argv, envp))
+		return (1);
 	shell_loop(&shell);
 	cleanup_shell(&shell);
 	return (shell.exit_status);
@@ -42,6 +46,27 @@ int	main(int argc, char **argv, char **envp)
 ** 3. Execute command (TODO).
 ** 4. Free allocated resources.
 */
+
+static int	update_(t_command *cmd, t_shell *shell)
+{
+	t_token *args;
+	char	*str;
+	char	*arg;
+
+	args = cmd->args[0];
+	if (!args)
+		return (1);
+	str = expand_str(shell, args->value, args->quote_type);
+	if (!str)
+		return (shell->exit_status = 1, 1);
+	arg = ft_strjoin("_=", str);
+	if (!arg)
+		return (shell->exit_status = 1, free(str), 1);
+	if (!exp_one(shell, arg))
+		return (shell->exit_status = 1, free(arg), free(str), 1);
+	return (free(arg), free(str), 0);
+}
+
 void	process_input(char *input, t_shell *shell)
 {
 	t_token		*tokens;
@@ -64,6 +89,7 @@ void	process_input(char *input, t_shell *shell)
 	{
 		//print_command(cmd);
 		exec(cmd, shell);
+		update_(cmd, shell);
 		free_commands(cmd);
 	}
 	free_tokens(tokens);

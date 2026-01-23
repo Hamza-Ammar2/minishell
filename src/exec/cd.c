@@ -9,14 +9,12 @@ static char *get_dir(char *arg, t_shell *shell)
     char   *home;
 
     home_env = find_env(shell, "HOME");
-    if (!home_env /* && (!arg || (arg && arg[0] == '~')) */)
+    if (!home_env)
         home = "";
     else
         home = home_env->value;
     if (!arg || ft_strcmp(arg, "--") == 0)
         return (ft_strdup(home));
-    else if (arg[0] == '~' && (arg[1] == '/' || arg[1] == '\0'))
-        return (ft_strjoin(home, arg + 1));
     else if (ft_strcmp(arg, "-") == 0)
     {
         home_env = find_env(shell, "OLDPWD");

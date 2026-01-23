@@ -55,8 +55,6 @@ static int  here_doc_read(t_shell *shell, char *value, int type, int fd[2])
 {
     char *line;
 
-    // FIX: In non-interactive mode, heredocs can't work properly because stdin is shared
-    // between main loop and heredoc reading. Skip heredoc and create empty pipe.
     line = get_exp(shell, value, type);
     if (sig)
         return (clean_stuff(shell, fd, line));

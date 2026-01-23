@@ -3,7 +3,7 @@
 #include "../include/minishell.h"
 #include "../libft/libft.h"
 
-static int exp_one(t_shell *shell, char *arg)
+int exp_one(t_shell *shell, char *arg)
 {
     char    *eq;
     char    *key;
@@ -101,20 +101,19 @@ int    export(char **args, t_shell *shell)
 
     if (!*args)
         return (print_export(shell));
-    exit_status = 0; // FIX: Track if any errors occurred
+    exit_status = 0;
     while (*args)
     {
         if (!isvalid_key(*args))
         {
-            // FIX: Print to stderr (fd 2) not stdout, add newline, include the invalid arg
             fprintf(stderr, "export: `%s': not a valid identifier\n", *args);
             args++;
-            exit_status = 1; // FIX: Mark that we had an error
-            continue; // FIX: Continue processing other args but return error at end
+            exit_status = 1;
+            continue;
         }
         if (!exp_one(shell, *args))
             return (1);
         args++;
     }
-    return (exit_status); // FIX: Return 1 if any validation failed, 0 if all succeeded
+    return (exit_status);
 }

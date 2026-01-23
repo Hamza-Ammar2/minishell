@@ -28,6 +28,7 @@ INC_DIR = include
 
 SRCS = $(SRC_DIR)/main.c \
        $(SRC_DIR)/init.c \
+	   $(SRC_DIR)/init_utils.c \
        $(SRC_DIR)/cleanup.c \
 	   $(SRC_DIR)/signal_stuff.c \
        $(SRC_DIR)/lexer/tokenizer.c \
