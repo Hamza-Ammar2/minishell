@@ -47,26 +47,6 @@ int	main(int argc, char **argv, char **envp)
 ** 4. Free allocated resources.
 */
 
-static int	update_(t_command *cmd, t_shell *shell)
-{
-	t_token *args;
-	char	*str;
-	char	*arg;
-
-	args = cmd->args[0];
-	if (!args)
-		return (1);
-	str = expand_str(shell, args->value, args->quote_type);
-	if (!str)
-		return (shell->exit_status = 1, 1);
-	arg = ft_strjoin("_=", str);
-	if (!arg)
-		return (shell->exit_status = 1, free(str), 1);
-	if (!exp_one(shell, arg))
-		return (shell->exit_status = 1, free(arg), free(str), 1);
-	return (free(arg), free(str), 0);
-}
-
 void	process_input(char *input, t_shell *shell)
 {
 	t_token		*tokens;
@@ -89,7 +69,6 @@ void	process_input(char *input, t_shell *shell)
 	{
 		//print_command(cmd);
 		exec(cmd, shell);
-		update_(cmd, shell);
 		free_commands(cmd);
 	}
 	free_tokens(tokens);

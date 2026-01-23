@@ -42,6 +42,26 @@ int is_dir(char *path)
     return S_ISDIR(st.st_mode);
 }
 
+int	update_(t_command *cmd, t_shell *shell)
+{
+	t_token *args;
+	char	*str;
+	char	*arg;
+
+	args = cmd->args[0];
+	if (!args)
+		return (1);
+	str = expand_str(shell, args->value, args->quote_type);
+	if (!str)
+		return (shell->exit_status = 1, 1);
+	arg = ft_strjoin("_=", str);
+	if (!arg)
+		return (shell->exit_status = 1, free(str), 1);
+	if (!exp_one(shell, arg))
+		return (shell->exit_status = 1, free(arg), free(str), 1);
+	return (free(arg), free(str), 0);
+}
+
 int exit_exec(char **args, char *str)
 {
     struct stat st;

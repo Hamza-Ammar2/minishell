@@ -88,6 +88,8 @@ static int    rec_exec(char **paths, int fd[3][2], t_command *cmds, t_shell *she
         return (fd[2][1]);
     if (pipe(fd[fd[2][0] % 2]) == -1)
         return (fd[2][1] = -1, close_pipes(cmds, fd), perror("pipe failed"), 1);
+    if (update_(cmds, shell) != 0)
+        return (perror("could not update _"), close_pipes(cmds, fd), 1);
     if (here_doc(shell, cmds->redirects, fd) == -1)
         return (close_pipes(cmds, fd), fd[2][0] += 1,
             rec_exec(paths, fd, cmds->next, shell));
