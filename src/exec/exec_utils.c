@@ -49,7 +49,7 @@ int exit_exec(char **args, char *str)
 
     cmd = args[0];
     if (!cmd || cmd[0] == '\0')
-        exit(0);
+        (fprintf(stderr, "command not found\n"), exit(127));
     if (ft_strchr(cmd, '/')) 
     {
         if (stat(cmd, &st) != 0)

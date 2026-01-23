@@ -73,8 +73,6 @@ static void    exec_single(t_command *cmd, t_shell *shell, int fd[3][2], char **
     args = wraper(cmd->args, shell);
     if (!args)
         (close_child(fd), exit(1));
-    if (!args[0])
-        (close_child(fd), free_splits(args), exit(0));
     close_child(fd);
     ft_exit(cmd->args, shell);
     str = get_path(paths, args[0]);

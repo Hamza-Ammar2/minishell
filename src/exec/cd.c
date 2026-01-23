@@ -6,27 +6,28 @@
 static char *get_dir(char *arg, t_shell *shell)
 {
     t_env *home_env;
-    char    *dir;
+    char   *home;
 
     home_env = find_env(shell, "HOME");
-    if (!home_env && (!arg || (arg && arg[0] == '~')))
-        return (fprintf(stderr, "cd: HOME not set\n"), NULL);
-    if (!arg)
-        dir = ft_strdup(home_env->value);
-    else if (arg[0] == '~')
-        dir = ft_strjoin(home_env->value, arg + 1);
+    if (!home_env /* && (!arg || (arg && arg[0] == '~')) */)
+        home = "";
+    else
+        home = home_env->value;
+    if (!arg || ft_strcmp(arg, "--") == 0)
+        return (ft_strdup(home));
+    else if (arg[0] == '~' && (arg[1] == '/' || arg[1] == '\0'))
+        return (ft_strjoin(home, arg + 1));
     else if (ft_strcmp(arg, "-") == 0)
     {
         home_env = find_env(shell, "OLDPWD");
         if (!home_env)
             return (fprintf(stderr, "cd: OLDPWD not set\n"), NULL);
-        dir = ft_strdup(home_env->value);
-        write(STDOUT_FILENO, dir, ft_strlen(dir));
+        home = home_env->value;
+        write(STDOUT_FILENO, home, ft_strlen(home));
         write(STDOUT_FILENO, "\n", 1);
+        return (ft_strdup(home));
     }
-    else
-        dir = ft_strdup(arg);
-    return (dir);
+    return (ft_strdup(arg));
 }
 
 static int  update_pwd(t_shell *shell, char *pwd)
@@ -61,14 +62,16 @@ int    cd(char **args, t_shell *shell)
     char    *dir;
     int     c;
 
-    dir = get_dir(args[0], shell);
-    if (!dir)
-        return (1);
     c = 0;
     while (args[c])
         c++;
     if (c > 1)
-        return (free(dir), fprintf(stderr, "cd: too many arguments\n"), 1);
+        return (fprintf(stderr, "cd: too many arguments\n"), 1);
+    if (args[0] && !args[0][0])
+        return (0);
+    dir = get_dir(args[0], shell);
+    if (!dir)
+        return (1);
     if (update_pwd(shell, "OLDPWD") == 1)
         return (free(dir), 1);
     if (!is_dir(dir))

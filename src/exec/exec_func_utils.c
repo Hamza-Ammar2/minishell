@@ -33,7 +33,7 @@ static int  eeu(t_command *cmds, t_shell *shell, int fd[3][2], char **args)
     if (ft_strcmp(args[0], "env") == 0)
         fd[2][1] = env(&args[1], shell);
     else if (ft_strcmp(args[0], "echo") == 0)
-        fd[2][1] = echo(&args[1]);
+        fd[2][1] = echo(&args[1], shell);
     else
         fd[2][1] = unset(shell, &args[1]);
     return (1);

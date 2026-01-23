@@ -46,21 +46,55 @@ int    env(char **args, t_shell *shell)
     return (0);
 }
 
-int    echo(char **args)
+static  int is_n_flag(char *arg)
+{
+    int i;
+
+    if (!arg || arg[0] != '-')
+        return (0);
+    i = 1;
+    while (arg[i])
+    {
+        if (arg[i] != 'n')
+            return (0);
+        i++;
+    }
+    if (i == 1)
+        return (0);
+    return (1);
+}
+
+static  int    write_tilde(char *arg, t_shell *shell)
+{
+    t_env   *home;
+
+    if (arg[0] == '~' && (arg[1] == '/' || arg[1] == '\0'))
+    {
+        home = find_env(shell, "HOME");
+        if (!home)
+            return (write(STDOUT_FILENO, arg, ft_strlen(arg)));
+        write(STDOUT_FILENO, home->value, ft_strlen(home->value));
+        write(STDOUT_FILENO, arg + 1, ft_strlen(arg + 1));
+        return (1);
+    }
+    return (write(STDOUT_FILENO, arg, ft_strlen(arg)));
+}
+
+int    echo(char **args, t_shell *shell)
 {
     int     newline;
     int     i;
 
     newline = 1;
     i = 0;
-    while (args[i] && ft_strcmp(args[i], "-n") == 0)
+    while (args[i] && is_n_flag(args[i]))
     {
         newline = 0;
         i++;
     }
     while (args[i])
     {
-        write(STDOUT_FILENO, args[i], ft_strlen(args[i]));
+        write_tilde(args[i], shell);
         if (args[i + 1] /* && *args[i] */)
             write(STDOUT_FILENO, " ", 1);
         i++;

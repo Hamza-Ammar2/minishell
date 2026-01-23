@@ -56,8 +56,10 @@ SRCS = $(SRC_DIR)/main.c \
 	   $(SRC_DIR)/exec/exec_utils.c \
 	   $(SRC_DIR)/exec/here_doc_stuff.c \
 	   $(SRC_DIR)/exec/builtins3.c \
+	   $(SRC_DIR)/exec/builtins4.c \
 	   $(SRC_DIR)/exec/cd.c \
 	   $(SRC_DIR)/exec/handle_quotes.c \
+	   $(SRC_DIR)/exec/handle_quotes_hd.c \
 	   $(SRC_DIR)/exec/pipe.c
 
 # ================================== OBJECTS ================================== #

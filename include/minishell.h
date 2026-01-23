@@ -143,7 +143,7 @@ int     check_builtin(t_command *cmds, t_shell *shell, int fd[3][2]);
 int    export(char **args, t_shell *shell);
 int    cd(char **args, t_shell *shell);
 int	   env(char **args, t_shell *shell);
-int    echo(char **args);
+int    echo(char **args, t_shell *shell);
 int    unset(t_shell *shell, char **args);
 int    pwd(char **args);
 int    ft_exit(t_token **args, t_shell *shell);
@@ -161,6 +161,7 @@ t_env   *find_env(t_shell *shell, char *key);
 char 	*do_env(t_shell *shell, char *str);
 char    *expand_str(t_shell *shell, char *str, int quote_type);
 char    *expand_quo(t_shell *shell, char *str, int quote_type);
+char    *expand_str_hd(t_shell *shell, char *str, int quote_type);
 void	free_env(t_env *env);
 
 

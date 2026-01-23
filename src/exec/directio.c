@@ -61,12 +61,16 @@ static int  in_out(t_shell *shell, t_token *redir)
 int    direct_io(t_shell *shell, t_command *cmd, int fd[3][2])
 {
     t_token *redir;
-    int     hd;
+    char    *raw;
 
     redir = cmd->redirects;
     while (redir)
     {
-        redir->value = expand_str(shell, redir->value, redir->quote_type);
+        raw = redir->value;
+        redir->value = expand_str(shell, raw, redir->quote_type);
+        free(raw);
+        if (!redir->value)
+            return (perror("directio: expansion failed"), 0);
         if (redir->type == TOKEN_REDIRECT_IN || redir->type == TOKEN_REDIRECT_OUT)
         {
             if (!in_out(shell, redir))
@@ -74,13 +78,8 @@ int    direct_io(t_shell *shell, t_command *cmd, int fd[3][2])
             redir = redir->next;
             continue;
         }
-        hd = here_doc_app(shell, redir, fd);
-        if (hd != 1)
-        {
-            if (!hd)
-                perror("direct_here_app failed");
-            return (0);
-        }
+        if (!here_doc_app(shell, redir, fd))
+            return (perror("direct_here_app failed"), 0);
         redir = redir->next;
     }
     return (1);

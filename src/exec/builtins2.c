@@ -3,43 +3,6 @@
 #include "../include/minishell.h"
 #include "../libft/libft.h"
 
-static void del_one(t_shell *shell, char *arg)
-{
-    t_env   *current;
-    t_env   *prev;
-    t_env   *to_delete;
-
-    current = shell->env;
-    prev = NULL;
-    while (current)
-    {
-        if (ft_strcmp(current->key, arg) == 0)
-        {
-            to_delete = current;
-            if (prev)
-                prev->next = current->next;
-            else
-                shell->env = current->next;
-            free(to_delete->key);
-            free(to_delete->value);
-            free(to_delete);
-            break ;
-        }
-        prev = current;
-        current = current->next;
-    }
-}
-
-int    unset(t_shell *shell, char **args)
-{
-    while (*args)
-    {
-        del_one(shell, *args);
-        args++;
-    }
-    return (0);
-}
-
 static int exp_one(t_shell *shell, char *arg)
 {
     char    *eq;
@@ -87,10 +50,57 @@ static int  isvalid_key(char *str)
     return (1);
 }
 
+void    bsort(char **args)
+{
+    int     i;
+    int     swapped;
+    char    *tmp;
+
+    swapped = 1;
+    while (swapped)
+    {
+        swapped = 0;
+        i = 0;
+        while (args[i + 1])
+        {
+            if (ft_strcmp(args[i], args[i + 1]) > 0)
+            {
+                tmp = args[i];
+                args[i] = args[i + 1];
+                args[i + 1] = tmp;
+                swapped = 1;
+            }
+            i++;
+        }
+    }
+}
+
+static int print_export(t_shell *shell)
+{
+    char    **args;
+    int     i;
+
+    i = 0;
+    args = env2arr(shell->env);
+    if (!args)
+        return (perror("print_export: malloc failed"), 1);
+    bsort(args);
+    while (args[i])
+    {
+        write(STDOUT_FILENO, "declare -x ", 11);
+        write(STDOUT_FILENO, args[i], ft_strlen(args[i]));
+        write(STDOUT_FILENO, "\n", 1);
+        i++;
+    }
+    return (free_splits(args), 0);
+}
+
 int    export(char **args, t_shell *shell)
 {
     int     exit_status;
 
+    if (!*args)
+        return (print_export(shell));
     exit_status = 0; // FIX: Track if any errors occurred
     while (*args)
     {

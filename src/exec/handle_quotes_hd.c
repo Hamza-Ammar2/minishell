@@ -34,23 +34,21 @@ static char    *get_next_quote(char *str, int quote_type)
 
 static int write_exp(int fd[2], t_shell *shell, char *str, int quote_type)
 {
-    char    *expanded;
+    //char    *expanded;
     char    *raw;
     int     len;
 
     if (quote_type != QUOTE_NONE)
         str++;
+    (void)shell;
     raw = ft_substr(str, 0, get_next_quote(str, quote_type) - str);
     if (!raw)
         return (perror("could not expand string"), -1);
-    expanded = expand_quo(shell, raw, quote_type);
-    /* printf("Raw: [%s] QUOTE_TYPE: [%d]\n", raw, quote_type);
-    printf("Expanded: [%s]\n", expanded); */
+    /* expanded = expand_quo(shell, raw, quote_type);
     if (!expanded)
-        return (free(raw), perror("could not expand string"), -1);
-    len = ft_strlen(expanded);
-    write(fd[1], expanded, len);
-    free(expanded);
+        return (free(raw), perror("could not expand string"), -1); */
+    len = ft_strlen(raw);
+    write(fd[1], raw, len);
     free(raw);
     return (len);
 }
@@ -70,7 +68,7 @@ static char    *get_buff(int fd[2], int total_len)
     return (res);
 }
 
-char    *expand_str(t_shell *shell, char *str, int quote_type)
+char    *expand_str_hd(t_shell *shell, char *str, int quote_type)
 {
     int fd[2];
     int total_len;
