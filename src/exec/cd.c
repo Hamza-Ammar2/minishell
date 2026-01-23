@@ -43,6 +43,8 @@ static int  update_pwd(t_shell *shell, char *pwd)
         if (!old)
             return (perror("cd: malloc failed"), 1);
         old->key = ft_strdup(pwd);
+        if (!old->key)
+            return (free(old), perror("cd: malloc failed"), 1);
         old->value = oldpwd;
         old->next = shell->env;
         shell->env = old;

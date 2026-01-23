@@ -47,7 +47,7 @@ int	count_args(t_token *tokens)
 ** 3. Skip redirect operators and their filenames.
 ** 4. NULL-terminate the array.
 */
-static void	fill_args(t_command *cmd, t_token *tokens)
+static int	fill_args(t_command *cmd, t_token *tokens)
 {
 	int		i;
 	t_token	*current;
@@ -61,7 +61,7 @@ static void	fill_args(t_command *cmd, t_token *tokens)
 			cmd->args[i] = new_token(TOKEN_WORD, current->value,
 				 current->quote_type);
 			if(!cmd->args[i])
-				return ;
+				return (-1);
 			i++;
 		}
 		else if (is_operator_token(current->type))
@@ -72,6 +72,7 @@ static void	fill_args(t_command *cmd, t_token *tokens)
 		current = current->next;
 	}
 	cmd->args[i] = NULL;
+	return (0);
 }
 
 /*
@@ -104,7 +105,11 @@ static t_command	*parse_single_command(t_token *tokens)
 		free_commands(cmd);
 		return (NULL);
 	}
-	fill_args(cmd, tokens);
+	if (fill_args(cmd, tokens) == -1)
+	{
+		free_commands(cmd);
+		return (NULL);
+	}
 	return (cmd);
 }
 

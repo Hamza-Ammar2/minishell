@@ -70,6 +70,8 @@ int    ft_exit(t_token **args, t_shell *shell)
     if (!args)
         return (-1);
     cmd = expand_str(shell, args[0]->value, args[0]->quote_type);
+    if (!cmd)
+        return (1);
     if (ft_strcmp(cmd, "exit") != 0)
         return (free(cmd), -1);
     free(cmd);

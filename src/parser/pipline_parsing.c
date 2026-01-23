@@ -92,7 +92,7 @@ t_token *extract_command_tokens(t_token **tokens)
 ** 3. Skip redirect operators and their filenames.
 ** 4. NULL-terminate the args array.
 */
-static void	fill_command_args(t_command *cmd, t_token *tokens)
+static int	fill_command_args(t_command *cmd, t_token *tokens)
 {
 	int		i;
 	t_token	*tmp;
@@ -106,7 +106,7 @@ static void	fill_command_args(t_command *cmd, t_token *tokens)
 			// Create new token with quote_type preserved
 			cmd->args[i] = new_token(TOKEN_WORD, tmp->value, tmp->quote_type);
 			if (!cmd->args[i])
-				return;  // Handle allocation failure
+				return (-1);
 			i++;
 		}
 		else if (is_redirect_type(tmp->type))
@@ -117,6 +117,7 @@ static void	fill_command_args(t_command *cmd, t_token *tokens)
 		tmp = tmp->next;
 	}
 	cmd->args[i] = NULL;
+	return (0);
 }
 
 /*
@@ -150,7 +151,11 @@ static t_command	*create_pipeline_command(t_token *cmd_tokens)
 		free_commands(cmd);
 		return (NULL);
 	}
-	fill_command_args(cmd, cmd_tokens);
+	if (fill_command_args(cmd, cmd_tokens) == -1)
+	{
+		free_commands(cmd);
+		return (NULL);
+	}
 	return (cmd);
 }
 

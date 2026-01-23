@@ -22,7 +22,11 @@ t_token *new_token(t_token_type type, char *value, int quote_type)
 		return (NULL);
 	token->type = type;
 	if (value)
+	{
 		token->value = ft_strdup(value);
+		if (!token->value)
+			return (free(token), NULL);
+	}
 	else
 		token->value = NULL;
 	token->next = NULL;
