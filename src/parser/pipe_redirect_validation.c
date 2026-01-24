@@ -6,7 +6,7 @@
 /*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:05:10 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 03:08:42 by lpons            ###   ########.fr       */
+/*   Updated: 2026/01/24 19:45:14 by lpons            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,13 +47,13 @@ static int	validate_pipe_boundaries(t_token *tokens)
 
 	if (tokens->type == TOKEN_PIPE)
 	{
-		fprintf(stderr, "minishell: syntax error near unexpected token `|'\n");
+		ft_fprintf(2, "minishell: syntax error near unexpected token `|'\n");
 		return (0);
 	}
 	last = get_last_token(tokens);
 	if (last->type == TOKEN_PIPE)
 	{
-		fprintf(stderr,
+		ft_fprintf(2,
 			"minishell: syntax error near unexpected token `newline'\n");
 		return (0);
 	}
@@ -81,7 +81,7 @@ static int	validate_consecutive_pipes(t_token *tokens)
 	{
 		if (current->type == TOKEN_PIPE && current->next->type == TOKEN_PIPE)
 		{
-			fprintf(stderr,
+			ft_fprintf(2,
 				"minishell: syntax error near unexpected token `|'\n");
 			return (0);
 		}

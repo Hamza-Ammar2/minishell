@@ -6,7 +6,7 @@
 /*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:01:05 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 03:21:20 by lpons            ###   ########.fr       */
+/*   Updated: 2026/01/24 19:45:14 by lpons            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ int	env(char **args, t_shell *shell)
 
 	if (args && args[0])
 	{
-		fprintf(stderr, "env: too many arguments\n");
+		ft_fprintf(2, "env: too many arguments\n");
 		return (1);
 	}
 	current = shell->env;

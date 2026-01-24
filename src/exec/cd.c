@@ -6,7 +6,7 @@
 /*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:01:54 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 03:20:32 by lpons            ###   ########.fr       */
+/*   Updated: 2026/01/24 19:45:14 by lpons            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ static char	*get_dir(char *arg, t_shell *shell)
 	{
 		home_env = find_env(shell, "OLDPWD");
 		if (!home_env)
-			return (fprintf(stderr, "cd: OLDPWD not set\n"), NULL);
+			return (ft_fprintf(2, "cd: OLDPWD not set\n"), NULL);
 		home = home_env->value;
 		write(STDOUT_FILENO, home, ft_strlen(home));
 		write(STDOUT_FILENO, "\n", 1);
@@ -76,7 +76,7 @@ int	cd(char **args, t_shell *shell)
 	while (args[c])
 		c++;
 	if (c > 1)
-		return (fprintf(stderr, "cd: too many arguments\n"), 1);
+		return (ft_fprintf(2, "cd: too many arguments\n"), 1);
 	if (args[0] && !args[0][0])
 		return (0);
 	dir = get_dir(args[0], shell);

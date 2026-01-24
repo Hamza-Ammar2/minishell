@@ -6,7 +6,7 @@
 /*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:01:09 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 03:10:58 by lpons            ###   ########.fr       */
+/*   Updated: 2026/01/24 19:45:14 by lpons            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,7 @@ int	export(char **args, t_shell *shell)
 	{
 		if (!isvalid_key(*args))
 		{
-			fprintf(stderr, "export: `%s': not a valid identifier\n", *args);
+			ft_fprintf(2, "export: `%s': not a valid identifier\n", *args);
 			args++;
 			exit_status = 1;
 			continue ;
