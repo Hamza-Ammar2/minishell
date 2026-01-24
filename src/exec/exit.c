@@ -5,11 +5,7 @@
 
 void    exit_nice(t_shell *shell, t_command *cmd, int stat)
 {
-    (void)shell;
-    (void)cmd;
-    // free_commands(cmd);
-    // cleanup_shell(shell);
-    exit(stat);
+    
 }
 
 static void ex1(t_shell *shell, t_command *cmds, char **args)
