@@ -27,10 +27,12 @@ INC_DIR = include
 # ================================== SOURCES ================================== #
 
 SRCS = $(SRC_DIR)/main.c \
-       $(SRC_DIR)/init.c \
-	   $(SRC_DIR)/init_utils.c \
-       $(SRC_DIR)/cleanup.c \
-	   $(SRC_DIR)/signal_stuff.c \
+       $(SRC_DIR)/utils/init.c \
+	   $(SRC_DIR)/utils/init_utils.c \
+       $(SRC_DIR)/utils/cleanup.c \
+	   $(SRC_DIR)/utils/signal_stuff.c \
+	   $(SRC_DIR)/utils/ft_fprintf_utils.c \
+	   $(SRC_DIR)/utils/ft_fprintf.c \
        $(SRC_DIR)/lexer/tokenizer.c \
        $(SRC_DIR)/lexer/token_utils.c \
        $(SRC_DIR)/lexer/quote_tokens.c \
@@ -43,12 +45,12 @@ SRCS = $(SRC_DIR)/main.c \
        $(SRC_DIR)/parser/redirection_parsing.c \
        $(SRC_DIR)/parser/pipe_redirect_validation.c \
        $(SRC_DIR)/parser/WD_debug_print.c \
-	   $(SRC_DIR)/ft_fprintf/ft_fprintf_utils.c \
-	   $(SRC_DIR)/ft_fprintf/ft_fprintf.c \
+	   $(SRC_DIR)/builtins/builtins.c \
+	   $(SRC_DIR)/builtins/builtins2.c \
+	   $(SRC_DIR)/builtins/builtins3.c \
+	   $(SRC_DIR)/builtins/builtins4.c \
 	   $(SRC_DIR)/exec/exec.c \
 	   $(SRC_DIR)/exec/utils.c \
-	   $(SRC_DIR)/exec/builtins.c \
-	   $(SRC_DIR)/exec/builtins2.c \
 	   $(SRC_DIR)/exec/utils_str.c \
 	   $(SRC_DIR)/exec/env_stuff.c \
 	   $(SRC_DIR)/exec/directio.c \
@@ -58,8 +60,6 @@ SRCS = $(SRC_DIR)/main.c \
 	   $(SRC_DIR)/exec/exec_utils.c \
 	   $(SRC_DIR)/exec/here_doc_stuff.c \
 	   $(SRC_DIR)/exec/heredoc_utils.c \
-	   $(SRC_DIR)/exec/builtins3.c \
-	   $(SRC_DIR)/exec/builtins4.c \
 	   $(SRC_DIR)/exec/cd.c \
 	   $(SRC_DIR)/exec/handle_quotes.c \
 	   $(SRC_DIR)/exec/handle_quotes_hd.c \
@@ -73,12 +73,12 @@ OBJS = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
 all: $(NAME)
 
-libft:
+libft/libft.a:
 	@echo "$(YELLOW)Building libft...$(RESET)"
 	@$(MAKE) -C ./libft
 	@echo "$(GREEN)✓ libft built successfully!$(RESET)"
 
-$(NAME): libft $(OBJS)
+$(NAME): libft/libft.a $(OBJS)
 	@echo "$(YELLOW)Linking $(NAME)...$(RESET)"
 	@$(CC) $(CFLAGS) $(OBJS) $(LDFLAGS) -o $(NAME)
 	@echo "$(GREEN)✓ $(NAME) created successfully!$(RESET)"
@@ -104,4 +104,4 @@ re: fclean all
 
 # ================================== PHONY ==================================== #
 
-.PHONY: all clean fclean re libft
+.PHONY: all clean fclean re
