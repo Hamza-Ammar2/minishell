@@ -6,7 +6,7 @@
 /*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:01:35 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 03:20:32 by lpons            ###   ########.fr       */
+/*   Updated: 2026/01/24 19:45:14 by lpons            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ static void	handle_exit_error(char *exit_arg, t_shell *shell, int err_type)
 {
 	if (err_type == 0)
 	{
-		fprintf(stderr, "exit: %s: numeric argument required\n", exit_arg);
+		ft_fprintf(2, "exit: %s: numeric argument required\n", exit_arg);
 		free(exit_arg);
 		shell->exit_status = 2;
 		exit(2);
@@ -63,7 +63,7 @@ static int	process_exit_args(t_token **args, t_shell *shell)
 		handle_exit_error(exit_arg, shell, 0);
 	if (args[2])
 	{
-		fprintf(stderr, "exit: too many arguments\n");
+		ft_fprintf(2, "exit: too many arguments\n");
 		free(exit_arg);
 		shell->exit_status = 1;
 		return (1);

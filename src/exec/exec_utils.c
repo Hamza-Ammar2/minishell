@@ -6,7 +6,7 @@
 /*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:02:29 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 03:02:34 by lpons            ###   ########.fr       */
+/*   Updated: 2026/01/24 19:45:14 by lpons            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,21 +79,21 @@ int	exit_exec(char **args, char *str)
 
 	cmd = args[0];
 	if (!cmd || cmd[0] == '\0')
-		(fprintf(stderr, "command not found\n"), exit(127));
+		(ft_fprintf(2, "command not found\n"), exit(127));
 	if (ft_strchr(cmd, '/'))
 	{
 		if (stat(cmd, &st) != 0)
-			(fprintf(stderr, "No such file or directory\n"), exit(127));
+			(ft_fprintf(2, "No such file or directory\n"), exit(127));
 		if (S_ISDIR(st.st_mode))
-			(fprintf(stderr, "Is a directory\n"), exit(126));
+			(ft_fprintf(2, "Is a directory\n"), exit(126));
 		if (access(cmd, X_OK) != 0)
-			(fprintf(stderr, "Permission denied\n"), exit(126));
+			(ft_fprintf(2, "Permission denied\n"), exit(126));
 	}
 	if (!str)
-		(fprintf(stderr, "command not found\n"), exit(127));
+		(ft_fprintf(2, "command not found\n"), exit(127));
 	if (S_ISDIR(st.st_mode))
-		(fprintf(stderr, "Is a directory\n"), exit(126));
+		(ft_fprintf(2, "Is a directory\n"), exit(126));
 	if (access(str, X_OK) != 0)
-		(fprintf(stderr, "Permission denied\n"), exit(126));
+		(ft_fprintf(2, "Permission denied\n"), exit(126));
 	return (0);
 }
