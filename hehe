@@ -1,5 +1,0 @@
-cat << $USER
-why
-not
-$HOME
-$USER
