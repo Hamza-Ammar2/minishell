@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:03:17 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 21:50:55 by haammar          ###   ########.fr       */
+/*   Updated: 2026/01/25 00:09:47 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ static int	here_doc_read(t_shell *shell, char *value, int type, int fd)
 		if (!line)
 			break ;
 	}
-	if (!line)
+	if (line)
 		free(line);
 	return (free(value), close(fd), 1);
 }
