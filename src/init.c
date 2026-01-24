@@ -93,5 +93,7 @@ int	init_shell(t_shell *shell, char **argv, char **envp)
 	arg = ft_strjoin("_=", argv[0]);
 	if (!arg)
 		return (0);
-	return (exp_one(shell, arg));
+	if (!exp_one(shell, arg))
+		return (free(arg), 0);
+	return (free(arg), 1);
 }

@@ -3,6 +3,20 @@
 #include "../include/minishell.h"
 #include "../libft/libft.h"
 
+char **get_paths(t_shell *shell)
+{
+    char *path;
+    char **paths;
+    t_env *env_node;
+
+    env_node = find_env(shell, "PATH");
+    if (!env_node || !env_node->value)
+        return (NULL);
+    path = env_node->value;
+    paths = ft_split(path, ':');
+    return (paths);
+}
+
 char *create_path(char *path, char *cmd)
 {
     char    *full_path;

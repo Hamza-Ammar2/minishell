@@ -12,6 +12,8 @@ int    connect_pipes(t_command *cmd, int fd[3][2])
     failed = 0;
     if (i > 0)
         failed = dup2(fd[(i+1)%2][0], STDIN_FILENO);
+    if (failed == -1)
+        return (perror("dup2: connecting pipes failed"), -1);
     if (cmd->next)
         failed = dup2(fd[i%2][1], STDOUT_FILENO);
     if (failed == -1)

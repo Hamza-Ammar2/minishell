@@ -45,8 +45,10 @@ int     check_builtin(t_command *cmds, t_shell *shell, int fd[3][2])
     int i;
 
     args = wraper(cmds->args, shell);
-    if (!args || !args[0])
-        return (free_splits(args), 0);
+    if (!args /* || !args[0] */)
+        return (/* free_splits(args), */ 0);
+    if (!args[0])
+        return (free(args), 0);
     i = pce(cmds, shell, fd, args);
     if (i == -1 || i == 1)
         return (free_splits(args), i);

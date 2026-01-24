@@ -123,6 +123,7 @@ char			*ft_strdup(const char *s);
 
 
 /* Execution part */
+char	**get_paths(t_shell *shell);
 char    *get_path(char **paths, char *cmd);
 void    exec(t_command *cmds, t_shell *shell);
 char 	*create_path(char *path, char *cmd);

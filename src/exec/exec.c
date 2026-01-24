@@ -7,18 +7,22 @@
 static int    rec_exec(char **paths, int fd[3][2], t_command *cmds, t_shell *shell);
 static void    exec_single(t_command *cmd, t_shell *shell, int fd[3][2], char **paths);
 
-static char **get_paths(t_shell *shell)
+static int  check_begin(t_command *cmds, t_shell *shell, int fd[3][2])
 {
-    char *path;
-    char **paths;
-    t_env *env_node;
-
-    env_node = find_env(shell, "PATH");
-    if (!env_node || !env_node->value)
-        return (NULL);
-    path = env_node->value;
-    paths = ft_split(path, ':');
-    return (paths);
+    if (!cmds->next)
+    {
+        if (ft_exit(cmds->args, shell) == 1)
+        {
+            shell->exit_status = 1;
+            return (1);
+        }
+        if (do_builtin(cmds, shell, fd) != 0)
+        {
+            shell->exit_status = fd[2][1];
+            return (1);
+        }
+    }
+    return (0);
 }
 
 void    exec(t_command *cmds, t_shell *shell)
@@ -31,16 +35,10 @@ void    exec(t_command *cmds, t_shell *shell)
         return ;
     if (pipe(fd[1]) == -1)
         return (perror("pipe failed"));
-    if (!cmds->next)
-    {
-        if (ft_exit(cmds->args, shell) == 1)
-        {
-            shell->exit_status = 1;
-            return ;
-        }
-    }
     fd[2][0] = 0;
     fd[2][1] = 0;
+    if (check_begin(cmds, shell, fd))
+        return ;
     paths = get_paths(shell);
     last_pid = rec_exec(paths, fd, cmds, shell);
     shell->exit_status = last_pid;
@@ -66,6 +64,8 @@ static void    exec_single(t_command *cmd, t_shell *shell, int fd[3][2], char **
     char *str;
     char **args;
 
+    if (do_builtin(cmd, shell, fd) != 0)
+        exit(fd[2][1]);
     if (connect_pipes(cmd, fd) == -1)
         (close_child(fd), exit(1));
     if (!direct_io(shell, cmd, fd))
@@ -93,8 +93,8 @@ static int    rec_exec(char **paths, int fd[3][2], t_command *cmds, t_shell *she
     if (here_doc(shell, cmds->redirects, fd) == -1)
         return (close_pipes(cmds, fd), fd[2][0] += 1,
             rec_exec(paths, fd, cmds->next, shell));
-    if (do_builtin(cmds, shell, fd) != 0)
-        return (rec_exec(paths, fd, cmds->next, shell));
+    /* if (do_builtin(cmds, shell, fd) != 0)
+        return (rec_exec(paths, fd, cmds->next, shell)); */
     fd[2][1] = fork();
     if (fd[2][1] < 0)
         return (close_pipes(cmds, fd), perror("fork failed"), 1);
