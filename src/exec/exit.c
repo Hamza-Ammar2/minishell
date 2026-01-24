@@ -5,8 +5,8 @@
 
 void    exit_nice(t_shell *shell, t_command *cmd, int stat)
 {
-    (void)cmd;
-    (void)shell;
+    free_commands(cmd);
+    cleanup_shell(shell);
     exit(stat);
 }
 

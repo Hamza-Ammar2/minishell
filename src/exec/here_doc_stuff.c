@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   here_doc_stuff.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:03:17 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 21:50:55 by haammar          ###   ########.fr       */
+/*   Updated: 2026/01/25 00:10:35 by lpons            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ static int	here_doc_read(t_shell *shell, char *value, int type, int fd)
 		if (!line)
 			break ;
 	}
-	if (!line)
+	if (line)
 		free(line);
 	return (free(value), close(fd), 1);
 }
