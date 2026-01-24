@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:02:38 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 22:44:57 by haammar          ###   ########.fr       */
+/*   Updated: 2026/01/24 23:37:37 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,10 @@ void	exec(t_command *cmds, t_shell *shell)
 	paths = get_paths(shell);
 	last_pid = rec_exec(paths, fd, cmds, shell);
 	shell->exit_status = last_pid;
+	//printf("%d\n\n\n\n", shell->exit_status);
 	if (last_pid != 1 && last_pid != -1 && last_pid != 0)
 		shell->exit_status = get_status(last_pid);
+	//printf("%d", shell->exit_status);
 	while (wait(NULL) > 0)
 		;
 	free_splits(paths);
@@ -94,7 +96,7 @@ static void	exec_single(t_command *cmd, t_shell *shell, int fd[3][2],
 	close(shell->stdin_backup);
 	execve(str, args, env2arr(shell->env));
 	perror("execve failed");
-	exit(1);
+	exit_nice(shell, cmd, 1);
 }
 
 static int	rec_exec(char **paths, int fd[3][2], t_command *cmds,

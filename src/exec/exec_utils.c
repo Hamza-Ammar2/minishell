@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:02:29 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 22:14:10 by haammar          ###   ########.fr       */
+/*   Updated: 2026/01/24 23:48:45 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,8 @@ int	update_(t_command *cmd, t_shell *shell)
 	char	*str;
 	char	*arg;
 
+	if (!cmd->args)
+		return (0);
 	args = cmd->args[0];
 	if (!args)
 		return (1);

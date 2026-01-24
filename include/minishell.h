@@ -50,11 +50,10 @@ typedef struct s_token
 // 3. Command struct
 typedef struct s_command
 {
-	struct s_command 	*start;
-	char	*heredoc;
 	t_token				**args;          // Array of pointers to token structs (command and arguments)
 	t_token             *redirects;       // List of redirect tokens (operator + filename pairs)
 	struct s_command    *next;            // Next command in pipeline
+	struct s_command 	*start;
 }   t_command;
 
 typedef struct s_env
