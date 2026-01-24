@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:05:06 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 20:41:47 by haammar          ###   ########.fr       */
+/*   Updated: 2026/01/25 00:38:28 by lpons            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,6 +145,8 @@ t_command	*parse(t_token *tokens)
 	if (count_pipes(tokens) > 0)
 		return (parse_pipeline(tokens));
 	cmd = parse_single_command(tokens);
+	if (!cmd)
+		return (NULL);
 	cmd->start = cmd;
 	return (cmd);
 }
