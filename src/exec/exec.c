@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:02:38 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 21:33:15 by haammar          ###   ########.fr       */
+/*   Updated: 2026/01/24 22:27:12 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ static int	check_begin(t_command *cmds, t_shell *shell, int fd[3][2])
 {
 	if (!cmds->next)
 	{
-		if (ft_exit(cmds->args, shell) == 1)
+		if (ft_exit(cmds->args, shell, cmds) == 1)
 			return (close(fd[1][1]), close(fd[1][0]), shell->exit_status = 1,
 				1);
 		if (check_builtin(cmds, shell, fd) != 0)
@@ -74,20 +74,20 @@ static void	exec_single(t_command *cmd, t_shell *shell, int fd[3][2],
 	char	**args;
 
 	if (do_builtin(cmd, shell, fd) != 0)
-		(close_child(fd), free_commands(cmd->start), cleanup_shell(shell), exit(fd[2][1]));
+		(close_child(fd), exit_nice(shell, cmd, fd[2][1]));
 	if (connect_pipes(cmd, fd) == -1)
-		(close_child(fd), free_commands(cmd->start), cleanup_shell(shell), exit(1));
+		(close_child(fd), exit_nice(shell, cmd, 1));
 	if (!direct_io(shell, cmd))
-		(close_child(fd), free_commands(cmd->start), cleanup_shell(shell), exit(1));
+		(close_child(fd), exit_nice(shell, cmd, 1));
 	args = wraper(cmd->args, shell);
 	if (!args)
-		(close_child(fd), free_commands(cmd->start), cleanup_shell(shell), exit(1));
+		(close_child(fd), exit_nice(shell, cmd, 1));
 	close_child(fd);
-	ft_exit(cmd->args, shell);
+	ft_exit(cmd->args, shell, cmd);
 	str = get_path(paths, args[0]);
 	close(shell->stdout_backup);
 	close(shell->stdin_backup);
-	exit_exec(args, str);
+	exit_exec(shell, cmd, args, str);
 	execve(str, args, env2arr(shell->env));
 	perror("execve failed");
 	exit(1);

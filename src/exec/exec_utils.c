@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:02:29 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 21:52:19 by haammar          ###   ########.fr       */
+/*   Updated: 2026/01/24 22:14:10 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,32 +71,3 @@ int	update_(t_command *cmd, t_shell *shell)
 		return (shell->exit_status = 1, free(arg), free(str), 1);
 	return (free(arg), free(str), 0);
 }
-
-int	exit_exec(char **args, char *str)
-{
-	struct stat	st;
-	char		*cmd;
-
-	st.st_mode = 0;
-	cmd = args[0];
-	if (!cmd || cmd[0] == '\0')
-		(ft_fprintf(2, "command not found\n"), exit(127));
-	if (ft_strchr(cmd, '/'))
-	{
-		if (stat(cmd, &st) != 0)
-			(ft_fprintf(2, "No such file or directory\n"), exit(127));
-		if (S_ISDIR(st.st_mode))
-			(ft_fprintf(2, "Is a directory\n"), exit(126));
-		if (access(cmd, X_OK) != 0)
-			(ft_fprintf(2, "Permission denied\n"), exit(126));
-	}
-	if (!str)
-		(ft_fprintf(2, "command not found\n"), exit(127));
-	if (S_ISDIR(st.st_mode))
-		(ft_fprintf(2, "Is a directory\n"), exit(126));
-	if (access(str, X_OK) != 0)
-		(ft_fprintf(2, "Permission denied\n"), exit(126));
-	return (0);
-}
-
-

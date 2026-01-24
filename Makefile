@@ -61,6 +61,7 @@ SRCS = $(SRC_DIR)/main.c \
 	   $(SRC_DIR)/exec/here_doc_stuff.c \
 	   $(SRC_DIR)/exec/heredoc_utils.c \
 	   $(SRC_DIR)/exec/cd.c \
+	   $(SRC_DIR)/exec/exit.c \
 	   $(SRC_DIR)/exec/handle_quotes.c \
 	   $(SRC_DIR)/exec/here_doc_stuff_again.c \
 	   $(SRC_DIR)/exec/handle_quotes_hd.c \

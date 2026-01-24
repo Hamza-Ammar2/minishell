@@ -140,8 +140,9 @@ char    *make_hd();
 /* Utils */
 int     get_status(int last_pid);
 int	here_doc(t_shell *shell, t_command *cmds);
-int exit_exec(char **args, char *str);
+int	exit_exec(t_shell *shell, t_command *cmds, char **args, char *str);
 int	strcmpy(const char *s1, const char *s2);
+void    exit_nice(t_shell *shell, t_command *cmd, int stat);
 
 /* Built-in functions */
 int 	do_builtin(t_command *cmds, t_shell *shell, int fd[3][2]);
@@ -152,7 +153,7 @@ int	   env(char **args, t_shell *shell);
 int    echo(char **args, t_shell *shell);
 int    unset(t_shell *shell, char **args);
 int    pwd(char **args);
-int    ft_exit(t_token **args, t_shell *shell);
+int		ft_exit(t_token **args, t_shell *shell, t_command *cmd);
 int 	is_dir(char *path);
 
 /* Signal handling */
