@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   word_builder.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/01/24 02:45:44 by lpons             #+#    #+#             */
+/*   Updated: 2026/01/24 03:04:26 by lpons            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../include/minishell.h"
 #include "../../libft/libft.h"
 
@@ -45,7 +57,7 @@ static int	extract_unquoted_part(const char *input, char **result)
 	char	*segment;
 
 	len = 0;
-	while (input[len] && !ft_isspace(input[len]) 
+	while (input[len] && !ft_isspace(input[len])
 		&& !is_operator((char *)&input[len]) && !is_quote(input[len]))
 		len++;
 	if (len == 0)
@@ -73,8 +85,8 @@ static int	extract_unquoted_part(const char *input, char **result)
 ** 3. Append quoted content to word.
 ** 4. Update position pointer.
 */
-static int	process_quoted_part(const char *input, int *i, 
-	char **word, int *quote_type)
+static int	process_quoted_part(const char *input, int *i, char **word,
+		int *quote_type)
 {
 	char	*quoted_part;
 	int		temp_quote_type;
@@ -118,7 +130,7 @@ char	*extract_complete_word(const char *input, int *i, int *quote_type)
 
 	word = NULL;
 	*quote_type = QUOTE_NONE;
-	while (input[*i] && !ft_isspace(input[*i]) 
+	while (input[*i] && !ft_isspace(input[*i])
 		&& !is_operator((char *)&input[*i]))
 	{
 		if (is_quote(input[*i]))

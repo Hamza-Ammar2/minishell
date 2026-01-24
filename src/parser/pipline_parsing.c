@@ -1,53 +1,16 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   pipline_parsing.c                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/01/24 03:05:13 by lpons             #+#    #+#             */
+/*   Updated: 2026/01/24 03:18:57 by lpons            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../include/minishell.h"
-
-/*
-** 🔧 What the function Does
-** Counts the number of pipe tokens in a token list.
-**
-** 🔗 Role in the Program
-** Determines if input contains a pipeline and how many commands exist.
-**
-** 🧩 Step-by-Step
-** 1. Traverse token list.
-** 2. Count TOKEN_PIPE tokens.
-** 3. Return total count.
-*/
-int count_pipes(t_token *tokens)
-{
-    int i;
-
-    i = 0;
-    while(tokens)
-    {
-        if(tokens->type == TOKEN_PIPE)
-            i ++;
-        tokens = tokens->next;
-    }
-    return i;
-}
-
-/*
-** 🔧 What the function Does
-** Locates the next pipe token in the list.
-**
-** 🔗 Role in the Program
-** Helper for traversing and splitting commands at pipe boundaries.
-**
-** 🧩 Step-by-Step
-** 1. Traverse tokens until pipe found.
-** 2. Return pointer to pipe token.
-** 3. Return NULL if no pipe exists.
-*/
-t_token *find_next_pipe(t_token *tokens)
-{
-    while(tokens)
-    {
-        if(tokens->type == TOKEN_PIPE)
-            return(tokens);
-        tokens = tokens->next;
-    }
-    return NULL;
-}
 
 /*
 ** 🔧 What the function Does
@@ -62,21 +25,22 @@ t_token *find_next_pipe(t_token *tokens)
 ** 3. Skip pipe token if present.
 ** 4. Return copied token list for the command.
 */
-t_token *extract_command_tokens(t_token **tokens)
+t_token	*extract_command_tokens(t_token **tokens)
 {
-    t_token *head;
-    t_token *copy;
+	t_token	*head;
+	t_token	*copy;
 
-    head = NULL;
-    while (*tokens && (*tokens)->type != TOKEN_PIPE)
-    {
-        copy = new_token((*tokens)->type, (*tokens)->value, (*tokens)->quote_type);
-        add_token_to_list(&head, copy);
-        *tokens = (*tokens)->next;
-    }
-    if (*tokens)  // Skip pipe if present
-        *tokens = (*tokens)->next;
-    return (head);
+	head = NULL;
+	while (*tokens && (*tokens)->type != TOKEN_PIPE)
+	{
+		copy = new_token((*tokens)->type, (*tokens)->value,
+				(*tokens)->quote_type);
+		add_token_to_list(&head, copy);
+		*tokens = (*tokens)->next;
+	}
+	if (*tokens)
+		*tokens = (*tokens)->next;
+	return (head);
 }
 
 /*
@@ -103,7 +67,6 @@ static int	fill_command_args(t_command *cmd, t_token *tokens)
 	{
 		if (tmp->type == TOKEN_WORD)
 		{
-			// Create new token with quote_type preserved
 			cmd->args[i] = new_token(TOKEN_WORD, tmp->value, tmp->quote_type);
 			if (!cmd->args[i])
 				return (-1);

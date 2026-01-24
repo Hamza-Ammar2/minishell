@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_printf_utils.c                                  :+:      :+:    :+:   */
+/*   ft_fprintf_utils.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/17 13:15:24 by haammar           #+#    #+#             */
-/*   Updated: 2026/01/22 00:01:20 by haammar          ###   ########.fr       */
+/*   Updated: 2026/01/24 03:00:48 by lpons            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 static int	func(int fd, long n, char *nums, int base)
 {
-	int		c;
+	int	c;
 
 	c = 0;
 	if (n > base - 1)
@@ -25,7 +25,7 @@ static int	func(int fd, long n, char *nums, int base)
 
 static int	func_ptr(int fd, unsigned long n, char *nums, int base)
 {
-	int		c;
+	int	c;
 
 	c = 0;
 	if (n > (unsigned long)(base - 1))
@@ -73,7 +73,7 @@ int	print_num(int fd, long n)
 
 int	print_str(int fd, char *s)
 {
-	size_t		c;
+	size_t	c;
 
 	if (!s)
 		return (write(fd, "(null)", 6));

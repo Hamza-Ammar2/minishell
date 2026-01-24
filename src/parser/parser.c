@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parser.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/01/24 03:05:06 by lpons             #+#    #+#             */
+/*   Updated: 2026/01/24 03:05:43 by lpons            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../include/minishell.h"
 
 /*
@@ -59,8 +71,8 @@ static int	fill_args(t_command *cmd, t_token *tokens)
 		if (current->type == TOKEN_WORD)
 		{
 			cmd->args[i] = new_token(TOKEN_WORD, current->value,
-				 current->quote_type);
-			if(!cmd->args[i])
+					current->quote_type);
+			if (!cmd->args[i])
 				return (-1);
 			i++;
 		}

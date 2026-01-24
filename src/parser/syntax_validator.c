@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   syntax_validator.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/01/24 03:05:21 by lpons             #+#    #+#             */
+/*   Updated: 2026/01/24 03:05:26 by lpons            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../include/minishell.h"
 
 /*
@@ -13,10 +25,8 @@
 */
 int	is_operator_token(t_token_type type)
 {
-	return (type == TOKEN_PIPE
-		|| type == TOKEN_REDIRECT_IN
-		|| type == TOKEN_REDIRECT_OUT
-		|| type == TOKEN_REDIRECT_APPEND
+	return (type == TOKEN_PIPE || type == TOKEN_REDIRECT_IN
+		|| type == TOKEN_REDIRECT_OUT || type == TOKEN_REDIRECT_APPEND
 		|| type == TOKEN_REDIRECT_HEREDOC);
 }
 
@@ -67,7 +77,8 @@ static int	validate_end(t_token *tokens)
 	last = get_last_token(tokens);
 	if (is_operator_token(last->type))
 	{
-		fprintf(stderr, "minishell: syntax error near unexpected token `newline'\n");
+		fprintf(stderr,
+			"minishell: syntax error near unexpected token `newline'\n");
 		return (0);
 	}
 	return (1);

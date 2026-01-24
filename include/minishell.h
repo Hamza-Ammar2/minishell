@@ -138,6 +138,7 @@ int    restore(t_shell *shell);
 int     get_status(int last_pid);
 int    here_doc(t_shell *shell, t_token *redir, int fd[3][2]);
 int exit_exec(char **args, char *str);
+int	strcmpy(const char *s1, const char *s2);
 
 /* Built-in functions */
 int 	do_builtin(t_command *cmds, t_shell *shell, int fd[3][2]);

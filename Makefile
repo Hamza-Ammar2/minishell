@@ -39,9 +39,10 @@ SRCS = $(SRC_DIR)/main.c \
        $(SRC_DIR)/parser/parser_utils.c \
        $(SRC_DIR)/parser/syntax_validator.c \
        $(SRC_DIR)/parser/pipline_parsing.c \
+       $(SRC_DIR)/parser/pipeline_utils.c \
        $(SRC_DIR)/parser/redirection_parsing.c \
        $(SRC_DIR)/parser/pipe_redirect_validation.c \
-       $(SRC_DIR)/parser/debug_print.c \
+       $(SRC_DIR)/parser/WD_debug_print.c \
 	   $(SRC_DIR)/ft_fprintf/ft_fprintf_utils.c \
 	   $(SRC_DIR)/ft_fprintf/ft_fprintf.c \
 	   $(SRC_DIR)/exec/exec.c \
@@ -56,6 +57,7 @@ SRCS = $(SRC_DIR)/main.c \
 	   $(SRC_DIR)/exec/get_next_line_utils.c \
 	   $(SRC_DIR)/exec/exec_utils.c \
 	   $(SRC_DIR)/exec/here_doc_stuff.c \
+	   $(SRC_DIR)/exec/heredoc_utils.c \
 	   $(SRC_DIR)/exec/builtins3.c \
 	   $(SRC_DIR)/exec/builtins4.c \
 	   $(SRC_DIR)/exec/cd.c \

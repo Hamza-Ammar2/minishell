@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   redirection_parsing.c                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/01/24 03:05:17 by lpons             #+#    #+#             */
+/*   Updated: 2026/01/24 03:24:29 by lpons            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../include/minishell.h"
 
 /*
@@ -12,9 +24,10 @@
 ** 2. Take filename value from filename token.
 ** 3. Create new token with combined properties.
 */
-static t_token *create_redirect_token(t_token_type type, t_token *filename_token)
+static t_token	*create_redirect_token(t_token_type type,
+		t_token *filename_token)
 {
-    return (new_token(type, filename_token->value, filename_token->quote_type));
+	return (new_token(type, filename_token->value, filename_token->quote_type));
 }
 
 /*
@@ -31,25 +44,25 @@ static t_token *create_redirect_token(t_token_type type, t_token *filename_token
 ** 4. Add to redirect list and skip filename token.
 ** 5. Return list of merged redirect tokens.
 */
-t_token *extract_redirections(t_token *tokens)
+t_token	*extract_redirections(t_token *tokens)
 {
-    t_token *rdr_tokens;
-    t_token *redirect;
+	t_token	*rdr_tokens;
+	t_token	*redirect;
 
-    rdr_tokens = NULL;
-    while (tokens)
-    {
-        if (is_redirect_type(tokens->type))
-        {
-            if (!tokens->next)
-                return (NULL);
-            redirect = create_redirect_token(tokens->type, tokens->next);
-            add_token_to_list(&rdr_tokens, redirect);
-            tokens = tokens->next;
-        }
-        tokens = tokens->next;
-    }
-    return (rdr_tokens);
+	rdr_tokens = NULL;
+	while (tokens)
+	{
+		if (is_redirect_type(tokens->type))
+		{
+			if (!tokens->next)
+				return (NULL);
+			redirect = create_redirect_token(tokens->type, tokens->next);
+			add_token_to_list(&rdr_tokens, redirect);
+			tokens = tokens->next;
+		}
+		tokens = tokens->next;
+	}
+	return (rdr_tokens);
 }
 
 /*
@@ -63,7 +76,7 @@ t_token *extract_redirections(t_token *tokens)
 ** 1. Call extract_redirections to get merged redirect tokens.
 ** 2. Store result in cmd->redirects field.
 */
-void parse_redirections(t_command *cmd, t_token *tokens)
+void	parse_redirections(t_command *cmd, t_token *tokens)
 {
 	cmd->redirects = extract_redirections(tokens);
 }

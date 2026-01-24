@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   debug_print.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/01/24 03:04:54 by lpons             #+#    #+#             */
+/*   Updated: 2026/01/24 03:10:58 by lpons            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../include/minishell.h"
 
 /*
@@ -82,9 +94,7 @@ void	print_command(t_command *cmd)
 	i = 0;
 	while (cmd->args && cmd->args[i])
 	{
-		// Print value and quote type
-		printf("\"%s\" (quote:%d)", 
-			cmd->args[i]->value,
+		printf("\"%s\" (quote:%d)", cmd->args[i]->value,
 			cmd->args[i]->quote_type);
 		if (cmd->args[i + 1])
 			printf(", ");

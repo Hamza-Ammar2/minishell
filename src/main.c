@@ -1,16 +1,27 @@
-
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/01/24 02:47:18 by lpons             #+#    #+#             */
+/*   Updated: 2026/01/24 03:26:13 by lpons            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "../include/minishell.h"
 #include "../libft/libft.h"
 
-extern sig_atomic_t sig;
+extern sig_atomic_t	g_sig;
 
 /*
 ** 🔧 What the function Does
 ** Entry point of the minishell program.
 **
 ** 🔗 Role in the Program
-** Initializes the shell, runs the main loop, and cleans up resources before exit.
+** Initializes the shell, runs the main loop, and cleans up
+** resources before exit.
 **
 ** 🧩 Step-by-Step
 ** 1. Initialize shell structure.
@@ -67,7 +78,6 @@ void	process_input(char *input, t_shell *shell)
 	cmd = parse(tokens);
 	if (cmd)
 	{
-		//print_command(cmd);
 		exec(cmd, shell);
 		free_commands(cmd);
 	}
@@ -89,12 +99,11 @@ void	process_input(char *input, t_shell *shell)
 ** 5. Free input and repeat.
 */
 
-
 void	shell_loop(t_shell *shell)
 {
 	char	*input;
 	int		is_interactive;
-	
+
 	is_interactive = isatty(STDIN_FILENO);
 	while (1)
 	{
@@ -115,6 +124,6 @@ void	shell_loop(t_shell *shell)
 			process_input(input, shell);
 		}
 		free(input);
-		sig = 0;
+		g_sig = 0;
 	}
 }

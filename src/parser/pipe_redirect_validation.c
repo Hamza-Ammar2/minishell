@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   pipe_redirect_validation.c                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/01/24 03:05:10 by lpons             #+#    #+#             */
+/*   Updated: 2026/01/24 03:08:42 by lpons            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../include/minishell.h"
 
 /*
@@ -13,10 +25,8 @@
 */
 int	is_redirect_type(t_token_type type)
 {
-	return (type == TOKEN_REDIRECT_IN
-		|| type == TOKEN_REDIRECT_OUT
-		|| type == TOKEN_REDIRECT_APPEND
-		|| type == TOKEN_REDIRECT_HEREDOC);
+	return (type == TOKEN_REDIRECT_IN || type == TOKEN_REDIRECT_OUT
+		|| type == TOKEN_REDIRECT_APPEND || type == TOKEN_REDIRECT_HEREDOC);
 }
 
 /*
@@ -43,7 +53,8 @@ static int	validate_pipe_boundaries(t_token *tokens)
 	last = get_last_token(tokens);
 	if (last->type == TOKEN_PIPE)
 	{
-		fprintf(stderr, "minishell: syntax error near unexpected token `newline'\n");
+		fprintf(stderr,
+			"minishell: syntax error near unexpected token `newline'\n");
 		return (0);
 	}
 	return (1);
@@ -70,7 +81,8 @@ static int	validate_consecutive_pipes(t_token *tokens)
 	{
 		if (current->type == TOKEN_PIPE && current->next->type == TOKEN_PIPE)
 		{
-			fprintf(stderr, "minishell: syntax error near unexpected token `|'\n");
+			fprintf(stderr,
+				"minishell: syntax error near unexpected token `|'\n");
 			return (0);
 		}
 		current = current->next;
@@ -123,16 +135,12 @@ int	validate_redirection_syntax(t_token *tokens)
 	{
 		if (is_redirect_type(current->type))
 		{
-			/* Check next token exists */
 			if (!current->next)
 			{
-				// error message removed
 				return (0);
 			}
-			/* Check next token is a word (filename) */
 			if (current->next->type != TOKEN_WORD)
 			{
-				// error message removed
 				return (0);
 			}
 		}

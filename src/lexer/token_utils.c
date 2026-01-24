@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   token_utils.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/01/24 02:45:11 by lpons             #+#    #+#             */
+/*   Updated: 2026/01/24 03:04:14 by lpons            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../include/minishell.h"
 
 /*
@@ -13,7 +25,7 @@
 ** 3. Duplicate token value.
 ** 4. Initialize next pointer to NULL.
 */
-t_token *new_token(t_token_type type, char *value, int quote_type)
+t_token	*new_token(t_token_type type, char *value, int quote_type)
 {
 	t_token	*token;
 
@@ -111,8 +123,8 @@ char	*extract_word(char *input)
 	int		i;
 
 	len = 0;
-	while (input[len] && !ft_isspace(input[len]) 
-		&& !is_operator(&input[len]) && !is_quote(input[len]))
+	while (input[len] && !ft_isspace(input[len]) && !is_operator(&input[len])
+		&& !is_quote(input[len]))
 		len++;
 	word = malloc(sizeof(char) * (len + 1));
 	if (!word)

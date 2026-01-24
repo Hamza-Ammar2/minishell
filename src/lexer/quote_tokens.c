@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   quote_tokens.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/01/24 02:44:57 by lpons             #+#    #+#             */
+/*   Updated: 2026/01/24 03:00:09 by lpons            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "../../include/minishell.h"
 #include "../../libft/libft.h"
@@ -63,7 +74,6 @@ char	*extract_quoted_word(const char *input, int *i, int *quote_type)
 		ft_putstr_fd("minishell: syntax error: unclosed quote\n", 2);
 		return (NULL);
 	}
-	// FIX: Include quotes in the string (start at *i, length is close_pos + 2)
 	string = ft_substr(input, *i, close_pos + 2);
 	if (!string)
 		return (NULL);

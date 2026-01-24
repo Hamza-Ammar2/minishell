@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 20:39:11 by haammar           #+#    #+#             */
-/*   Updated: 2026/01/04 16:25:25 by haammar          ###   ########.fr       */
+/*   Updated: 2026/01/24 03:02:55 by lpons            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ static char	*clean(int l, char **buff, char *dup)
 	free(*buff);
 	*buff = 0;
 	if (l < 0)
-		return (free(dup), (char *) 0);
+		return (free(dup), (char *)0);
 	return (dup);
 }
 
@@ -32,7 +32,7 @@ static char	*nc(char *dup, char **buff, size_t *start, size_t *end)
 	*end = 0;
 	free(*buff);
 	*buff = 0;
-	return ((char *) 0);
+	return ((char *)0);
 }
 
 static char	*iterread(int fd, char **buff, size_t *start, size_t *end)
@@ -55,8 +55,8 @@ static char	*iterread(int fd, char **buff, size_t *start, size_t *end)
 			return (*start = 0, *end = 0, clean(l, buff, dup));
 		s = find_char(*buff, '\n', l);
 		if (s)
-			return (*start = 1 + (size_t)(s - *buff),
-				*end = l, nc(append(dup, *buff, dl, *start), buff, start, end));
+			return (*start = 1 + (size_t)(s - *buff), *end = l, nc(append(dup,
+						*buff, dl, *start), buff, start, end));
 		dup = append(dup, *buff, dl, l);
 		if (!dup)
 			return (*start = 0, *end = 0, clean(0, buff, dup));
