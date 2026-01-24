@@ -62,6 +62,7 @@ SRCS = $(SRC_DIR)/main.c \
 	   $(SRC_DIR)/exec/heredoc_utils.c \
 	   $(SRC_DIR)/exec/cd.c \
 	   $(SRC_DIR)/exec/handle_quotes.c \
+	   $(SRC_DIR)/exec/here_doc_stuff_again.c \
 	   $(SRC_DIR)/exec/handle_quotes_hd.c \
 	   $(SRC_DIR)/exec/pipe.c
 
@@ -101,6 +102,9 @@ fclean: clean
 	@echo "$(GREEN)✓ $(NAME) removed!$(RESET)"
 
 re: fclean all
+
+test: all
+	valgrind --leak-check=full --trace-children=yes --track-fds=all --show-leak-kinds=all --suppressions=readline.supp ./minishell
 
 # ================================== PHONY ==================================== #
 

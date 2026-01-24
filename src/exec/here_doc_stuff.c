@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   here_doc_stuff.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:03:17 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 03:25:56 by lpons            ###   ########.fr       */
+/*   Updated: 2026/01/24 21:50:55 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,12 +15,11 @@
 
 extern sig_atomic_t	g_sig;
 
-static int	clean_stuff(t_shell *shell, int fd[2], char *line)
+static int	clean_stuff(t_shell *shell, int fd, char *line)
 {
 	g_sig = 0;
 	restore(shell);
-	close(fd[1]);
-	close(fd[0]);
+	close(fd);
 	free(line);
 	return (2);
 }
@@ -38,7 +37,10 @@ static char	*get_exp(t_shell *shell, char *value, int type)
 		return (NULL);
 	if (strcmpy(raw, value) == 0)
 		return (free(raw), NULL);
+	(void)type;
+	(void)shell;
 	line = expand_quo(shell, raw, type);
+	//line = raw;
 	if (g_sig)
 	{
 		free(raw);
@@ -48,68 +50,66 @@ static char	*get_exp(t_shell *shell, char *value, int type)
 	return (line);
 }
 
-static int	here_doc_read(t_shell *shell, char *value, int type, int fd[2])
+static int	here_doc_read(t_shell *shell, char *value, int type, int fd)
 {
 	char	*line;
 
 	line = get_exp(shell, value, type);
 	if (g_sig)
-		return (clean_stuff(shell, fd, line));
+		return (free(value), clean_stuff(shell, fd, line));
 	while (strcmpy(line, value) != 0)
 	{
-		write(fd[1], line, ft_strlen(line));
+		write(fd, line, ft_strlen(line));
 		if (isatty(STDIN_FILENO))
-			write(fd[1], "\n", 1);
+			write(fd, "\n", 1);
 		free(line);
 		line = get_exp(shell, value, type);
 		if (g_sig)
-			return (clean_stuff(shell, fd, line));
+			return (free(value), clean_stuff(shell, fd, line));
 		if (!line)
 			break ;
 	}
-	if (dup2(fd[0], STDIN_FILENO) == -1)
-		return (perror("dup2 failed"), -1);
-	return (free(line), 1);
+	if (!line)
+		free(line);
+	return (free(value), close(fd), 1);
 }
 
-static int	heredoc(t_shell *shell, t_token *redir, int fd[3][2])
+static int	heredoc(t_shell *shell, t_token *redir)
 {
-	int		type;
-	int		i;
-	char	*raw;
+	int		fd;
+	char	*delim;
 
-	i = (fd[2][0] + 1) % 2;
-	close(fd[i][0]);
-	close(fd[i][1]);
-	if (pipe(fd[i]) == -1)
-		return (perror("heredoc pipe failed"), -1);
-	type = redir->quote_type;
-	if (type == QUOTE_SINGLE || type == QUOTE_DOUBLE)
-		type = QUOTE_SINGLE;
-	raw = redir->value;
-	redir->value = expand_str_hd(shell, raw, redir->quote_type);
-	free(raw);
+	if (redir->type != TOKEN_REDIRECT_HEREDOC)
+		return (1);
+	delim = expand_str_hd(shell, redir->value, redir->quote_type);
+	if (!delim)
+		return (0);
+	free(redir->value);
+	redir->value = make_hd();
 	if (!redir->value)
-		return (perror("heredoc: expansion failed"), -1);
-	return (here_doc_read(shell, redir->value, type, fd[i]));
+		return (0);
+	fd = open(redir->value, O_WRONLY | O_TRUNC | O_CREAT, 0644);
+	if (fd == -1)
+		return (0);
+	return (here_doc_read(shell, delim, redir->quote_type, fd));
 }
 
-int	here_doc(t_shell *shell, t_token *redir, int fd[3][2])
+int	here_doc(t_shell *shell, t_command *cmds)
 {
-	int	i;
+	t_command *cmd;
+	t_token	*redir;
 
-	i = 0;
-	while (redir)
+	cmd = cmds;
+	while (cmd)
 	{
-		if (redir->type == TOKEN_REDIRECT_HEREDOC)
-			i = heredoc(shell, redir, fd);
-		if (i == -1 || i == 2)
-			break ;
-		redir = redir->next;
+		redir = cmd->redirects;
+		while (redir)
+		{
+			if (!heredoc(shell, redir))
+				return (0);
+			redir = redir->next;
+		}
+		cmd = cmd->next;
 	}
-	if (i == -1)
-		shell->exit_status = 1;
-	if (i == 2)
-		i = -1;
-	return (i);
+	return (1);
 }

@@ -50,6 +50,8 @@ typedef struct s_token
 // 3. Command struct
 typedef struct s_command
 {
+	struct s_command 	*start;
+	char	*heredoc;
 	t_token				**args;          // Array of pointers to token structs (command and arguments)
 	t_token             *redirects;       // List of redirect tokens (operator + filename pairs)
 	struct s_command    *next;            // Next command in pipeline
@@ -127,16 +129,17 @@ char	**get_paths(t_shell *shell);
 char    *get_path(char **paths, char *cmd);
 void    exec(t_command *cmds, t_shell *shell);
 char 	*create_path(char *path, char *cmd);
-int	    direct_io(t_shell *shell, t_command *cmd, int fd[3][2]);
+int	    direct_io(t_shell *shell, t_command *cmd);
 char 	**wraper(t_token **args, t_shell *shell);
 void	free_splits(char **splits);
 int    	connect_pipes(t_command *cmd, int fd[3][2]);
 int  close_pipes(t_command *cmds, int fd[3][2]);
 int    restore(t_shell *shell);
+char    *make_hd();
 
 /* Utils */
 int     get_status(int last_pid);
-int    here_doc(t_shell *shell, t_token *redir, int fd[3][2]);
+int	here_doc(t_shell *shell, t_command *cmds);
 int exit_exec(char **args, char *str);
 int	strcmpy(const char *s1, const char *s2);
 
