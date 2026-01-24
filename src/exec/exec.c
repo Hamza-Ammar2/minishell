@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:02:38 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 22:27:12 by haammar          ###   ########.fr       */
+/*   Updated: 2026/01/24 22:44:57 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,8 @@ static int	check_begin(t_command *cmds, t_shell *shell, int fd[3][2])
 {
 	if (!cmds->next)
 	{
+		if (update_(cmds, shell) != 0)
+			return (close(fd[1][1]), close(fd[1][0]), perror("could not update _"), 1);
 		if (ft_exit(cmds->args, shell, cmds) == 1)
 			return (close(fd[1][1]), close(fd[1][0]), shell->exit_status = 1,
 				1);
@@ -79,15 +81,17 @@ static void	exec_single(t_command *cmd, t_shell *shell, int fd[3][2],
 		(close_child(fd), exit_nice(shell, cmd, 1));
 	if (!direct_io(shell, cmd))
 		(close_child(fd), exit_nice(shell, cmd, 1));
+	if (!cmd->args[0])
+		exit_nice(shell, cmd, 0);
 	args = wraper(cmd->args, shell);
 	if (!args)
 		(close_child(fd), exit_nice(shell, cmd, 1));
 	close_child(fd);
 	ft_exit(cmd->args, shell, cmd);
 	str = get_path(paths, args[0]);
+	exit_exec(shell, cmd, args, str);
 	close(shell->stdout_backup);
 	close(shell->stdin_backup);
-	exit_exec(shell, cmd, args, str);
 	execve(str, args, env2arr(shell->env));
 	perror("execve failed");
 	exit(1);
