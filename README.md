@@ -171,34 +171,37 @@ minishell/
 
 ## Resources
 
-### Documentation and References
-- [GNU Bash Manual](https://www.gnu.org/software/bash/manual/)
-- [Advanced Programming in the UNIX Environment (APUE)](https://www.amazon.com/Advanced-Programming-UNIX-Environment-3rd/dp/0321637739) - Stevens & Rago
-- [Linux Man Pages](https://man7.org/linux/man-pages/) - System calls reference
-- [Readline Library Documentation](https://tiswww.case.edu/php/chet/readline/rltop.html)
-- [Shell Syntax](https://pubs.opengroup.org/onlinepubs/009695399/utilities/xcu_chap02.html) - POSIX specification
+### Official Documentation
+- [GNU Bash Manual](https://www.gnu.org/software/bash/manual/bash.html) - Complete reference for bash shell behavior
+- [GNU Readline Library](https://tiswww.case.edu/php/chet/readline/rltop.html) - Documentation for readline functions
+- [POSIX Shell Command Language](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html) - Standard shell specification
 
-### Tutorials and Articles
-- [Writing a Unix Shell](https://brennan.io/2015/01/16/write-a-shell-in-c/) - Stephen Brennan
-- [Building a Shell](https://github.com/tokenrove/build-your-own-shell) - Tutorial series
-- [Process Management in Unix](https://www.geeksforgeeks.org/process-management-in-unix/)
+### System Calls & Functions
+Key man pages used:
+- `man 2 fork` - Creating child processes
+- `man 2 execve` - Executing programs
+- `man 2 pipe` - Creating pipes
+- `man 2 dup2` - Duplicating file descriptors
+- `man 2 wait` / `man 2 waitpid` - Waiting for process termination
+- `man 3 readline` - Reading input with history
 
-### AI Usage
-AI assistance (GitHub Copilot, ChatGPT) was used for the following tasks:
-- **Code structure suggestions**: Initial architecture and organization patterns
-- **Documentation**: Generating code comments and README structure
-- **Research**: Understanding POSIX shell behavior and edge cases
+### Learning Resources
+- [Writing a Unix Shell](https://brennan.io/2015/01/16/write-a-shell-in-c/) by Stephen Brennan - Excellent tutorial on shell fundamentals
+- [Build Your Own Shell](https://github.com/tokenrove/build-your-own-shell) - Step-by-step shell implementation guide
+- [Linux Programming Interface](http://man7.org/tlpi/) - Comprehensive guide to system programming
 
-No AI-generated code was used directly without understanding and adaptation. All core logic was written and validated manually.
+### Testing Tools
+- [LucasKuhn/minishell_tester](https://github.com/LucasKuhn/minishell_tester) - Comprehensive test suite for minishell
+- [zstenger93/42_minishell_tester](https://github.com/zstenger93/42_minishell_tester) - Additional test cases
 
-## Testing
+### AI Usage Disclosure
+AI assistance (GitHub Copilot, ChatGPT) was utilized for:
+- **Task Division & Planning**: Initial task structure and work schedule.
+- **Debugging assistance**: Understanding edge cases and POSIX behavior
+- **Research**: Clarifying system call behavior and best practices
 
-The project includes a test suite from [minishell_tester](https://github.com/LucasKuhn/minishell_tester):
+**Important**: All AI-generated suggestions were carefully reviewed, understood, and adapted. Core logic and implementation were written manually with full comprehension of the codebase.
 
-```bash
-cd minishell_tester
-./tester
-```
 
 ## Known Limitations
 
@@ -209,8 +212,8 @@ cd minishell_tester
 
 ## Authors
 
-- **lpons** - [GitHub Profile]
-- **hammar** - [GitHub Profile]
+- **lpons** - [https://github.com/lukeferenc]
+- **hammar** - [https://github.com/Hamza-Ammar2/minishell]
 
 ## License
 
