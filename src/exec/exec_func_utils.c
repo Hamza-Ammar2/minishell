@@ -59,10 +59,11 @@ int     check_builtin(t_command *cmds, t_shell *shell, int fd[3][2])
     return (0);
 }
 
-static char    *tilde(char *str, t_shell *shell)
+static char    *tilde(char *str, t_shell *shell, int quote_type)
 {
     t_env   *home_env;
     char    *home;
+    char    *til;
 
     home_env = find_env(shell, "HOME");
     if (home_env)
@@ -70,8 +71,13 @@ static char    *tilde(char *str, t_shell *shell)
     else
         home = "";
     if (*str == '~' && (str[1] == '\0' || str[1] == '/'))
-        return (ft_strjoin(home, str + 1));
-    return (str);
+        til = ft_strjoin(home, str + 1);
+    else
+        til = ft_strdup(str);
+    if (!til)
+        return (NULL);
+    str = expand_str(shell, til, quote_type);
+    return (free(til), str);
 }
 
 char **wraper(t_token **args, t_shell *shell)
@@ -89,7 +95,7 @@ char **wraper(t_token **args, t_shell *shell)
     j = 0;
     while (j < count)
     {
-        args_array[j] = expand_str(shell, tilde(args[j]->value, shell), args[j]->quote_type);
+        args_array[j] = tilde(args[j]->value, shell, args[j]->quote_type);
         if (!args_array[j])
             return (perror("could not create arguments list"), free_splits(args_array), NULL);
         j++;
