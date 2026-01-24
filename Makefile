@@ -73,7 +73,12 @@ OBJS = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
 all: $(NAME)
 
-$(NAME): $(OBJS)
+libft:
+	@echo "$(YELLOW)Building libft...$(RESET)"
+	@$(MAKE) -C ./libft
+	@echo "$(GREEN)✓ libft built successfully!$(RESET)"
+
+$(NAME): libft $(OBJS)
 	@echo "$(YELLOW)Linking $(NAME)...$(RESET)"
 	@$(CC) $(CFLAGS) $(OBJS) $(LDFLAGS) -o $(NAME)
 	@echo "$(GREEN)✓ $(NAME) created successfully!$(RESET)"
@@ -86,15 +91,17 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 clean:
 	@echo "$(RED)Cleaning object files...$(RESET)"
 	@rm -rf $(OBJ_DIR)
+	@$(MAKE) -C ./libft clean
 	@echo "$(GREEN)✓ Object files cleaned!$(RESET)"
 
 fclean: clean
 	@echo "$(RED)Removing $(NAME)...$(RESET)"
 	@rm -f $(NAME)
+	@$(MAKE) -C ./libft fclean
 	@echo "$(GREEN)✓ $(NAME) removed!$(RESET)"
 
 re: fclean all
 
 # ================================== PHONY ==================================== #
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re libft
