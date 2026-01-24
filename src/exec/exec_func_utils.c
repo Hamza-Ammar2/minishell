@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_func_utils.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:02:21 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 03:14:41 by lpons            ###   ########.fr       */
+/*   Updated: 2026/01/24 20:44:00 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ static int	pce(t_command *cmds, t_shell *shell, int fd[3][2], char **args)
 		return (0);
 	if (connect_pipes(cmds, fd) == -1)
 		return (-1);
-	if (!direct_io(shell, cmds, fd))
+	if (!direct_io(shell, cmds))
 		return (-1);
 	if (ft_strcmp(args[0], "pwd") == 0)
 		fd[2][1] = pwd(&args[1]);
@@ -38,7 +38,7 @@ static int	eeu(t_command *cmds, t_shell *shell, int fd[3][2], char **args)
 		return (0);
 	if (connect_pipes(cmds, fd) == -1)
 		return (-1);
-	if (!direct_io(shell, cmds, fd))
+	if (!direct_io(shell, cmds))
 		return (-1);
 	if (ft_strcmp(args[0], "env") == 0)
 		fd[2][1] = env(&args[1], shell);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle_quotes.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:03:08 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 03:10:58 by lpons            ###   ########.fr       */
+/*   Updated: 2026/01/24 20:44:48 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,28 +42,32 @@ static char	*get_next_quote(char *str, int quote_type)
 	return (q2);
 }
 
-static int	write_exp(int fd[2], t_shell *shell, char *str, int quote_type)
+static char	*write_exp(char *res, t_shell *shell, char *str, int quote_type)
 {
 	char	*expanded;
 	char	*raw;
-	int		len;
+	char	*tmp;
 
 	if (quote_type != QUOTE_NONE)
 		str++;
 	raw = ft_substr(str, 0, get_next_quote(str, quote_type) - str);
 	if (!raw)
-		return (perror("could not expand string"), -1);
+		return (perror("could not expand string"), NULL);
 	expanded = expand_quo(shell, raw, quote_type);
 	if (!expanded)
-		return (free(raw), perror("could not expand string"), -1);
-	len = ft_strlen(expanded);
-	write(fd[1], expanded, len);
+		return (free(raw), perror("could not expand string"), NULL);
+	tmp = res;
+	res = ft_strjoin(res, expanded);
+	if (!res)
+		return (free(raw), free(expanded), perror("could not expand string"), NULL);
 	free(expanded);
 	free(raw);
-	return (len);
+	if (tmp)
+		free(tmp);
+	return (res);
 }
 
-static char	*get_buff(int fd[2], int total_len)
+/* static char	*get_buff(int fd[2], int total_len)
 {
 	char	*res;
 
@@ -76,31 +80,28 @@ static char	*get_buff(int fd[2], int total_len)
 	res[total_len] = '\0';
 	close(fd[0]);
 	return (res);
-}
+} */
 
 char	*expand_str(t_shell *shell, char *str, int quote_type)
 {
-	int	fd[2];
-	int	total_len;
-	int	len;
+	char	*res;
 
 	if (!str)
 		return (NULL);
-	if (pipe(fd) == -1)
-		return (perror("pipe failed"), NULL);
-	total_len = 0;
+	res = ft_strdup("");
+	if (!res)
+		return (NULL);
 	while (*str)
 	{
 		quote_type = quote2type(*str);
-		len = write_exp(fd, shell, str, quote_type);
-		if (len == -1)
-			return (close(fd[0]), close(fd[1]), NULL);
-		total_len += len;
+		res = write_exp(res, shell, str, quote_type);
+		if (!res)
+			return (NULL);
 		if (quote_type != QUOTE_NONE)
 			str++;
 		str = get_next_quote(str, quote_type);
 		if (quote_type != QUOTE_NONE)
 			str++;
 	}
-	return (get_buff(fd, total_len));
+	return (res);
 }

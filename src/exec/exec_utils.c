@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:02:29 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 03:02:34 by lpons            ###   ########.fr       */
+/*   Updated: 2026/01/24 21:42:54 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,7 @@ int	exit_exec(char **args, char *str)
 	struct stat	st;
 	char		*cmd;
 
+	st.st_mode = 0;
 	cmd = args[0];
 	if (!cmd || cmd[0] == '\0')
 		(fprintf(stderr, "command not found\n"), exit(127));
@@ -97,3 +98,5 @@ int	exit_exec(char **args, char *str)
 		(fprintf(stderr, "Permission denied\n"), exit(126));
 	return (0);
 }
+
+

@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   directio.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:01:58 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 03:02:05 by lpons            ###   ########.fr       */
+/*   Updated: 2026/01/24 21:04:45 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 #include "../libft/libft.h"
 
-static int	here_doc_app(t_shell *shell, t_token *redir, int fd[3][2])
+static int	here_doc_app(t_shell *shell, t_token *redir)
 {
 	int	file;
 
@@ -32,8 +32,10 @@ static int	here_doc_app(t_shell *shell, t_token *redir, int fd[3][2])
 	{
 		if (dup2(shell->stdin_backup, STDIN_FILENO) == -1)
 			return (perror("dup2 failed"), 0);
-		if (dup2(fd[(fd[2][0] + 1) % 2][0], STDIN_FILENO) == -1)
+		file = open(redir->value, O_RDONLY, 0644);
+		if (dup2(file, STDIN_FILENO) == -1)
 			return (perror("dup2 failed"), 0);
+		close(file);
 		return (1);
 	}
 	return (1);
@@ -68,7 +70,7 @@ static int	in_out(t_shell *shell, t_token *redir)
 	return (1);
 }
 
-int	direct_io(t_shell *shell, t_command *cmd, int fd[3][2])
+int	direct_io(t_shell *shell, t_command *cmd)
 {
 	t_token	*redir;
 	char	*raw;
@@ -89,7 +91,7 @@ int	direct_io(t_shell *shell, t_command *cmd, int fd[3][2])
 			redir = redir->next;
 			continue ;
 		}
-		if (!here_doc_app(shell, redir, fd))
+		if (!here_doc_app(shell, redir))
 			return (perror("direct_here_app failed"), 0);
 		redir = redir->next;
 	}

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 02:47:18 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 03:26:13 by lpons            ###   ########.fr       */
+/*   Updated: 2026/01/24 20:59:37 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,11 +76,13 @@ void	process_input(char *input, t_shell *shell)
 		return ;
 	}
 	cmd = parse(tokens);
-	if (cmd)
+	if (cmd && here_doc(shell, cmd))
 	{
 		exec(cmd, shell);
 		free_commands(cmd);
 	}
+	else if (cmd)
+		free_commands(cmd);
 	free_tokens(tokens);
 }
 

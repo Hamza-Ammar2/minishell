@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:02:38 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 16:25:17 by haammar          ###   ########.fr       */
+/*   Updated: 2026/01/24 21:33:15 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,11 +25,8 @@ static int	check_begin(t_command *cmds, t_shell *shell, int fd[3][2])
 		if (ft_exit(cmds->args, shell) == 1)
 			return (close(fd[1][1]), close(fd[1][0]), shell->exit_status = 1,
 				1);
-		if (here_doc(shell, cmds->redirects, fd) == -1)
-			return (close(fd[1][1]), close(fd[1][0]), shell->exit_status = 1,
-				1);
 		if (check_builtin(cmds, shell, fd) != 0)
-			return (close(fd[1][1]), close(fd[1][0]),
+			return (restore(shell), close(fd[1][1]), close(fd[1][0]),
 				shell->exit_status = fd[2][1], 1);
 	}
 	return (0);
@@ -77,17 +74,19 @@ static void	exec_single(t_command *cmd, t_shell *shell, int fd[3][2],
 	char	**args;
 
 	if (do_builtin(cmd, shell, fd) != 0)
-		exit(fd[2][1]);
+		(close_child(fd), free_commands(cmd->start), cleanup_shell(shell), exit(fd[2][1]));
 	if (connect_pipes(cmd, fd) == -1)
-		(close_child(fd), exit(1));
-	if (!direct_io(shell, cmd, fd))
-		(close_child(fd), exit(1));
+		(close_child(fd), free_commands(cmd->start), cleanup_shell(shell), exit(1));
+	if (!direct_io(shell, cmd))
+		(close_child(fd), free_commands(cmd->start), cleanup_shell(shell), exit(1));
 	args = wraper(cmd->args, shell);
 	if (!args)
-		(close_child(fd), exit(1));
+		(close_child(fd), free_commands(cmd->start), cleanup_shell(shell), exit(1));
 	close_child(fd);
 	ft_exit(cmd->args, shell);
 	str = get_path(paths, args[0]);
+	close(shell->stdout_backup);
+	close(shell->stdin_backup);
 	exit_exec(args, str);
 	execve(str, args, env2arr(shell->env));
 	perror("execve failed");
@@ -103,9 +102,6 @@ static int	rec_exec(char **paths, int fd[3][2], t_command *cmds,
 		return (fd[2][1] = -1, close_pipes(cmds, fd), perror("pipe failed"), 1);
 	if (update_(cmds, shell) != 0)
 		return (perror("could not update _"), close_pipes(cmds, fd), 1);
-	if (here_doc(shell, cmds->redirects, fd) == -1)
-		return (close_pipes(cmds, fd), fd[2][0] += 1, rec_exec(paths, fd,
-				cmds->next, shell));
 	fd[2][1] = fork();
 	if (fd[2][1] < 0)
 		return (close_pipes(cmds, fd), perror("fork failed"), 1);
