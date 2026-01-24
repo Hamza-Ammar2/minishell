@@ -1,0 +1,13 @@
+================================================================================
+MINISHELL TEST FAILURES - COMPREHENSIVE DOCUMENTATION
+================================================================================
+Generated: January 24, 2026
+Total Failures Documented: 0
+
+Format for each failure:
+  Test: <exact command>
+  Bash output: <what bash produces>
+  Your output: <what your minishell produces>
+  Difference likely caused by: <explanation>
+  Required by subject: <YES/NO/BORDERLINE>
+================================================================================

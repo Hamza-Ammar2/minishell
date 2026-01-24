@@ -1,0 +1,1409 @@
+================================================================================
+MINISHELL TEST FAILURES - COMPREHENSIVE DOCUMENTATION
+================================================================================
+Generated: January 24, 2026
+Total Failures Documented: 110
+
+Format for each failure:
+  Test: <exact command>
+  Bash output: <what bash produces>
+  Your output: <what your minishell produces>
+  Difference likely caused by: <explanation>
+  Required by subject: <YES/NO/BORDERLINE>
+================================================================================
+
+
+================================================================================
+FILE: 0_compare_parsing.sh
+================================================================================
+
+🟪--- FAILURE #1 ---🟪
+Test Number: 11
+Test File: 0_compare_parsing.sh:line26
+
+Test:
+  /bin/echo '"'$USER'"'
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #2 ---🟪
+Test Number: 14
+Test File: 0_compare_parsing.sh:line32
+
+Test:
+  /bin/echo "'"'$USER'"'"
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #3 ---🟪
+Test Number: 25
+Test File: 0_compare_parsing.sh:line54
+
+Test:
+  
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #4 ---🟪
+Test Number: 26
+Test File: 0_compare_parsing.sh:line56
+
+Test:
+  /bin/echo hi >./outfiles/outfile01 | /bin/echo bye
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #5 ---🟪
+Test Number: 28
+Test File: 0_compare_parsing.sh:line60
+
+Test:
+  
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #6 ---🟪
+Test Number: 29
+Test File: 0_compare_parsing.sh:line62
+
+Test:
+  /bin/echo '$='
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+
+================================================================================
+FILE: 10_parsing_hell.sh
+================================================================================
+
+🟪--- FAILURE #7 ---🟪
+Test Number: 3
+Test File: 10_parsing_hell.sh:line10
+
+Test:
+  /bin/rm -f ">"
+
+⚠️  SEGMENTATION FAULT
+
+Bash output:
+  [Normal execution, exit 0]
+
+Your output:
+  SEGFAULT - exit code 139
+
+Difference likely caused by:
+  Memory corruption, NULL pointer dereference, or invalid memory access
+
+Required by subject: YES - Shell must not crash
+
+🟪--- FAILURE #8 ---🟪
+Test Number: 16
+Test File: 10_parsing_hell.sh:line52
+
+Test:
+  $USER
+
+⚠️  SEGMENTATION FAULT
+
+Bash output:
+  [Normal execution, exit 0]
+
+Your output:
+  SEGFAULT - exit code 139
+
+Difference likely caused by:
+  Memory corruption, NULL pointer dereference, or invalid memory access
+
+Required by subject: YES - Shell must not crash
+
+🟪--- FAILURE #9 ---🟪
+Test Number: 18
+Test File: 10_parsing_hell.sh:line58
+
+Test:
+  
+
+⚠️  SEGMENTATION FAULT
+
+Bash output:
+  [Normal execution, exit 0]
+
+Your output:
+  SEGFAULT - exit code 139
+
+Difference likely caused by:
+  Memory corruption, NULL pointer dereference, or invalid memory access
+
+Required by subject: YES - Shell must not crash
+
+🟪--- FAILURE #10 ---🟪
+Test Number: 19
+Test File: 10_parsing_hell.sh:line62
+
+Test:
+  why
+
+⚠️  SEGMENTATION FAULT
+
+Bash output:
+  [Normal execution, exit 0]
+
+Your output:
+  SEGFAULT - exit code 139
+
+Difference likely caused by:
+  Memory corruption, NULL pointer dereference, or invalid memory access
+
+Required by subject: YES - Shell must not crash
+
+🟪--- FAILURE #11 ---🟪
+Test Number: 57
+Test File: 10_parsing_hell.sh:line167
+
+Test:
+  
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #12 ---🟪
+Test Number: 112
+Test File: 10_parsing_hell.sh:line297
+
+Test:
+  
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #13 ---🟪
+Test Number: 113
+Test File: 10_parsing_hell.sh:line299
+
+Test:
+  pwD
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #14 ---🟪
+Test Number: 123
+Test File: 10_parsing_hell.sh:line319
+
+Test:
+  
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+
+================================================================================
+FILE: 1_builtins.sh
+================================================================================
+
+🟪--- FAILURE #15 ---🟪
+Test Number: 14
+Test File: 1_builtins.sh:line33
+
+Test:
+  
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #16 ---🟪
+Test Number: 17
+Test File: 1_builtins.sh:line39
+
+Test:
+  
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #17 ---🟪
+Test Number: 27
+Test File: 1_builtins.sh:line59
+
+Test:
+  echo """"""""$USER""""""""
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #18 ---🟪
+Test Number: 29
+Test File: 1_builtins.sh:line63
+
+Test:
+  
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #19 ---🟪
+Test Number: 30
+Test File: 1_builtins.sh:line65
+
+Test:
+  echo hi >./outfiles/outfile01 | echo bye
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #20 ---🟪
+Test Number: 32
+Test File: 1_builtins.sh:line69
+
+Test:
+  
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #21 ---🟪
+Test Number: 33
+Test File: 1_builtins.sh:line71
+
+Test:
+  echo '$='
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #22 ---🟪
+Test Number: 102
+Test File: 1_builtins.sh:line233
+
+Test:
+  echo "-n test1 -n test2"
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #23 ---🟪
+Test Number: 105
+Test File: 1_builtins.sh:line239
+
+Test:
+  echo ~42
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #24 ---🟪
+Test Number: 107
+Test File: 1_builtins.sh:line243
+
+Test:
+  
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #25 ---🟪
+Test Number: 123
+Test File: 1_builtins.sh:line294
+
+Test:
+  
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #26 ---🟪
+Test Number: 140
+Test File: 1_builtins.sh:line360
+
+Test:
+  cd '/etc' 
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #27 ---🟪
+Test Number: 150
+Test File: 1_builtins.sh:line390
+
+Test:
+  cd '/' 
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #28 ---🟪
+Test Number: 170
+Test File: 1_builtins.sh:line430
+
+Test:
+  pwd
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #29 ---🟪
+Test Number: 185
+Test File: 1_builtins.sh:line460
+
+Test:
+  cd echo
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #30 ---🟪
+Test Number: 200
+Test File: 1_builtins.sh:line490
+
+Test:
+  pwd
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #31 ---🟪
+Test Number: 231
+Test File: 1_builtins.sh:line566
+
+Test:
+  env | wc -l
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+
+================================================================================
+FILE: 1_pipelines.sh
+================================================================================
+
+🟪--- FAILURE #32 ---🟪
+Test Number: 29
+Test File: 1_pipelines.sh:line96
+
+Test:
+  23
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #33 ---🟪
+Test Number: 35
+Test File: 1_pipelines.sh:line142
+
+Test:
+  ad
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #34 ---🟪
+Test Number: 36
+Test File: 1_pipelines.sh:line144
+
+Test:
+  stop
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #35 ---🟪
+Test Number: 41
+Test File: 1_pipelines.sh:line166
+
+Test:
+  fwe
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+
+================================================================================
+FILE: 1_redirs.sh
+================================================================================
+
+🟪--- FAILURE #36 ---🟪
+Test Number: 89
+Test File: 1_redirs.sh:line247
+
+Test:
+  chmod -r tmp_redir_out_file1
+
+⚠️  SEGMENTATION FAULT
+
+Bash output:
+  [Normal execution, exit 0]
+
+Your output:
+  SEGFAULT - exit code 139
+
+Difference likely caused by:
+  Memory corruption, NULL pointer dereference, or invalid memory access
+
+Required by subject: YES - Shell must not crash
+
+🟪--- FAILURE #37 ---🟪
+Test Number: 90
+Test File: 1_redirs.sh:line250
+
+Test:
+  
+
+⚠️  SEGMENTATION FAULT
+
+Bash output:
+  [Normal execution, exit 0]
+
+Your output:
+  SEGFAULT - exit code 139
+
+Difference likely caused by:
+  Memory corruption, NULL pointer dereference, or invalid memory access
+
+Required by subject: YES - Shell must not crash
+
+🟪--- FAILURE #38 ---🟪
+Test Number: 91
+Test File: 1_redirs.sh:line253
+
+Test:
+  
+
+⚠️  SEGMENTATION FAULT
+
+Bash output:
+  [Normal execution, exit 0]
+
+Your output:
+  SEGFAULT - exit code 139
+
+Difference likely caused by:
+  Memory corruption, NULL pointer dereference, or invalid memory access
+
+Required by subject: YES - Shell must not crash
+
+
+================================================================================
+FILE: 1_scmds.sh
+================================================================================
+
+🟪--- FAILURE #39 ---🟪
+Test Number: 7
+Test File: 1_scmds.sh:line19
+
+Test:
+  
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+
+================================================================================
+FILE: 1_variables.sh
+================================================================================
+
+🟪--- FAILURE #40 ---🟪
+Test Number: 15
+Test File: 1_variables.sh:line40
+
+Test:
+  unset X
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #41 ---🟪
+Test Number: 18
+Test File: 1_variables.sh:line46
+
+Test:
+  
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #42 ---🟪
+Test Number: 19
+Test File: 1_variables.sh:line48
+
+Test:
+  export a="asd" b="de" o= c="hellomi" X
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #43 ---🟪
+Test Number: 20
+Test File: 1_variables.sh:line50
+
+Test:
+  unset o asd B x X wqd c
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #44 ---🟪
+Test Number: 26
+Test File: 1_variables.sh:line62
+
+Test:
+  
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #45 ---🟪
+Test Number: 46
+Test File: 1_variables.sh:line133
+
+Test:
+  rm -rf test
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #46 ---🟪
+Test Number: 47
+Test File: 1_variables.sh:line136
+
+Test:
+  /bin/echo $PWD/random_folder
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #47 ---🟪
+Test Number: 48
+Test File: 1_variables.sh:line139
+
+Test:
+  /bin/echo ""$?""
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #48 ---🟪
+Test Number: 50
+Test File: 1_variables.sh:line145
+
+Test:
+  /bin/echo ''$?''"42"
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #49 ---🟪
+Test Number: 51
+Test File: 1_variables.sh:line148
+
+Test:
+  
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #50 ---🟪
+Test Number: 53
+Test File: 1_variables.sh:line154
+
+Test:
+  /bin/echo "'$?'"
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #51 ---🟪
+Test Number: 57
+Test File: 1_variables.sh:line166
+
+Test:
+  /bin/echo $PWD
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+
+================================================================================
+FILE: 2_correction.sh
+================================================================================
+
+🟪--- FAILURE #52 ---🟪
+Test Number: 60
+Test File: 2_correction.sh:line129
+
+Test:
+  echo 'Hello World'
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #53 ---🟪
+Test Number: 65
+Test File: 2_correction.sh:line139
+
+Test:
+  
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #54 ---🟪
+Test Number: 66
+Test File: 2_correction.sh:line141
+
+Test:
+  'e'cho 42
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #55 ---🟪
+Test Number: 68
+Test File: 2_correction.sh:line145
+
+Test:
+  
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #56 ---🟪
+Test Number: 69
+Test File: 2_correction.sh:line147
+
+Test:
+  echo @World'42'Hello
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #57 ---🟪
+Test Number: 75
+Test File: 2_correction.sh:line159
+
+Test:
+  echo 1 '|' echo 2
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #58 ---🟪
+Test Number: 78
+Test File: 2_correction.sh:line165
+
+Test:
+  echo 1 '||' echo 2
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #59 ---🟪
+Test Number: 110
+Test File: 2_correction.sh:line261
+
+Test:
+  export USER=
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #60 ---🟪
+Test Number: 113
+Test File: 2_correction.sh:line273
+
+Test:
+  env | grep NEW
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+
+================================================================================
+FILE: 2_path_check.sh
+================================================================================
+
+🟪--- FAILURE #61 ---🟪
+Test Number: 12
+Test File: 2_path_check.sh:line47
+
+Test:
+  cd .
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+
+================================================================================
+FILE: 8_syntax_errors.sh
+================================================================================
+
+🟪--- FAILURE #62 ---🟪
+Test Number: 15
+Test File: 8_syntax_errors.sh:line33
+
+Test:
+  /bin/cat ><
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #63 ---🟪
+Test Number: 20
+Test File: 8_syntax_errors.sh:line43
+
+Test:
+  
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #64 ---🟪
+Test Number: 21
+Test File: 8_syntax_errors.sh:line46
+
+Test:
+  
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #65 ---🟪
+Test Number: 22
+Test File: 8_syntax_errors.sh:line49
+
+Test:
+  
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+
+================================================================================
+FILE: 9_go_wild.sh
+================================================================================
+
+🟪--- FAILURE #66 ---🟪
+Test Number: 7
+Test File: 9_go_wild.sh:line22
+
+Test:
+  
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+
+🟪--- FAILURE #67 ---🟪
+Test Number: 14
+Test File: 9_go_wild.sh:line49
+
+Test:
+  echo 'echo $1' > tmp_test_sh
+
+[Run command to get actual outputs]
+
+Bash output:
+  [To be tested]
+
+Your output:
+  [To be tested]
+
+Difference likely caused by:
+  [Needs analysis]
+
+Required by subject: [YES/NO/BORDERLINE]
+

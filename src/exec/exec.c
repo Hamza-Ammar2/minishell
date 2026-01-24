@@ -6,7 +6,7 @@
 /*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:02:38 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 21:01:27 by lpons            ###   ########.fr       */
+/*   Updated: 2026/01/24 21:07:25 by lpons            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ static int	check_begin(t_command *cmds, t_shell *shell, int fd[3][2])
 {
 	if (!cmds->next)
 	{
-		if (ft_exit(cmds->args, shell) == 1)
+		if (cmds->args && cmds->args[0] && ft_exit(cmds->args, shell) == 1)
 			return (close(fd[1][1]), close(fd[1][0]), shell->exit_status = 1,
 				1);
 		if (here_doc(shell, cmds->redirects, fd) == -1)
@@ -86,7 +86,8 @@ static void	exec_single(t_command *cmd, t_shell *shell, int fd[3][2],
 	if (!args || !args[0])
 		(close_child(fd), exit(127));
 	close_child(fd);
-	ft_exit(cmd->args, shell);
+	if (cmd->args && cmd->args[0])
+		ft_exit(cmd->args, shell);
 	str = get_path(paths, args[0]);
 	exit_exec(args, str);
 	execve(str, args, env2arr(shell->env));
