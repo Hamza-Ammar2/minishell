@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:02:38 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 03:10:58 by lpons            ###   ########.fr       */
+/*   Updated: 2026/01/24 16:25:17 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,15 +23,14 @@ static int	check_begin(t_command *cmds, t_shell *shell, int fd[3][2])
 	if (!cmds->next)
 	{
 		if (ft_exit(cmds->args, shell) == 1)
-		{
-			shell->exit_status = 1;
-			return (1);
-		}
-		if (do_builtin(cmds, shell, fd) != 0)
-		{
-			shell->exit_status = fd[2][1];
-			return (1);
-		}
+			return (close(fd[1][1]), close(fd[1][0]), shell->exit_status = 1,
+				1);
+		if (here_doc(shell, cmds->redirects, fd) == -1)
+			return (close(fd[1][1]), close(fd[1][0]), shell->exit_status = 1,
+				1);
+		if (check_builtin(cmds, shell, fd) != 0)
+			return (close(fd[1][1]), close(fd[1][0]),
+				shell->exit_status = fd[2][1], 1);
 	}
 	return (0);
 }
