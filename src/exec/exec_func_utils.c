@@ -6,7 +6,7 @@
 /*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:02:21 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 03:14:41 by lpons            ###   ########.fr       */
+/*   Updated: 2026/01/24 21:01:26 by lpons            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,8 @@ char	**wraper(t_token **args, t_shell *shell)
 	int		j;
 	char	**args_array;
 
+	if (!args || !args[0])
+		return (NULL);
 	count = 0;
 	while (args[count])
 		count++;
