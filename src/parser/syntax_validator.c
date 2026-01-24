@@ -32,13 +32,14 @@ int	is_operator_token(t_token_type type)
 
 /*
 ** 🔧 What the function Does
-** Checks if command starts with an operator (invalid).
+** Checks if command starts with a pipe operator (invalid).
 **
 ** 🔗 Role in the Program
-** Validates token list doesn't start with operator.
+** Validates token list doesn't start with pipe.
+** Note: Starting with redirections (< > << >>) is valid in bash.
 **
 ** 🧩 Step-by-Step
-** 1. Check if first token is operator.
+** 1. Check if first token is a pipe.
 ** 2. Print error if invalid.
 ** 3. Return 0 for invalid, 1 for valid.
 */
@@ -46,10 +47,9 @@ static int	validate_start(t_token *tokens)
 {
 	if (!tokens)
 		return (1);
-	if (is_operator_token(tokens->type))
+	if (tokens->type == TOKEN_PIPE)
 	{
-		fprintf(stderr, "minishell: syntax error near unexpected token `%d'\n",
-			tokens->type);
+		fprintf(stderr, "minishell: syntax error near unexpected token `|'\n");
 		return (0);
 	}
 	return (1);
@@ -86,16 +86,19 @@ static int	validate_end(t_token *tokens)
 
 /*
 ** 🔧 What the function Does
-** Checks for consecutive operators (invalid).
+** Checks for invalid consecutive operators.
 **
 ** 🔗 Role in the Program
-** Validates no two operators appear in a row.
+** Validates operator sequences are valid.
+** Note: Consecutive redirects like "< file1 < file2" are valid.
+**       But "| |" or "|  <" at start of pipe segment are invalid.
 **
 ** 🧩 Step-by-Step
 ** 1. Traverse token list.
-** 2. Check if current and next are both operators.
-** 3. Print error if found.
-** 4. Return 0 for invalid, 1 for valid.
+** 2. Check if current is redirect and next is not a word.
+** 3. Check if current is pipe and next is also pipe or redirect.
+** 4. Print error if invalid sequence found.
+** 5. Return 0 for invalid, 1 for valid.
 */
 static int	validate_consecutive(t_token *tokens)
 {
@@ -104,11 +107,23 @@ static int	validate_consecutive(t_token *tokens)
 	current = tokens;
 	while (current && current->next)
 	{
-		if (is_operator_token(current->type)
-			&& is_operator_token(current->next->type))
+		if (current->type == TOKEN_PIPE)
 		{
-			fprintf(stderr, "minishell: syntax error near unexpected token\n");
-			return (0);
+			if (is_operator_token(current->next->type))
+			{
+				fprintf(stderr,
+					"minishell: syntax error near unexpected token\n");
+				return (0);
+			}
+		}
+		else if (is_redirect_type(current->type))
+		{
+			if (current->next->type != TOKEN_WORD)
+			{
+				fprintf(stderr,
+					"minishell: syntax error: redirect needs filename\n");
+				return (0);
+			}
 		}
 		current = current->next;
 	}
