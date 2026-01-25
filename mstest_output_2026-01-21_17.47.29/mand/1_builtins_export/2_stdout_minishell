@@ -1,8 +1,0 @@
-/home/haammar
-RUSTUP_HOME=/usr/share/rust/rustup
-CARGO_HOME=/usr/share/rust/cargo
-HOME=/home/haammar
-42
-RUSTUP_HOME=/usr/share/rust/rustup
-CARGO_HOME=/usr/share/rust/cargo
-HOME=42

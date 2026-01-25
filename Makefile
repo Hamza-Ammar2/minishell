@@ -44,7 +44,6 @@ SRCS = $(SRC_DIR)/main.c \
        $(SRC_DIR)/parser/pipeline_utils.c \
        $(SRC_DIR)/parser/redirection_parsing.c \
        $(SRC_DIR)/parser/pipe_redirect_validation.c \
-       $(SRC_DIR)/parser/WD_debug_print.c \
 	   $(SRC_DIR)/builtins/builtins.c \
 	   $(SRC_DIR)/builtins/builtins2.c \
 	   $(SRC_DIR)/builtins/builtins3.c \
