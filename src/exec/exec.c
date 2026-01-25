@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:02:38 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/25 02:04:32 by haammar          ###   ########.fr       */
+/*   Updated: 2026/01/25 14:54:36 by lpons            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,8 @@ static int	check_begin(t_command *cmds, t_shell *shell, int fd[3][2])
 	if (!cmds->next)
 	{
 		if (update_(cmds, shell) != 0)
-			return (close(fd[1][1]), close(fd[1][0]), perror("could not update _"), 1);
+			return (close(fd[1][1]), close(fd[1][0]),
+				perror("could not update _"), 1);
 		if (ft_exit(cmds->args, shell, cmds) == 1)
 			return (close(fd[1][1]), close(fd[1][0]), shell->exit_status = 1,
 				1);

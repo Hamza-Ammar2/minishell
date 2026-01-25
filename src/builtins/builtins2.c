@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins2.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:01:09 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/25 01:52:23 by haammar          ###   ########.fr       */
+/*   Updated: 2026/01/25 14:57:04 by lpons            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ static int	print_export(t_shell *shell)
 		if (args[i][0] == '_' && args[i][1] == '=')
 		{
 			i++;
-			continue;
+			continue ;
 		}
 		write(STDOUT_FILENO, "declare -x ", 11);
 		write(STDOUT_FILENO, args[i], ft_strlen(args[i]));

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   syntax_validator.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:05:21 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/25 01:43:57 by haammar          ###   ########.fr       */
+/*   Updated: 2026/01/25 14:56:18 by lpons            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,11 +107,7 @@ static int	validate_consecutive(t_token *tokens)
 	current = tokens;
 	while (current && current->next)
 	{
-		/* if (current->type == TOKEN_PIPE
-			&& is_operator_token(current->next->type))
-			return (ft_fprintf(2,
-					"minishell: syntax error near unexpected token\n"), 0);
-		else  */if (is_redirect_type(current->type)
+		if (is_redirect_type(current->type)
 			&& current->next->type != TOKEN_WORD)
 			return (ft_fprintf(2,
 					"minishell: syntax error: redirect needs filename\n"), 0);

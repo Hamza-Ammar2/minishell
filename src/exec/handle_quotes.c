@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle_quotes.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:03:08 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 20:44:48 by haammar          ###   ########.fr       */
+/*   Updated: 2026/01/25 14:53:33 by lpons            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,28 +59,14 @@ static char	*write_exp(char *res, t_shell *shell, char *str, int quote_type)
 	tmp = res;
 	res = ft_strjoin(res, expanded);
 	if (!res)
-		return (free(raw), free(expanded), perror("could not expand string"), NULL);
+		return (free(raw), free(expanded), perror("could not expand string"),
+			NULL);
 	free(expanded);
 	free(raw);
 	if (tmp)
 		free(tmp);
 	return (res);
 }
-
-/* static char	*get_buff(int fd[2], int total_len)
-{
-	char	*res;
-
-	res = malloc(sizeof(char) * (total_len + 1));
-	close(fd[1]);
-	if (!res)
-		return (close(fd[0]), perror("malloc failed"), NULL);
-	if (read(fd[0], res, total_len) == -1)
-		return (perror("read failed"), close(fd[0]), free(res), NULL);
-	res[total_len] = '\0';
-	close(fd[0]);
-	return (res);
-} */
 
 char	*expand_str(t_shell *shell, char *str, int quote_type)
 {

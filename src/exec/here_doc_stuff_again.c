@@ -6,11 +6,9 @@
 /*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/25 01:06:10 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/25 01:06:12 by lpons            ###   ########.fr       */
+/*   Updated: 2026/01/25 14:54:22 by lpons            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-
 
 #include "../include/minishell.h"
 #include "../libft/libft.h"

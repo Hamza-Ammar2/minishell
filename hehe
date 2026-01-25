@@ -1,4 +1,0 @@
-ls|cat Makefile|cat<<asd>out
-$USER
-asd
-/bin/rm -f out
