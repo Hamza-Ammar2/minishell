@@ -6,7 +6,7 @@
 /*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:05:21 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 03:05:26 by lpons            ###   ########.fr       */
+/*   Updated: 2026/01/25 00:53:00 by lpons            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ static int	validate_start(t_token *tokens)
 		return (1);
 	if (tokens->type == TOKEN_PIPE)
 	{
-		fprintf(stderr, "minishell: syntax error near unexpected token `|'\n");
+		ft_fprintf(2, "minishell: syntax error near unexpected token `|'\n");
 		return (0);
 	}
 	return (1);
@@ -77,7 +77,7 @@ static int	validate_end(t_token *tokens)
 	last = get_last_token(tokens);
 	if (is_operator_token(last->type))
 	{
-		fprintf(stderr,
+		ft_fprintf(2,
 			"minishell: syntax error near unexpected token `newline'\n");
 		return (0);
 	}
@@ -107,24 +107,14 @@ static int	validate_consecutive(t_token *tokens)
 	current = tokens;
 	while (current && current->next)
 	{
-		if (current->type == TOKEN_PIPE)
-		{
-			if (is_operator_token(current->next->type))
-			{
-				fprintf(stderr,
-					"minishell: syntax error near unexpected token\n");
-				return (0);
-			}
-		}
-		else if (is_redirect_type(current->type))
-		{
-			if (current->next->type != TOKEN_WORD)
-			{
-				fprintf(stderr,
-					"minishell: syntax error: redirect needs filename\n");
-				return (0);
-			}
-		}
+		if (current->type == TOKEN_PIPE
+			&& is_operator_token(current->next->type))
+			return (ft_fprintf(2,
+					"minishell: syntax error near unexpected token\n"), 0);
+		else if (is_redirect_type(current->type)
+			&& current->next->type != TOKEN_WORD)
+			return (ft_fprintf(2,
+					"minishell: syntax error: redirect needs filename\n"), 0);
 		current = current->next;
 	}
 	return (1);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cleanup.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 02:47:05 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 21:31:36 by haammar          ###   ########.fr       */
+/*   Updated: 2026/01/25 00:47:35 by lpons            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,8 +44,6 @@ void	cleanup_shell(t_shell *shell)
 {
 	restore(shell);
 	close(shell->stdin_backup);
-	// close(shell->stdin_backup);
-	// close(shell->stdout_backup);
 	close(shell->stdout_backup);
 	close(STDIN_FILENO);
 	close(STDOUT_FILENO);

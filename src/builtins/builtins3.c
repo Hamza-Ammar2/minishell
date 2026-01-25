@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins3.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:01:35 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 22:26:38 by haammar          ###   ########.fr       */
+/*   Updated: 2026/01/25 01:00:38 by lpons            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,8 @@ static void	handle_numeric_exit(char *exit_arg, t_shell *shell, t_command *cmd)
 	exit_nice(shell, cmd, (unsigned char)exit_code);
 }
 
-static void	handle_exit_error(char *exit_arg, t_shell *shell, int err_type, t_command *cmd)
+static void	handle_exit_error(char *exit_arg, t_shell *shell, int err_type,
+		t_command *cmd)
 {
 	if (err_type == 0)
 	{
@@ -76,7 +77,7 @@ int	ft_exit(t_token **args, t_shell *shell, t_command *cmds)
 {
 	char	*cmd;
 
-	if (!args)
+	if (!args || !args[0])
 		return (-1);
 	cmd = expand_str(shell, args[0]->value, args[0]->quote_type);
 	if (!cmd)

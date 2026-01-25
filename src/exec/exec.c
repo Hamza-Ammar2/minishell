@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:02:38 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 23:37:37 by haammar          ###   ########.fr       */
+/*   Updated: 2026/01/25 01:02:59 by lpons            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ static void	exec_single(t_command *cmd, t_shell *shell, int fd[3][2],
 		(close_child(fd), exit_nice(shell, cmd, 1));
 	if (!direct_io(shell, cmd))
 		(close_child(fd), exit_nice(shell, cmd, 1));
-	if (!cmd->args[0])
+	if (!cmd->args || !cmd->args[0])
 		exit_nice(shell, cmd, 0);
 	args = wraper(cmd->args, shell);
 	if (!args)

@@ -6,7 +6,7 @@
 /*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:05:06 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/25 00:38:28 by lpons            ###   ########.fr       */
+/*   Updated: 2026/01/25 00:49:33 by lpons            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,6 +140,7 @@ static t_command	*parse_single_command(t_token *tokens)
 t_command	*parse(t_token *tokens)
 {
 	t_command	*cmd;
+	
 	if (!tokens)
 		return (NULL);
 	if (count_pipes(tokens) > 0)
