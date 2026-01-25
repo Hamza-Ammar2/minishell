@@ -90,16 +90,24 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	@echo "$(RED)Cleaning object files...$(RESET)"
-	@rm -rf $(OBJ_DIR)
-	@$(MAKE) -C ./libft clean
-	@echo "$(GREEN)✓ Object files cleaned!$(RESET)"
+	@if [ -d $(OBJ_DIR) ] || $(MAKE) -C ./libft -q clean 2>/dev/null; then \
+		echo "$(RED)Cleaning object files...$(RESET)"; \
+		rm -rf $(OBJ_DIR); \
+		$(MAKE) -C ./libft clean; \
+		echo "$(GREEN)✓ Object files cleaned!$(RESET)"; \
+	else \
+		echo "make: Nothing to be done for 'clean'."; \
+	fi
 
 fclean: clean
-	@echo "$(RED)Removing $(NAME)...$(RESET)"
-	@rm -f $(NAME)
-	@$(MAKE) -C ./libft fclean
-	@echo "$(GREEN)✓ $(NAME) removed!$(RESET)"
+	@if [ -f $(NAME) ] || $(MAKE) -C ./libft -q fclean 2>/dev/null; then \
+		echo "$(RED)Removing $(NAME)...$(RESET)"; \
+		rm -f $(NAME); \
+		$(MAKE) -C ./libft fclean; \
+		echo "$(GREEN)✓ $(NAME) removed!$(RESET)"; \
+	else \
+		echo "make: Nothing to be done for 'fclean'."; \
+	fi
 
 re: fclean all
 
@@ -108,4 +116,4 @@ test: all
 
 # ================================== PHONY ==================================== #
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re test

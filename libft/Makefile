@@ -62,12 +62,20 @@ bonus: $(BONUS_FILES)
 	fi
 # Cleanup
 clean:
-	@echo "$(RED)Cleaning objects…$(RESET)"
-	@rm -rf $(OBJDIR) .bonus_done
+	@if [ -d $(OBJDIR) ] || [ -f .bonus_done ]; then \
+		echo "$(RED)Cleaning objects…$(RESET)"; \
+		rm -rf $(OBJDIR) .bonus_done; \
+	else \
+		echo "make[1]: Nothing to clean."; \
+	fi
 
 fclean: clean
-	@echo "$(RED)Removing library…$(RESET)"
-	@rm -f $(NAME)
+	@if [ -f $(NAME) ]; then \
+		echo "$(RED)Removing library…$(RESET)"; \
+		rm -f $(NAME); \
+	else \
+		echo "make[1]: Nothing to fclean."; \
+	fi
 
 re: fclean all
 	@echo "$(YELLOW)Rebuilt everything!$(RESET)"
