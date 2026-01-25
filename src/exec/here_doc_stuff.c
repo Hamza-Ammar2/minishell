@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   here_doc_stuff.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:03:17 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/25 00:41:17 by haammar          ###   ########.fr       */
+/*   Updated: 2026/01/25 01:05:42 by lpons            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,6 @@ static char	*get_exp(t_shell *shell, char *value, int type)
 	(void)type;
 	(void)shell;
 	line = expand_quo(shell, raw, type);
-	//line = raw;
 	if (g_sig)
 	{
 		free(raw);
@@ -96,8 +95,8 @@ static int	heredoc(t_shell *shell, t_token *redir)
 
 int	here_doc(t_shell *shell, t_command *cmds)
 {
-	t_command *cmd;
-	t_token	*redir;
+	t_command	*cmd;
+	t_token		*redir;
 
 	cmd = cmds;
 	while (cmd)

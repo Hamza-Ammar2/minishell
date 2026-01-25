@@ -6,7 +6,7 @@
 /*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:02:38 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/25 01:02:59 by lpons            ###   ########.fr       */
+/*   Updated: 2026/01/25 01:06:58 by lpons            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,10 +51,8 @@ void	exec(t_command *cmds, t_shell *shell)
 	paths = get_paths(shell);
 	last_pid = rec_exec(paths, fd, cmds, shell);
 	shell->exit_status = last_pid;
-	//printf("%d\n\n\n\n", shell->exit_status);
 	if (last_pid != 1 && last_pid != -1 && last_pid != 0)
 		shell->exit_status = get_status(last_pid);
-	//printf("%d", shell->exit_status);
 	while (wait(NULL) > 0)
 		;
 	free_splits(paths);
