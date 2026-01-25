@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   here_doc_stuff.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:03:17 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/25 01:05:42 by lpons            ###   ########.fr       */
+/*   Updated: 2026/01/25 01:17:23 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,7 @@ static int	heredoc(t_shell *shell, t_token *redir)
 {
 	int		fd;
 	char	*delim;
+	int		type;
 
 	if (redir->type != TOKEN_REDIRECT_HEREDOC)
 		return (1);
@@ -90,7 +91,10 @@ static int	heredoc(t_shell *shell, t_token *redir)
 	fd = open(redir->value, O_WRONLY | O_TRUNC | O_CREAT, 0644);
 	if (fd == -1)
 		return (0);
-	return (here_doc_read(shell, delim, redir->quote_type, fd));
+	type = QUOTE_NONE;
+	if (redir->quote_type == QUOTE_SINGLE || redir->quote_type == QUOTE_DOUBLE)
+		type = QUOTE_SINGLE;
+	return (here_doc_read(shell, delim, type, fd));
 }
 
 int	here_doc(t_shell *shell, t_command *cmds)

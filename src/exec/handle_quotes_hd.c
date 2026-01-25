@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:03:03 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 21:11:12 by haammar          ###   ########.fr       */
+/*   Updated: 2026/01/25 01:57:58 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,9 +42,8 @@ static char	*get_next_quote(char *str, int quote_type)
 	return (q2);
 }
 
-static char	*write_exp(char *res, t_shell *shell, char *str, int quote_type)
+static char	*write_exp(char *res, char *str, int quote_type)
 {
-	char	*expanded;
 	char	*raw;
 	char	*tmp;
 
@@ -53,14 +52,10 @@ static char	*write_exp(char *res, t_shell *shell, char *str, int quote_type)
 	raw = ft_substr(str, 0, get_next_quote(str, quote_type) - str);
 	if (!raw)
 		return (perror("could not expand string"), NULL);
-	expanded = expand_quo(shell, raw, quote_type);
-	if (!expanded)
-		return (free(raw), perror("could not expand string"), NULL);
 	tmp = res;
-	res = ft_strjoin(res, expanded);
+	res = ft_strjoin(res, raw);
 	if (!res)
-		return (free(raw), free(expanded), perror("could not expand string"), NULL);
-	free(expanded);
+		return (free(raw), perror("could not expand string"), NULL);
 	free(raw);
 	if (tmp)
 		free(tmp);
@@ -89,12 +84,13 @@ char	*expand_str_hd(t_shell *shell, char *str, int quote_type)
 	if (!str)
 		return (NULL);
 	res = ft_strdup("");
+	(void)shell;
 	if (!res)
 		return (NULL);
 	while (*str)
 	{
 		quote_type = quote2type(*str);
-		res = write_exp(res, shell, str, quote_type);
+		res = write_exp(res, str, quote_type);
 		if (!res)
 			return (NULL);
 		if (quote_type != QUOTE_NONE)
