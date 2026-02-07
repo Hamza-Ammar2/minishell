@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strjoin.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/16 22:39:21 by lpons             #+#    #+#             */
-/*   Updated: 2025/05/17 20:02:36 by lpons            ###   ########.fr       */
+/*   Updated: 2026/02/07 08:46:43 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,18 +31,3 @@ char	*ft_strjoin(const char *s1, const char *s2)
 	ft_strlcat(res, s2, total);
 	return (res);
 }
-
-/*
-#include <stdio.h>
-#include <stdlib.h>
-
-int	main(void)
-{
-	char	*joined;
-
-	joined = ft_strjoin("Hello, Donkey!");
-	printf("%s\n", joined);
-	free(joined);
-	return (0);
-}
-*/

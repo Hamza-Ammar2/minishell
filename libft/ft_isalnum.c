@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_isalnum.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 21:13:35 by lpons             #+#    #+#             */
-/*   Updated: 2025/05/16 23:23:12 by lpons            ###   ########.fr       */
+/*   Updated: 2026/02/07 08:49:12 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,16 +19,3 @@ int	ft_isalnum(int c)
 		return (1);
 	return (0);
 }
-
-/*
-#include <stdio.h>
-
-int	main(void)
-{
-	int	num;
-
-	num = ft_isalnum(' ');
-	printf("%d\n", num);
-	return (0);
-}
-*/

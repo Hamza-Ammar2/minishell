@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 02:47:13 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 02:47:14 by lpons            ###   ########.fr       */
+/*   Updated: 2026/02/07 09:40:42 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,9 +93,9 @@ int	init_shell(t_shell *shell, char **argv, char **envp)
 	shell->exit_status = 0;
 	shell->env = NULL;
 	if (export(envp, shell) != 0)
-		return (0);
+		return (free_env(shell->env), 0);
 	if (!init_lvl(shell))
-		return (0);
+		return (free_env(shell->env), 0);
 	shell->input = NULL;
 	shell->envp = envp;
 	shell->stdin_backup = dup(STDIN_FILENO);
@@ -104,6 +104,6 @@ int	init_shell(t_shell *shell, char **argv, char **envp)
 	if (!arg)
 		return (0);
 	if (!exp_one(shell, arg))
-		return (free(arg), 0);
+		return (free(arg), cleanup_shell(shell), 0);
 	return (free(arg), 1);
 }

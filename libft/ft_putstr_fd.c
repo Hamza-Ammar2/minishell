@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_putstr_fd.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/16 22:38:53 by lpons             #+#    #+#             */
-/*   Updated: 2025/05/17 19:07:46 by lpons            ###   ########.fr       */
+/*   Updated: 2026/02/07 08:47:20 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,14 +18,3 @@ void	ft_putstr_fd(char *s, int fd)
 		return ;
 	write(fd, s, ft_strlen(s));
 }
-
-/*
-#include <unistd.h>
-
-int	main(void)
-{
-	ft_putstr_fd("Donkey Boy", 1);
-	write(1, "\n", 1);
-	return (0);
-}
-*/

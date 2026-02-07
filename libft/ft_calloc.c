@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_calloc.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/16 22:36:54 by lpons             #+#    #+#             */
-/*   Updated: 2025/05/17 18:52:12 by lpons            ###   ########.fr       */
+/*   Updated: 2026/02/07 08:49:17 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,19 +26,3 @@ void	*ft_calloc(size_t count, size_t size)
 	ft_bzero(pointer, total);
 	return (pointer);
 }
-
-/*
-#include <stdio.h>
-
-int	main(void)
-{
-	int	*arr;
-
-	arr = ft_calloc(3, sizeof *arr);
-	if (!arr)
-		return (1);
-	printf("%d\n", arr[1]);
-	free(arr);
-	return (0);
-}
-*/

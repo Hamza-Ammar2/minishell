@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_memmove.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 21:16:39 by lpons             #+#    #+#             */
-/*   Updated: 2025/05/17 18:58:59 by lpons            ###   ########.fr       */
+/*   Updated: 2026/02/07 08:47:47 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,17 +57,3 @@ void	*ft_memmove(void *target, const void *source, size_t n)
 	}
 	return (target);
 }
-
-/*
-#include <stdio.h>
-#include <string.h>
-
-int	main(void)
-{
-	char	buf[7] = "donkey";
-
-	ft_memmove(buf, "abcdef", 6);
-	printf("%s\n", buf);
-	return (0);
-}
-*/

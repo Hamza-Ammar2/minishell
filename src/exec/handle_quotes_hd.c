@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:03:03 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/25 01:57:58 by haammar          ###   ########.fr       */
+/*   Updated: 2026/02/07 09:47:54 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ static char	*write_exp(char *res, char *str, int quote_type)
 	tmp = res;
 	res = ft_strjoin(res, raw);
 	if (!res)
-		return (free(raw), perror("could not expand string"), NULL);
+		return (free(raw), free(tmp), perror("could not expand string"), NULL);
 	free(raw);
 	if (tmp)
 		free(tmp);

@@ -3,50 +3,29 @@
 /*                                                        :::      ::::::::   */
 /*   builtins2.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:01:09 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/25 14:57:04 by lpons            ###   ########.fr       */
+/*   Updated: 2026/02/07 09:15:09 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 #include "../libft/libft.h"
 
-int	exp_one(t_shell *shell, char *arg)
-{
-	char	*eq;
-	char	*key;
-	char	*value;
-	t_env	*env;
-
-	eq = ft_strchr(arg, '=');
-	value = NULL;
-	if (eq)
-	{
-		key = ft_substr(arg, 0, eq - arg);
-		if (!key)
-			return (perror("exp_one: malloc failed"), 0);
-		value = ft_strdup(eq + 1);
-		if (!value)
-			return (free(key), perror("exp_one: malloc failed"), 0);
-	}
-	else
-		key = ft_strdup(arg);
-	if (!key)
-		return (perror("exp_one: malloc failed"), 0);
-	env = find_env(shell, key);
-	if (env && eq)
-		return (free(env->value), env->value = value, free(key), 1);
-	return (add_env(shell, key, value));
-}
-
 static int	isvalid_key(char *str)
 {
+	char	*end;
+	char	*tmp;
+
 	if (!str || (!ft_isalpha(str[0]) && str[0] != '_'))
 		return (0);
 	str++;
-	while (*str && *str != '=')
+	end = ft_strnstr(str, "+=", ft_strlen(str));
+	tmp = ft_strchr(str, '=');
+	if (tmp < end || !end)
+		end = tmp;
+	while (*str && str != end)
 	{
 		if (!ft_isalnum(*str) && *str != '_')
 			return (0);
@@ -105,6 +84,18 @@ static int	print_export(t_shell *shell)
 	return (free_splits(args), 0);
 }
 
+static int	handle_pe(t_shell *shell, char *arg)
+{
+	char	*eq;
+	char	*peq;
+
+	eq = ft_strchr(arg, '=');
+	peq = ft_strnstr(arg, "+=", ft_strlen(arg));
+	if (eq < peq || !peq)
+		return (exp_one(shell, arg));
+	return (exp_one_peq(shell, arg, peq));
+}
+
 int	export(char **args, t_shell *shell)
 {
 	int	exit_status;
@@ -121,7 +112,7 @@ int	export(char **args, t_shell *shell)
 			exit_status = 1;
 			continue ;
 		}
-		if (!exp_one(shell, *args))
+		if (!handle_pe(shell, *args))
 			return (1);
 		args++;
 	}

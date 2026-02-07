@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 02:47:21 by lpons             #+#    #+#             */
-/*   Updated: 2026/02/07 08:22:23 by haammar          ###   ########.fr       */
+/*   Updated: 2026/02/07 09:33:26 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,9 @@ int	sig_hook(void)
 {
 	if (g_sig)
 	{
+		if (ioctl(STDIN_FILENO, TIOCSTI, "\n") == -1)
+			ft_fprintf(2, "oioctl error\n");
 		rl_replace_line("", 0);
-		ioctl(STDIN_FILENO, TIOCSTI, "\n");
 		rl_done = 1;
 		return (1);
 	}

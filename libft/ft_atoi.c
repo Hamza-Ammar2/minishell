@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_atoi.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 21:11:38 by lpons             #+#    #+#             */
-/*   Updated: 2025/05/17 18:19:02 by lpons            ###   ########.fr       */
+/*   Updated: 2026/02/07 08:49:26 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,16 +37,3 @@ int	ft_atoi(const char *str)
 	result = result * polarity;
 	return (result);
 }
-
-/*
-#include <stdio.h>
-
-int	main(void)
-{
-	int	number;
-
-	number = ft_atoi("    123dsada");
-	printf("%d\n", number);
-	return (0);
-}
-*/

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strlcat.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 21:15:05 by lpons             #+#    #+#             */
-/*   Updated: 2025/05/17 19:13:01 by lpons            ###   ########.fr       */
+/*   Updated: 2026/02/07 08:46:36 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,18 +35,3 @@ size_t	ft_strlcat(char *dst, const char *src, size_t size)
 	dst[i + k] = '\0';
 	return (i + j);
 }
-
-/*
-#include <stdio.h>
-
-int	main(void)
-{
-	char	buffer[12] = "yo";
-	size_t	ret;
-
-	ret = ft_strlcat(buffer, "hello", 12);
-	printf("%zu\n", ret);
-	printf("%s\n", buffer);
-	return (0);
-}
-*/

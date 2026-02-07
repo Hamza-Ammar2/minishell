@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/17 18:39:31 by lpons             #+#    #+#             */
-/*   Updated: 2025/05/17 21:25:37 by lpons            ###   ########.fr       */
+/*   Updated: 2026/02/07 08:47:14 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,27 +84,3 @@ char	**ft_split(const char *s, char c)
 	array[i] = NULL;
 	return (array);
 }
-
-/*
-#include <stdio.h>
-#include <stdlib.h>
-
-int	main(void)
-{
-	char	**array;
-	int		j;
-
-	array = ft_split("hello world   42", ' ');
-	if (array == NULL)
-		return (1);
-	j = 0;
-	while (array[j] != NULL)
-	{
-		printf("[%s]\n", array[j]);
-		free(array[j]);
-		j++;
-	}
-	free(array);
-	return (0);
-}
-*/

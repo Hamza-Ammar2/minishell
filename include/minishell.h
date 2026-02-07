@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/25 15:02:35 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/25 15:03:24 by lpons            ###   ########.fr       */
+/*   Updated: 2026/02/07 09:13:54 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,6 +179,7 @@ int						init_sig(void);
 /* Environment part */
 char					**env2arr(t_env *env);
 int						exp_one(t_shell *shell, char *arg);
+int						exp_one_peq(t_shell *shell, char *arg, char *peq);
 int						add_env(t_shell *shell, char *key, char *value);
 t_env					*find_env(t_shell *shell, char *key);
 char					*do_env(t_shell *shell, char *str);

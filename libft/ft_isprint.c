@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_isprint.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 21:14:23 by lpons             #+#    #+#             */
-/*   Updated: 2025/05/16 23:23:37 by lpons            ###   ########.fr       */
+/*   Updated: 2026/02/07 08:48:55 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,16 +20,3 @@ int	ft_isprint(int c)
 	}
 	return (0);
 }
-
-/*
-#include <stdio.h>
-
-int	main(void)
-{
-	int	num;
-
-	num = ft_isprint(26);
-	printf("%d\n", num);
-	return (0);
-}
-*/

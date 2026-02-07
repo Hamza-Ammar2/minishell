@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strtrim.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/16 22:39:49 by lpons             #+#    #+#             */
-/*   Updated: 2025/05/17 20:35:05 by lpons            ###   ########.fr       */
+/*   Updated: 2026/02/07 08:45:56 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,23 +34,3 @@ char	*ft_strtrim(char const *s1, char const *set)
 	ft_strlcpy(result, start, len + 1);
 	return (result);
 }
-
-/*
-#include <stdio.h>
-
-int	main(void)
-{
-	char	*trimmed;
-
-	trimmed = ft_strtrim("  hello  ", " ");
-	printf("[%s]\n", trimmed);
-	free(trimmed);
-	trimmed = ft_strtrim("xxabcxx", "x");
-	printf("[%s]\n", trimmed);
-	free(trimmed);
-	trimmed = ft_strtrim("abcd", "xyz");
-	printf("[%s]\n", trimmed);
-	free(trimmed);
-	return (0);
-}
-*/

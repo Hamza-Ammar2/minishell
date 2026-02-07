@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_putendl_fd.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/16 22:38:45 by lpons             #+#    #+#             */
-/*   Updated: 2025/05/17 19:07:22 by lpons            ###   ########.fr       */
+/*   Updated: 2026/02/07 08:47:30 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,13 +22,3 @@ void	ft_putendl_fd(char *s, int fd)
 	write(fd, s, len);
 	write(fd, "\n", 1);
 }
-
-/*
-#include <unistd.h>
-
-int	main(void)
-{
-	ft_putendl_fd("hello, donkey!", 1);
-	return (0);
-}
-*/

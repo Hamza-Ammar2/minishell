@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_itoa.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/16 22:37:21 by lpons             #+#    #+#             */
-/*   Updated: 2025/05/17 20:18:03 by lpons            ###   ########.fr       */
+/*   Updated: 2026/02/07 08:48:49 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,13 +51,3 @@ char	*ft_itoa(int n)
 	}
 	return (string);
 }
-
-/*
-#include <stdlib.h>
-
-int	main(void)
-{
-	ft_itoa(0)
-	return (ft_itoa(0)[0] - '0');
-}
-*/

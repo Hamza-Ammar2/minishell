@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:01:54 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 19:45:14 by lpons            ###   ########.fr       */
+/*   Updated: 2026/02/07 08:36:37 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,10 @@ static char	*get_dir(char *arg, t_shell *shell)
 		home = "";
 	else
 		home = home_env->value;
-	if (!arg || ft_strcmp(arg, "--") == 0)
+	if ((!arg || ft_strcmp(arg, "--") == 0) && home_env)
 		return (ft_strdup(home));
+	else if (!home_env)
+		return (ft_fprintf(2, "cd: HOME not set\n"), NULL);
 	else if (ft_strcmp(arg, "-") == 0)
 	{
 		home_env = find_env(shell, "OLDPWD");

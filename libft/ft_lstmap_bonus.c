@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_lstmap_bonus.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/16 22:38:06 by lpons             #+#    #+#             */
-/*   Updated: 2025/05/17 18:57:17 by lpons            ###   ########.fr       */
+/*   Updated: 2026/02/07 08:48:18 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,27 +33,3 @@ t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *))
 	}
 	return (new_list);
 }
-
-/*
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-static void	*duplicate(void *content)
-{
-	return (strdup((char *)content));
-}
-
-int	main(void)
-{
-	t_list	*lst;
-	t_list	*mapped;
-
-	lst = ft_lstnew(strdup("hello"));
-	mapped = ft_lstmap(lst, duplicate, free);
-	printf("%s\n", (char *)mapped->content);
-	ft_lstclear(&lst,    free);
-	ft_lstclear(&mapped, free);
-	return (0);
-}
-*/

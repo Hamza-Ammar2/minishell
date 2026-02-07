@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_striteri.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/16 22:39:13 by lpons             #+#    #+#             */
-/*   Updated: 2025/05/17 19:10:55 by lpons            ###   ########.fr       */
+/*   Updated: 2026/02/07 08:46:49 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,16 +27,3 @@ void	ft_striteri(char *s, void (*f)(unsigned int, char *))
 		i++;
 	}
 }
-
-/*
-#include <stdio.h>
-
-int	main(void)
-{
-	char	str[] = "hello donkey";
-
-	ft_striteri(str, capitalize);
-	printf("%s\n", str);
-	return (0);
-}
-*/

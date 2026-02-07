@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_stuff.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:02:08 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 03:13:26 by lpons            ###   ########.fr       */
+/*   Updated: 2026/02/07 09:25:44 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ int	add_env(t_shell *shell, char *key, char *value)
 	if (!new_env)
 	{
 		perror("add_env: malloc failed");
-		return (0);
+		return (free(key), free(value), 0);
 	}
 	new_env->key = key;
 	new_env->value = value;

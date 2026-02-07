@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_memchr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/16 22:38:24 by lpons             #+#    #+#             */
-/*   Updated: 2025/05/16 23:27:00 by lpons            ###   ########.fr       */
+/*   Updated: 2026/02/07 08:48:04 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,20 +29,3 @@ void	*ft_memchr(const void *s, int c, size_t n)
 	}
 	return (NULL);
 }
-
-/*
-#include <stdio.h>
-
-int	main(void)
-{
-	const char	*s = "donkey";
-	char		*p;
-
-	p = ft_memchr(s, 'k', 6);
-	if (p)
-		printf("Found 'k' at: %s\n", p);
-	else
-		printf("Not found\n");
-	return (0);
-}
-*/

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle_quotes.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:03:08 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/25 14:53:33 by lpons            ###   ########.fr       */
+/*   Updated: 2026/02/07 09:44:42 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,8 +59,8 @@ static char	*write_exp(char *res, t_shell *shell, char *str, int quote_type)
 	tmp = res;
 	res = ft_strjoin(res, expanded);
 	if (!res)
-		return (free(raw), free(expanded), perror("could not expand string"),
-			NULL);
+		return (free(raw), free(tmp), free(expanded),
+			perror("could not expand string"), NULL);
 	free(expanded);
 	free(raw);
 	if (tmp)

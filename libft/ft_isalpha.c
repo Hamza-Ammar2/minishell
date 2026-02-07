@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_isalpha.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 21:13:52 by lpons             #+#    #+#             */
-/*   Updated: 2025/05/16 23:23:17 by lpons            ###   ########.fr       */
+/*   Updated: 2026/02/07 08:49:08 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,16 +20,3 @@ int	ft_isalpha(int c)
 	}
 	return (0);
 }
-
-/*
-#include <stdio.h>
-
-int	main(void)
-{
-	int	num;
-
-	num = ft_isalpha('7');
-	printf("%d\n", num);
-	return (0);
-}
-*/

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_memset.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 21:14:47 by lpons             #+#    #+#             */
-/*   Updated: 2025/05/17 18:59:20 by lpons            ###   ########.fr       */
+/*   Updated: 2026/02/07 08:47:41 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,16 +28,3 @@ void	*ft_memset(void *s, int c, size_t n)
 	}
 	return (s);
 }
-
-/*
-#include <stdio.h>
-
-int	main(void)
-{
-	char	buf[8] = "donkey";
-
-	ft_memset(buf, 'X', 3);
-	printf("%s\n", buf);
-	return (0);
-}
-*/

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_substr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/16 22:40:04 by lpons             #+#    #+#             */
-/*   Updated: 2025/05/17 19:18:34 by lpons            ###   ########.fr       */
+/*   Updated: 2026/02/07 08:45:47 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,20 +30,3 @@ char	*ft_substr(const char *s, unsigned int start, size_t len)
 	ft_strlcpy(substr, s + start, len + 1);
 	return (substr);
 }
-
-/*
-#include <stdio.h>
-
-int	main(void)
-{
-	char	*s;
-
-	s = ft_substr("libft substring", 6, 9);
-	printf("%s\n", s);
-	free(s);
-	s = ft_substr("short", 10, 5);
-	printf("[%s]\n", s);
-	free(s);
-	return (0);
-}
-*/
