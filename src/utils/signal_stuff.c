@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 02:47:21 by lpons             #+#    #+#             */
-/*   Updated: 2026/02/07 08:21:47 by haammar          ###   ########.fr       */
+/*   Updated: 2026/02/07 08:22:23 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,14 +38,14 @@ int	init_sig(void)
 
 	memset(&sa, 0, sizeof(sa));
 	sa.sa_handler = handle_sig;
-	sa.sa_handler = SIG_IGN;
+	sa2.sa_handler = SIG_IGN;
 	rl_signal_event_hook = sig_hook;
 	if (sigaction(SIGINT, &sa, NULL) == -1)
 	{
 		perror("sigaction");
 		return (0);
 	}
-	if (sigaction(SIGQUIT, &sa, NULL) == -1)
+	if (sigaction(SIGQUIT, &sa2, NULL) == -1)
 	{
 		perror("sigaction");
 		return (0);
