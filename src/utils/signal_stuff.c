@@ -6,11 +6,12 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 02:47:21 by lpons             #+#    #+#             */
-/*   Updated: 2026/02/13 19:11:08 by haammar          ###   ########.fr       */
+/*   Updated: 2026/02/13 22:42:24 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
+#include "../libft/libft.h"
 
 volatile sig_atomic_t	g_sig = 0;
 
