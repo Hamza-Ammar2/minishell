@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:03:08 by lpons             #+#    #+#             */
-/*   Updated: 2026/02/07 09:44:42 by haammar          ###   ########.fr       */
+/*   Updated: 2026/02/13 18:34:38 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,10 +52,10 @@ static char	*write_exp(char *res, t_shell *shell, char *str, int quote_type)
 		str++;
 	raw = ft_substr(str, 0, get_next_quote(str, quote_type) - str);
 	if (!raw)
-		return (perror("could not expand string"), NULL);
+		return (perror("could not expand string"), free(res), NULL);
 	expanded = expand_quo(shell, raw, quote_type);
 	if (!expanded)
-		return (free(raw), perror("could not expand string"), NULL);
+		return (free(raw), free(res), perror("could not expand string"), NULL);
 	tmp = res;
 	res = ft_strjoin(res, expanded);
 	if (!res)

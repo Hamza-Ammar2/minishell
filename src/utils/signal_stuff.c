@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 02:47:21 by lpons             #+#    #+#             */
-/*   Updated: 2026/02/07 09:33:26 by haammar          ###   ########.fr       */
+/*   Updated: 2026/02/13 19:11:08 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,8 @@ int	init_sig(void)
 	struct sigaction	sa;
 	struct sigaction	sa2;
 
-	memset(&sa, 0, sizeof(sa));
+	ft_memset(&sa, 0, sizeof(sa));
+	ft_memset(&sa2, 0, sizeof(sa2));
 	sa.sa_handler = handle_sig;
 	sa2.sa_handler = SIG_IGN;
 	rl_signal_event_hook = sig_hook;

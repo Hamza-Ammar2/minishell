@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:03:17 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/25 01:17:23 by haammar          ###   ########.fr       */
+/*   Updated: 2026/02/13 18:16:43 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ static int	clean_stuff(t_shell *shell, int fd, char *line)
 	restore(shell);
 	close(fd);
 	free(line);
-	return (2);
+	return (0);
 }
 
 static char	*get_exp(t_shell *shell, char *value, int type)

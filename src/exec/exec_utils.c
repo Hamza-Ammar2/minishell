@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:02:29 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/25 01:03:06 by lpons            ###   ########.fr       */
+/*   Updated: 2026/02/13 18:28:27 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ int	get_status(int last_pid)
 {
 	int	status;
 
+	status = 0;
 	waitpid((pid_t)last_pid, &status, 0);
 	if (WIFEXITED(status))
 		return (WEXITSTATUS(status));

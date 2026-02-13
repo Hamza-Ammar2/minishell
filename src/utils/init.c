@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 02:47:13 by lpons             #+#    #+#             */
-/*   Updated: 2026/02/07 09:40:42 by haammar          ###   ########.fr       */
+/*   Updated: 2026/02/13 19:10:57 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,12 @@ static char	**get_arr(t_env *env, char **envp)
 	i = 0;
 	while (current)
 	{
+		if (!current->value)
+		{
+			i++;
+			current = current->next;
+			continue;
+		}
 		envp[i] = malloc(sizeof(char) * (ft_strlen(current->key)
 					+ ft_strlen(current->value) + 2));
 		if (!envp[i])
@@ -77,7 +83,8 @@ char	**env2arr(t_env *env)
 	current = env;
 	while (current)
 	{
-		size++;
+		if (current->value)
+			size++;
 		current = current->next;
 	}
 	envp = malloc(sizeof(char *) * (size + 1));
@@ -92,10 +99,13 @@ int	init_shell(t_shell *shell, char **argv, char **envp)
 
 	shell->exit_status = 0;
 	shell->env = NULL;
-	if (export(envp, shell) != 0)
-		return (free_env(shell->env), 0);
+	if (*envp)
+	{
+		if (export(envp, shell) != 0)
+			return (0);
+	}
 	if (!init_lvl(shell))
-		return (free_env(shell->env), 0);
+		return (0);
 	shell->input = NULL;
 	shell->envp = envp;
 	shell->stdin_backup = dup(STDIN_FILENO);
@@ -104,6 +114,6 @@ int	init_shell(t_shell *shell, char **argv, char **envp)
 	if (!arg)
 		return (0);
 	if (!exp_one(shell, arg))
-		return (free(arg), cleanup_shell(shell), 0);
+		return (free(arg), 0);
 	return (free(arg), 1);
 }
