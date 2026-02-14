@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:02:29 by lpons             #+#    #+#             */
-/*   Updated: 2026/02/13 18:28:27 by haammar          ###   ########.fr       */
+/*   Updated: 2026/02/14 07:55:20 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@ int	get_status(int last_pid)
 
 	status = 0;
 	waitpid((pid_t)last_pid, &status, 0);
+	if (WIFSIGNALED(status) && WTERMSIG(status) == SIGQUIT)
+    	write(2, "Quit (core dumped)\n", 19);
 	if (WIFEXITED(status))
 		return (WEXITSTATUS(status));
 	else if (WIFSIGNALED(status))

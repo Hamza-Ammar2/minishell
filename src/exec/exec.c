@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:02:38 by lpons             #+#    #+#             */
-/*   Updated: 2026/02/14 07:03:15 by haammar          ###   ########.fr       */
+/*   Updated: 2026/02/14 08:01:10 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,13 +51,11 @@ void	exec(t_command *cmds, t_shell *shell)
 		return ;
 	paths = get_paths(shell);
 	last_pid = rec_exec(paths, fd, cmds, shell);
-	shell->exit_status = last_pid;
-	if (last_pid != 1 && last_pid != -1 && last_pid != 0)
-		shell->exit_status = get_status(last_pid);
+	shell->exit_status = get_status(last_pid);
+	/* if (last_pid != 1 && last_pid != -1 && last_pid != 0)
+		shell->exit_status = get_status(last_pid); */
 	while (wait(NULL) > 0)
 		;
-	if (shell->exit_status == 131)
-		ft_fprintf(STDERR_FILENO, "Quit (core dumped)\n");
 	free_splits(paths);
 }
 
