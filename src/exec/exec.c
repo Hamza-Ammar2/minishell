@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:02:38 by lpons             #+#    #+#             */
-/*   Updated: 2026/02/13 23:31:34 by haammar          ###   ########.fr       */
+/*   Updated: 2026/02/14 07:03:15 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,8 @@ void	exec(t_command *cmds, t_shell *shell)
 		shell->exit_status = get_status(last_pid);
 	while (wait(NULL) > 0)
 		;
+	if (shell->exit_status == 131)
+		ft_fprintf(STDERR_FILENO, "Quit (core dumped)\n");
 	free_splits(paths);
 }
 
