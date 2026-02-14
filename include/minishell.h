@@ -170,6 +170,9 @@ int						echo(char **args, t_shell *shell);
 int						unset(t_shell *shell, char **args);
 int						pwd(char **args);
 int						ft_exit(t_token **args, t_shell *shell, t_command *cmd);
+char					*trim_whitespace(char *str);
+int						is_numeric(char *str);
+int						str_to_long_long(char *str, long long *result);
 int						is_dir(char *path);
 
 /* Signal handling */

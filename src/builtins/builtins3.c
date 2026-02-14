@@ -6,36 +6,26 @@
 /*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:01:35 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/25 01:00:38 by lpons            ###   ########.fr       */
+/*   Updated: 2026/02/14 14:00:00 by lpons            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 #include "../libft/libft.h"
-
-static int	is_numeric(char *str)
-{
-	int	i;
-
-	i = 0;
-	if (str[i] == '+' || str[i] == '-')
-		i++;
-	if (!str[i])
-		return (0);
-	while (str[i])
-	{
-		if (!ft_isdigit(str[i]))
-			return (0);
-		i++;
-	}
-	return (1);
-}
+#include <limits.h>
+#include <errno.h>
 
 static void	handle_numeric_exit(char *exit_arg, t_shell *shell, t_command *cmd)
 {
-	int	exit_code;
+	long long	exit_code;
 
-	exit_code = ft_atoi(exit_arg);
+	if (!str_to_long_long(exit_arg, &exit_code))
+	{
+		ft_fprintf(2, "exit: %s: numeric argument required\n", exit_arg);
+		free(exit_arg);
+		shell->exit_status = 2;
+		exit_nice(shell, cmd, 2);
+	}
 	free(exit_arg);
 	shell->exit_status = (unsigned char)exit_code;
 	exit_nice(shell, cmd, (unsigned char)exit_code);
@@ -56,20 +46,23 @@ static void	handle_exit_error(char *exit_arg, t_shell *shell, int err_type,
 static int	process_exit_args(t_token **args, t_shell *shell, t_command *cmd)
 {
 	char	*exit_arg;
+	char	*trimmed;
 
 	if (!args[1])
 		exit(shell->exit_status);
 	exit_arg = expand_str(shell, args[1]->value, args[1]->quote_type);
-	if (!is_numeric(exit_arg))
-		handle_exit_error(exit_arg, shell, 0, cmd);
+	trimmed = trim_whitespace(exit_arg);
+	free(exit_arg);
+	if (!trimmed || !is_numeric(trimmed))
+		handle_exit_error(trimmed, shell, 0, cmd);
 	if (args[2])
 	{
 		ft_fprintf(2, "exit: too many arguments\n");
-		free(exit_arg);
+		free(trimmed);
 		shell->exit_status = 1;
 		return (1);
 	}
-	handle_numeric_exit(exit_arg, shell, cmd);
+	handle_numeric_exit(trimmed, shell, cmd);
 	return (0);
 }
 
@@ -85,5 +78,11 @@ int	ft_exit(t_token **args, t_shell *shell, t_command *cmds)
 	if (ft_strcmp(cmd, "exit") != 0)
 		return (free(cmd), -1);
 	free(cmd);
+	/*
+	** FIX: Print "exit" in interactive mode only (mirrors bash behavior)
+	** Bash prints "exit" when you type it in terminal, but not in scripts
+	*/
+	if (isatty(STDIN_FILENO))
+		ft_fprintf(1, "exit\n");
 	return (process_exit_args(args, shell, cmds));
 }

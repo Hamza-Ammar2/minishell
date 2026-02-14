@@ -12,6 +12,7 @@
 
 #include "../include/minishell.h"
 #include "../libft/libft.h"
+#include <stdarg.h>
 
 static int	print_var(int fd, va_list arg_ptr, char type, int *valid);
 
