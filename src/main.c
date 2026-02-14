@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 02:47:18 by lpons             #+#    #+#             */
-/*   Updated: 2026/02/07 09:57:34 by haammar          ###   ########.fr       */
+/*   Updated: 2026/02/13 23:35:04 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,27 +104,27 @@ void	process_input(char *input, t_shell *shell)
 void	shell_loop(t_shell *shell)
 {
 	char	*input;
-	int		is_interactive;
 
-	is_interactive = isatty(STDIN_FILENO);
 	while (1)
 	{
-		if (is_interactive)
+		if (isatty(STDIN_FILENO))
 			input = readline(PROMPT);
 		else
 			input = get_next_line(STDIN_FILENO);
 		if (!input)
 		{
-			if (is_interactive)
+			if (isatty(STDIN_FILENO))
 				printf("exit\n");
 			break ;
 		}
 		if (*input)
 		{
-			if (is_interactive)
+			if (isatty(STDIN_FILENO))
 				add_history(input);
 			process_input(input, shell);
 		}
+		if (g_sig)
+			shell->exit_status = 130;
 		free(input);
 		g_sig = 0;
 	}

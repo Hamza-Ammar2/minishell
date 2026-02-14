@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:02:38 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/25 14:54:36 by lpons            ###   ########.fr       */
+/*   Updated: 2026/02/13 23:31:34 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,10 @@ static int	rec_exec(char **paths, int fd[3][2], t_command *cmds,
 	if (fd[2][1] < 0)
 		return (close_pipes(cmds, fd), perror("fork failed"), 1);
 	if (fd[2][1] == 0)
+	{
+		child_signal();
 		exec_single(cmds, shell, fd, paths);
+	}
 	restore(shell);
 	if (close_pipes(cmds, fd))
 		return (fd[2][1]);

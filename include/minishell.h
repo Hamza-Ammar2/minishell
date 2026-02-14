@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/25 15:02:35 by lpons             #+#    #+#             */
-/*   Updated: 2026/02/07 09:13:54 by haammar          ###   ########.fr       */
+/*   Updated: 2026/02/14 06:32:51 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,6 +163,7 @@ int						do_builtin(t_command *cmds, t_shell *shell,
 int						check_builtin(t_command *cmds, t_shell *shell,
 							int fd[3][2]);
 int						export(char **args, t_shell *shell);
+int						print_export(t_shell *shell);
 int						cd(char **args, t_shell *shell);
 int						env(char **args, t_shell *shell);
 int						echo(char **args, t_shell *shell);
@@ -172,6 +173,7 @@ int						ft_exit(t_token **args, t_shell *shell, t_command *cmd);
 int						is_dir(char *path);
 
 /* Signal handling */
+int						child_signal(void);
 void					handle_sig(int s);
 int						sig_hook(void);
 int						init_sig(void);

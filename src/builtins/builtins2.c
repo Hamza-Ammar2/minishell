@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:01:09 by lpons             #+#    #+#             */
-/*   Updated: 2026/02/13 18:42:02 by haammar          ###   ########.fr       */
+/*   Updated: 2026/02/14 06:19:31 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,56 +32,6 @@ static int	isvalid_key(char *str)
 		str++;
 	}
 	return (1);
-}
-
-void	bsort(char **args)
-{
-	int		i;
-	int		swapped;
-	char	*tmp;
-
-	swapped = 1;
-	while (swapped)
-	{
-		swapped = 0;
-		i = 0;
-		while (args[i + 1])
-		{
-			if (ft_strcmp(args[i], args[i + 1]) > 0)
-			{
-				tmp = args[i];
-				args[i] = args[i + 1];
-				args[i + 1] = tmp;
-				swapped = 1;
-			}
-			i++;
-		}
-	}
-}
-
-static int	print_export(t_shell *shell)
-{
-	char	**args;
-	int		i;
-
-	i = 0;
-	args = env2arr(shell->env);
-	if (!args)
-		return (perror("print_export: malloc failed"), 1);
-	bsort(args);
-	while (args[i])
-	{
-		if (args[i][0] == '_' && args[i][1] == '=')
-		{
-			i++;
-			continue ;
-		}
-		write(STDOUT_FILENO, "declare -x ", 11);
-		write(STDOUT_FILENO, args[i], ft_strlen(args[i]));
-		write(STDOUT_FILENO, "\n", 1);
-		i++;
-	}
-	return (free_splits(args), 0);
 }
 
 static int	handle_pe(t_shell *shell, char *arg)

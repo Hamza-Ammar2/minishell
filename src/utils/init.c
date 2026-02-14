@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 02:47:13 by lpons             #+#    #+#             */
-/*   Updated: 2026/02/13 19:10:57 by haammar          ###   ########.fr       */
+/*   Updated: 2026/02/13 23:49:14 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,6 @@ static char	**get_arr(t_env *env, char **envp)
 	{
 		if (!current->value)
 		{
-			i++;
 			current = current->next;
 			continue;
 		}
