@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/25 15:02:35 by lpons             #+#    #+#             */
-/*   Updated: 2026/02/14 06:32:51 by haammar          ###   ########.fr       */
+/*   Updated: 2026/02/15 15:04:16 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define MINISHELL_H
 
 # include <errno.h>
+# include <limits.h>
 # include <fcntl.h>
 # include <readline/history.h>
 # include <readline/readline.h>
@@ -25,6 +26,7 @@
 # include <sys/stat.h>
 # include <sys/wait.h>
 # include <unistd.h>
+# include <stdarg.h>
 
 # define PROMPT "minishell$ "
 # ifndef BUFFER_SIZE

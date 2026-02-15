@@ -3,17 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   builtins3.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:01:35 by lpons             #+#    #+#             */
-/*   Updated: 2026/02/14 14:00:00 by lpons            ###   ########.fr       */
+/*   Updated: 2026/02/15 15:04:22 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 #include "../libft/libft.h"
-#include <limits.h>
-#include <errno.h>
 
 static void	handle_numeric_exit(char *exit_arg, t_shell *shell, t_command *cmd)
 {
