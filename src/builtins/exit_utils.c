@@ -74,14 +74,13 @@ int	str_to_long_long(char *str, long long *result)
 	int			i;
 	int			digit;
 
+	i = 0;
 	num = 0;
 	sign = 1;
-	i = 0;
 	if (str[i] == '-' || str[i] == '+')
 	{
-		if (str[i] == '-')
+		if (str[i++] == '-')
 			sign = -1;
-		i++;
 	}
 	while (str[i])
 	{
