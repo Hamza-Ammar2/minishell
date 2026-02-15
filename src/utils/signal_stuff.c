@@ -15,7 +15,7 @@
 
 volatile sig_atomic_t	g_sig = 0;
 
-int	child_signal()
+int	child_signal(void)
 {
 	struct sigaction	sa;
 	struct sigaction	sa2;

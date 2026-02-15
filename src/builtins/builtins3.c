@@ -78,10 +78,6 @@ int	ft_exit(t_token **args, t_shell *shell, t_command *cmds)
 	if (ft_strcmp(cmd, "exit") != 0)
 		return (free(cmd), -1);
 	free(cmd);
-	/*
-	** FIX: Print "exit" in interactive mode only (mirrors bash behavior)
-	** Bash prints "exit" when you type it in terminal, but not in scripts
-	*/
 	if (isatty(STDIN_FILENO))
 		ft_fprintf(1, "exit\n");
 	return (process_exit_args(args, shell, cmds));

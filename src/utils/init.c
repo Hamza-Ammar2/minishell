@@ -58,7 +58,7 @@ static char	**get_arr(t_env *env, char **envp)
 		if (!current->value)
 		{
 			current = current->next;
-			continue;
+			continue ;
 		}
 		envp[i] = malloc(sizeof(char) * (ft_strlen(current->key)
 					+ ft_strlen(current->value) + 2));

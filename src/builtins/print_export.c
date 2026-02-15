@@ -38,12 +38,12 @@ static void	bsort(t_env **args)
 	}
 }
 
-static void print_exp(t_env **envs)
+static void	print_exp(t_env **envs)
 {
-    int i;
+	int	i;
 
-    i = 0;
-    bsort(envs);
+	i = 0;
+	bsort(envs);
 	while (envs[i])
 	{
 		if (envs[i]->key[0] == '_' && envs[i]->key[1] == '=')
@@ -51,19 +51,19 @@ static void print_exp(t_env **envs)
 			i++;
 			continue ;
 		}
-        ft_fprintf(STDOUT_FILENO, "declare -x %s", envs[i]->key);
-        if (envs[i]->value)
-            ft_fprintf(STDOUT_FILENO, "=%s", envs[i]->value);
+		ft_fprintf(STDOUT_FILENO, "declare -x %s", envs[i]->key);
+		if (envs[i]->value)
+			ft_fprintf(STDOUT_FILENO, "=%s", envs[i]->value);
 		write(STDOUT_FILENO, "\n", 1);
 		i++;
 	}
-    free(envs);
+	free(envs);
 }
 
 int	print_export(t_shell *shell)
 {
 	t_env	*env;
-    t_env   **envs;
+	t_env	**envs;
 	int		l;
 
 	l = 0;
@@ -74,16 +74,16 @@ int	print_export(t_shell *shell)
 		env = env->next;
 	}
 	envs = malloc(sizeof(t_env *) * (l + 1));
-    if (!envs)
-        return (perror("print_export: malloc failed"), 1);
-    env = shell->env;
-    l = 0;
-    while (env)
-    {
-        envs[l] = env;
-        l++;
-        env = env->next;
-    }
-    envs[l] = NULL;
-    return (print_exp(envs), 0);
+	if (!envs)
+		return (perror("print_export: malloc failed"), 1);
+	env = shell->env;
+	l = 0;
+	while (env)
+	{
+		envs[l] = env;
+		l++;
+		env = env->next;
+	}
+	envs[l] = NULL;
+	return (print_exp(envs), 0);
 }

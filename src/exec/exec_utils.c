@@ -35,7 +35,7 @@ int	get_status(int last_pid)
 	status = 0;
 	waitpid((pid_t)last_pid, &status, 0);
 	if (WIFSIGNALED(status) && WTERMSIG(status) == SIGQUIT)
-    	write(2, "Quit (core dumped)\n", 19);
+		write(2, "Quit (core dumped)\n", 19);
 	if (WIFEXITED(status))
 		return (WEXITSTATUS(status));
 	else if (WIFSIGNALED(status))
