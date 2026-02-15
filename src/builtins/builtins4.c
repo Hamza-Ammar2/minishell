@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins4.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:01:39 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 23:09:03 by lpons            ###   ########.fr       */
+/*   Updated: 2026/02/15 15:12:45 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,8 @@ static void	del_one(t_shell *shell, char *arg)
 			else
 				shell->env = current->next;
 			free(to_delete->key);
-			free(to_delete->value);
+			if (to_delete->value)
+				free(to_delete->value);
 			free(to_delete);
 			break ;
 		}
