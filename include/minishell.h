@@ -84,6 +84,9 @@ typedef struct s_shell
 	int					exit_status;
 	int					stdin_backup;
 	int					stdout_backup;
+	/* LEAK FIX: Store current tokens so cleanup_shell can free them
+	** when exit is called mid-execution. */
+	t_token				*cur_tokens;
 }						t_shell;
 
 int						init_shell(t_shell *shell, char **argv, char **envp);

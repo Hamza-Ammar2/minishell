@@ -72,6 +72,17 @@ char	*get_next_line(int fd)
 	char			*dup;
 	char			*s;
 
+	/* LEAK FIX: Allow cleanup by calling with fd = -1.
+	** This frees the static buffer to prevent memory leaks on exit. */
+	if (fd == -1)
+	{
+		if (buff)
+			free(buff);
+		buff = NULL;
+		start = 0;
+		end = 0;
+		return (NULL);
+	}
 	if (!buff)
 	{
 		buff = malloc(sizeof(char) * BUFFER_SIZE);

@@ -76,6 +76,9 @@ void	process_input(char *input, t_shell *shell)
 		return ;
 	}
 	cmd = parse(tokens);
+	/* LEAK FIX: Store tokens in shell so cleanup_shell can free them
+	** if exit is called during execution. */
+	shell->cur_tokens = tokens;
 	if (cmd && here_doc(shell, cmd))
 	{
 		exec(cmd, shell);
@@ -84,6 +87,9 @@ void	process_input(char *input, t_shell *shell)
 	else if (cmd)
 		free_commands(cmd);
 	free_tokens(tokens);
+	/* LEAK FIX: Clear cur_tokens after normal processing to avoid
+	** double-free if cleanup_shell is called later. */
+	shell->cur_tokens = NULL;
 }
 
 /*
@@ -103,29 +109,30 @@ void	process_input(char *input, t_shell *shell)
 
 void	shell_loop(t_shell *shell)
 {
-	char	*input;
-
 	while (1)
 	{
 		if (isatty(STDIN_FILENO))
-			input = readline(PROMPT);
+			shell->input = readline(PROMPT);
 		else
-			input = get_next_line(STDIN_FILENO);
-		if (!input)
+			shell->input = get_next_line(STDIN_FILENO);
+		if (!shell->input)
 		{
 			if (isatty(STDIN_FILENO))
 				printf("exit\n");
 			break ;
 		}
-		if (*input)
+		if (*shell->input)
 		{
 			if (isatty(STDIN_FILENO))
-				add_history(input);
-			process_input(input, shell);
+				add_history(shell->input);
+			process_input(shell->input, shell);
 		}
 		if (g_sig)
 			shell->exit_status = 130;
-		free(input);
+		free(shell->input);
+		/* EXTRA LEAK FIX: Set to NULL after free so cleanup_shell won't
+		** double-free. May revert if leak is from readline, not our code. */
+		shell->input = NULL;
 		g_sig = 0;
 	}
 }

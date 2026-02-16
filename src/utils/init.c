@@ -98,6 +98,8 @@ int	init_shell(t_shell *shell, char **argv, char **envp)
 
 	shell->exit_status = 0;
 	shell->env = NULL;
+	/* LEAK FIX: Initialize cur_tokens to NULL for cleanup_shell */
+	shell->cur_tokens = NULL;
 	if (*envp)
 	{
 		if (export(envp, shell) != 0)

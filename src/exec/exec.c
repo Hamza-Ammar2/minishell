@@ -75,25 +75,40 @@ static void	exec_single(t_command *cmd, t_shell *shell, int fd[3][2],
 {
 	char	*str;
 	char	**args;
+	char	**envp;
 
+	/* LEAK FIX: Free paths before exit_nice in all child exit paths.
+	** Child processes inherit paths array but never freed it, causing
+	** ~1,325 bytes leak per forked command. */
 	if (do_builtin(cmd, shell, fd) != 0)
-		(close_child(fd), exit_nice(shell, cmd, fd[2][1]));
+		(close_child(fd), free_splits(paths), exit_nice(shell, cmd, fd[2][1]));
 	if (connect_pipes(cmd, fd) == -1)
-		(close_child(fd), exit_nice(shell, cmd, 1));
+		(close_child(fd), free_splits(paths), exit_nice(shell, cmd, 1));
 	if (!direct_io(shell, cmd))
-		(close_child(fd), exit_nice(shell, cmd, 1));
+		(close_child(fd), free_splits(paths), exit_nice(shell, cmd, 1));
 	if (!cmd->args || !cmd->args[0])
-		exit_nice(shell, cmd, 0);
+		(free_splits(paths), exit_nice(shell, cmd, 0));
 	args = wraper(cmd->args, shell);
 	if (!args)
-		(close_child(fd), exit_nice(shell, cmd, 1));
+		(close_child(fd), free_splits(paths), exit_nice(shell, cmd, 1));
 	close_child(fd);
 	ft_exit(cmd->args, shell, cmd);
 	str = get_path(paths, args[0]);
+	/* LEAK FIX: Free paths before exit_exec since it may call exit_nice */
+	free_splits(paths);
 	exit_exec(shell, cmd, args, str);
 	close(shell->stdout_backup);
 	close(shell->stdin_backup);
-	execve(str, args, env2arr(shell->env));
+	/* LEAK FIX: Store env2arr result to free on execve failure */
+	envp = env2arr(shell->env);
+	execve(str, args, envp);
+	/* LEAK FIX: Free envp and args on execve failure.
+	** Only free str if it was separately allocated (str != args[0]).
+	** When cmd contains '/' and exists, get_path returns args[0] directly. */
+	free_splits(envp);
+	if (str != args[0])
+		free(str);
+	free_splits(args);
 	perror("execve failed");
 	exit_nice(shell, cmd, 1);
 }
