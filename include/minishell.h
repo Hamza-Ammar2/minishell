@@ -114,6 +114,12 @@ char					*extract_complete_word(const char *input, int *i,
 ** Example: VAR="a b c"; echo $VAR -> splits into 3 separate arguments */
 t_token					*expand_and_split_tokens(t_shell *shell,
 							t_token *tokens);
+int						has_whitespace(const char *str);
+t_token					*append_token(t_token **head, t_token *tail, t_token *new);
+t_token					*append_split_tokens(t_token **head, t_token *tail,
+							char **splits);
+char					*expand_token_value(t_shell *shell, t_token *tok);
+int						should_split(t_token *tok, char *expanded);
 
 /* Parser functions */
 t_command				*parse(t_token *tokens);

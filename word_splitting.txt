@@ -11,248 +11,83 @@ Example:
   echo $VAR      -> echo receives 3 arguments: "one", "two", "three"
   echo "$VAR"    -> echo receives 1 argument: "one two three"
 
-Before this fix, our minishell treated $VAR as a single argument regardless
-of quotes, which is incorrect behavior.
 
 IMPLEMENTATION APPROACH: Tokenize -> Expand -> Re-tokenize
 -----------------------------------------------------------
-The standard approach is:
 1. TOKENIZE: Break input into tokens (already implemented)
 2. EXPAND: Replace $VAR with its value
 3. RE-TOKENIZE (Word Split): For unquoted expansions, split on whitespace
 
-We chose "Option A" - a simpler approach where we expand each token and
-split it if it was unquoted and contains whitespace after expansion.
 
+FILES
+=====
 
-FILES CHANGED
-=============
-
-1. NEW FILE: src/lexer/word_splitting.c
+1. src/lexer/word_splitting.c (4 functions)
 ------------------------------------------
-PURPOSE: Contains all word splitting logic in one place.
+- handle_split(): Splits expanded value into multiple tokens
+- handle_no_split(): Creates single token from expanded value
+- process_token(): Decides whether to split based on quote_type
+- expand_and_split_tokens(): Main entry point, iterates all tokens
 
-FUNCTIONS:
-- has_whitespace(str): Helper to check if a string contains whitespace.
-  WHY: We only split tokens that have whitespace in their expanded value.
-
-- create_split_tokens(splits, tail): Creates a linked list of tokens from
-  an array of strings (result of ft_split).
-  WHY: After splitting "one two three" into ["one", "two", "three"],
-  we need to convert each into a t_token for the parser.
-
-- process_word_token(shell, tok, should_free): Core logic for a single token.
-  WHY: This is where the actual word splitting decision happens:
-    - If token was QUOTED (single or double quotes), NO splitting
-    - If expanded value has no whitespace, NO splitting
-    - Otherwise, SPLIT on whitespace into multiple tokens
-
-- expand_and_split_tokens(shell, tokens): Main entry point.
-  WHY: Called from process_input() after tokenize() but before parse().
-  Iterates through all tokens, expands them, and splits unquoted ones.
-
-
-2. MODIFIED: include/minishell.h
+2. src/lexer/word_split_utils.c (5 functions)
 ------------------------------------------
-CHANGE: Added function declaration for expand_and_split_tokens().
-
-WHERE: After "Quote handling functions" section, before "Parser functions".
-
-WHY: The function needs to be callable from main.c's process_input().
-
-EXACT CHANGE:
-  Added:
-    /* WORD SPLITTING: Expand tokens and split unquoted expansions on whitespace.
-    ** Called after tokenize(), before parse() to implement proper $VAR expansion.
-    ** Example: VAR="a b c"; echo $VAR -> splits into 3 separate arguments */
-    t_token *expand_and_split_tokens(t_shell *shell, t_token *tokens);
+- has_whitespace(): Checks if string contains whitespace
+- append_token(): Adds token to end of list
+- append_split_tokens(): Creates tokens from ft_split result
+- expand_token_value(): Wrapper for expand_str
+- should_split(): Decides if token needs splitting
 
 
-3. MODIFIED: Makefile
-------------------------------------------
-CHANGE: Added word_splitting.c to SRCS list.
+OTHER MODIFIED FILES
+====================
 
-WHERE: After word_builder.c in the lexer section.
+3. include/minishell.h
+- Added function declarations for word splitting
 
-WHY: The new file needs to be compiled and linked into minishell.
+4. Makefile
+- Added word_splitting.c and word_split_utils.c to SRCS
 
-EXACT CHANGE:
-  Added:
-    $(SRC_DIR)/lexer/word_splitting.c \
+5. src/main.c (process_input)
+- Calls expand_and_split_tokens() after tokenize(), before parse()
 
+6. src/exec/exec_func_utils.c (tilde)
+- Removed expand_str() call to avoid double expansion
 
-4. MODIFIED: src/main.c (process_input function)
-------------------------------------------
-CHANGE: Call expand_and_split_tokens() after tokenize(), before parse().
+7. src/exec/exec_utils.c (update_)
+- Removed expand_str() call to avoid double expansion
 
-WHERE: In process_input(), after validate_syntax() check, before parse().
+8. src/builtins/builtins3.c (ft_exit, process_exit_args)
+- Removed expand_str() calls to avoid double expansion
 
-WHY: This is where we insert the expansion and word splitting step.
-The tokens need to be expanded and potentially split before being parsed
-into commands.
-
-EXACT CHANGE:
-  Added after validate_syntax() block:
-    /* WORD SPLITTING: Expand variables and split unquoted expansions.
-    ** This implements the Tokenize -> Expand -> Re-tokenize pattern.
-    ** Unquoted $VAR with spaces becomes multiple tokens.
-    ** Quoted "$VAR" stays as single token (no splitting). */
-    tokens = expand_and_split_tokens(shell, tokens);
-    if (!tokens)
-    {
-        shell->exit_status = 1;
-        return ;
-    }
+9. src/exec/directio.c (direct_io)
+- Removed expand_str() call to avoid double expansion
 
 
-5. MODIFIED: src/exec/exec_func_utils.c (tilde function)
-------------------------------------------
-CHANGE: Removed expand_str() call from tilde function.
+KEY DESIGN DECISION
+===================
 
-WHY: Since expansion is now done in word_splitting.c before parsing,
-we must NOT expand again during execution. The tilde function now
-only handles tilde expansion (~) and returns the value as-is.
+The new approach BUILDS A NEW TOKEN LIST instead of modifying in place.
+This is cleaner because:
+- No complex pointer manipulation
+- No tracking of prev/current/next with edge cases
+- Simple iteration: process each token, append result to new list
+- Original tokens are freed at the end
 
-BEFORE:
-  str = expand_str(shell, til, quote_type);
-  return (free(til), str);
+Old approach (complex):
+  - Modify tokens in place
+  - Track should_free flag
+  - Complex prev/next pointer updates
 
-AFTER:
-  /* WORD SPLIT FIX: Variable expansion is now done in word_splitting.c
-  ** before parsing. This function now only handles tilde expansion (~).
-  ** We no longer call expand_str here to avoid double expansion. */
-  return (result);
-
-
-6. MODIFIED: src/exec/exec_utils.c (update_ function)
-------------------------------------------
-CHANGE: Replaced expand_str() call with ft_strdup().
-
-WHY: The token value is already expanded. Using expand_str would
-cause double expansion.
-
-BEFORE:
-  str = expand_str(shell, args->value, args->quote_type);
-
-AFTER:
-  /* WORD SPLIT FIX: Variable expansion is now done in word_splitting.c
-  ** before parsing. Just use the already expanded value directly. */
-  str = ft_strdup(args->value);
-
-
-7. MODIFIED: src/builtins/builtins3.c (process_exit_args and ft_exit)
-------------------------------------------
-CHANGE: Replaced expand_str() calls with ft_strdup().
-
-WHY: Token values are already expanded by word_splitting.c.
-Double expansion would cause incorrect behavior.
-
-BEFORE:
-  exit_arg = expand_str(shell, args[1]->value, args[1]->quote_type);
-  cmd = expand_str(shell, args[0]->value, args[0]->quote_type);
-
-AFTER:
-  /* WORD SPLIT FIX: Variable expansion is now done in word_splitting.c
-  ** before parsing. Just use the already expanded value. */
-  exit_arg = ft_strdup(args[1]->value);
-  cmd = ft_strdup(args[0]->value);
-
-
-8. MODIFIED: src/exec/directio.c (direct_io function)
-------------------------------------------
-CHANGE: Removed expand_str() call and raw variable.
-
-WHY: Redirect filenames are already expanded when parsed.
-The redirection tokens come from the same token list that went
-through expand_and_split_tokens.
-
-BEFORE:
-  raw = redir->value;
-  redir->value = expand_str(shell, raw, redir->quote_type);
-  free(raw);
-
-AFTER:
-  /* WORD SPLIT FIX: Variable expansion is now done in word_splitting.c
-  ** before parsing. Redirect filenames are already expanded.
-  ** We no longer call expand_str here to avoid double expansion. */
-
-
-HOW IT WORKS
-============
-
-BEFORE (broken):
-  export VAR="a b c"
-  echo $VAR
-  -> Tokenizer creates: [echo] [$VAR]
-  -> Expander (during exec) replaces: [echo] [a b c]
-  -> echo receives 1 argument: "a b c"  <-- WRONG!
-
-AFTER (fixed):
-  export VAR="a b c"
-  echo $VAR
-  -> Tokenizer creates: [echo] [$VAR]
-  -> expand_and_split_tokens():
-     - Expands $VAR to "a b c"
-     - Token was unquoted (QUOTE_NONE) and has whitespace
-     - Splits into: [echo] [a] [b] [c]
-  -> Parser receives 4 tokens
-  -> echo receives 3 arguments: "a", "b", "c"  <-- CORRECT!
-
-QUOTED CASE (should NOT split):
-  echo "$VAR"
-  -> Tokenizer creates: [echo] ["$VAR"] with quote_type=QUOTE_DOUBLE
-  -> expand_and_split_tokens():
-     - Expands $VAR to "a b c"
-     - Token was quoted (QUOTE_DOUBLE) - NO SPLIT
-     - Result: [echo] [a b c]
-  -> echo receives 1 argument: "a b c"  <-- CORRECT!
-
-SINGLE QUOTES (should NOT expand):
-  echo '$VAR'
-  -> Tokenizer creates: [echo] ['$VAR'] with quote_type=QUOTE_SINGLE
-  -> expand_and_split_tokens():
-     - Token is QUOTE_SINGLE, expand_str returns "$VAR" literally
-     - No expansion, no split
-     - Result: [echo] [$VAR]
-  -> echo receives 1 argument: "$VAR"  <-- CORRECT!
+New approach (simple):
+  - Build new list from scratch
+  - Each token -> expand -> split if needed -> append to result
+  - Free original list at end
 
 
 TESTING
 =======
 
-Test 1: Basic word splitting
-  export VAR="one two three"
-  echo $VAR
-  Expected: one two three (3 args to echo)
-  Result: PASS ✓
-
-Test 2: Quoted - no splitting
-  echo "$VAR"
-  Expected: one two three (1 arg to echo)
-  Result: PASS ✓
-
-Test 3: Single quotes - no expansion
-  echo '$USER'
-  Expected: $USER (literal)
-  Result: PASS ✓
-
-Test 4: Mixed quoting
-  /tmp/argc $VAR "$VAR" '$VAR'
-  Expected: argc=5 (one, two, "one two", "$VAR")
-  Result: PASS ✓
-
-Test 5: Basic functionality still works
-  - echo, pipes, redirections, builtins
-  Result: PASS ✓
-
-
-NOTES
-=====
-
-- Word splitting only applies to WORD tokens (not operators like |, <, >)
-- Single-quoted strings ('$VAR') don't expand at all (handled by expand_str)
-- Double-quoted strings ("$VAR") expand but don't word-split
-- Empty expansions ($UNDEFINED) are removed from the token list
-- We use ft_split with ' ' as delimiter (IFS is space by default in minishell)
-- IMPORTANT: All places that previously called expand_str during execution
-  were modified to avoid double expansion
+Test 1: echo $VAR (VAR="a b c") -> 3 args ✓
+Test 2: echo "$VAR" -> 1 arg ✓
+Test 3: echo '$VAR' -> literal $VAR ✓
+Test 4: echo, pipes, redirections -> all work ✓
