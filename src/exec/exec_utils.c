@@ -66,7 +66,9 @@ int	update_(t_command *cmd, t_shell *shell)
 	args = cmd->args[0];
 	if (!args)
 		return (0);
-	str = expand_str(shell, args->value, args->quote_type);
+	/* WORD SPLIT FIX: Variable expansion is now done in word_splitting.c
+	** before parsing. Just use the already expanded value directly. */
+	str = ft_strdup(args->value);
 	if (!str)
 		return (shell->exit_status = 1, 1);
 	arg = ft_strjoin("_=", str);

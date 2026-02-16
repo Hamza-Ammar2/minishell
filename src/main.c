@@ -75,6 +75,16 @@ void	process_input(char *input, t_shell *shell)
 		shell->exit_status = 2;
 		return ;
 	}
+	/* WORD SPLITTING: Expand variables and split unquoted expansions.
+	** This implements the Tokenize -> Expand -> Re-tokenize pattern.
+	** Unquoted $VAR with spaces becomes multiple tokens.
+	** Quoted "$VAR" stays as single token (no splitting). */
+	tokens = expand_and_split_tokens(shell, tokens);
+	if (!tokens)
+	{
+		shell->exit_status = 1;
+		return ;
+	}
 	cmd = parse(tokens);
 	if (cmd && here_doc(shell, cmd))
 	{

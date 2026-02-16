@@ -73,16 +73,13 @@ static int	in_out(t_shell *shell, t_token *redir)
 int	direct_io(t_shell *shell, t_command *cmd)
 {
 	t_token	*redir;
-	char	*raw;
 
+	/* WORD SPLIT FIX: Variable expansion is now done in word_splitting.c
+	** before parsing. Redirect filenames are already expanded.
+	** We no longer call expand_str here to avoid double expansion. */
 	redir = cmd->redirects;
 	while (redir)
 	{
-		raw = redir->value;
-		redir->value = expand_str(shell, raw, redir->quote_type);
-		free(raw);
-		if (!redir->value)
-			return (perror("directio: expansion failed"), 0);
 		if (redir->type == TOKEN_REDIRECT_IN
 			|| redir->type == TOKEN_REDIRECT_OUT)
 		{

@@ -73,21 +73,22 @@ static char	*tilde(char *str, t_shell *shell, int quote_type)
 {
 	t_env	*home_env;
 	char	*home;
-	char	*til;
+	char	*result;
 
+	/* WORD SPLIT FIX: Variable expansion is now done in word_splitting.c
+	** before parsing. This function now only handles tilde expansion (~).
+	** We no longer call expand_str here to avoid double expansion. */
+	(void)quote_type;
 	home_env = find_env(shell, "HOME");
 	if (home_env)
 		home = home_env->value;
 	else
 		home = "";
 	if (*str == '~' && (str[1] == '\0' || str[1] == '/'))
-		til = ft_strjoin(home, str + 1);
+		result = ft_strjoin(home, str + 1);
 	else
-		til = ft_strdup(str);
-	if (!til)
-		return (NULL);
-	str = expand_str(shell, til, quote_type);
-	return (free(til), str);
+		result = ft_strdup(str);
+	return (result);
 }
 
 char	**wraper(t_token **args, t_shell *shell)

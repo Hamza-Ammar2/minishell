@@ -48,7 +48,9 @@ static int	process_exit_args(t_token **args, t_shell *shell, t_command *cmd)
 
 	if (!args[1])
 		exit(shell->exit_status);
-	exit_arg = expand_str(shell, args[1]->value, args[1]->quote_type);
+	/* WORD SPLIT FIX: Variable expansion is now done in word_splitting.c
+	** before parsing. Just use the already expanded value. */
+	exit_arg = ft_strdup(args[1]->value);
 	trimmed = trim_whitespace(exit_arg);
 	free(exit_arg);
 	if (!trimmed || !is_numeric(trimmed))
@@ -70,7 +72,9 @@ int	ft_exit(t_token **args, t_shell *shell, t_command *cmds)
 
 	if (!args || !args[0])
 		return (-1);
-	cmd = expand_str(shell, args[0]->value, args[0]->quote_type);
+	/* WORD SPLIT FIX: Variable expansion is now done in word_splitting.c
+	** before parsing. Just use the already expanded value. */
+	cmd = ft_strdup(args[0]->value);
 	if (!cmd)
 		return (1);
 	if (ft_strcmp(cmd, "exit") != 0)

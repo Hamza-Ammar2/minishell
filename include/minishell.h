@@ -109,6 +109,12 @@ char					*extract_quoted_word(const char *input, int *i,
 char					*extract_complete_word(const char *input, int *i,
 							int *quote_type);
 
+/* WORD SPLITTING: Expand tokens and split unquoted expansions on whitespace.
+** Called after tokenize(), before parse() to implement proper $VAR expansion.
+** Example: VAR="a b c"; echo $VAR -> splits into 3 separate arguments */
+t_token					*expand_and_split_tokens(t_shell *shell,
+							t_token *tokens);
+
 /* Parser functions */
 t_command				*parse(t_token *tokens);
 t_command				*new_command(void);

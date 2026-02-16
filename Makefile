@@ -37,6 +37,7 @@ SRCS = $(SRC_DIR)/main.c \
        $(SRC_DIR)/lexer/token_utils.c \
        $(SRC_DIR)/lexer/quote_tokens.c \
        $(SRC_DIR)/lexer/word_builder.c \
+       $(SRC_DIR)/lexer/word_splitting.c \
        $(SRC_DIR)/parser/parser.c \
        $(SRC_DIR)/parser/parser_utils.c \
        $(SRC_DIR)/parser/syntax_validator.c \
