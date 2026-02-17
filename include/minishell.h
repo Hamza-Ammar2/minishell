@@ -131,6 +131,7 @@ int						is_operator_token(t_token_type type);
 int						is_redirect_type(t_token_type type);
 t_token					*get_last_token(t_token *tokens);
 int						count_args(t_token *tokens);
+void					set_pipeline_start(t_command *head);
 
 /* Debug functions */
 void					print_command(t_command *cmd);

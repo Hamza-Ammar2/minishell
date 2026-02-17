@@ -179,5 +179,6 @@ t_command	*parse_pipeline(t_token *tokens)
 			return (free_commands(head), NULL);
 		link_command(&head, &current, new_cmd);
 	}
+	set_pipeline_start(head);
 	return (head);
 }

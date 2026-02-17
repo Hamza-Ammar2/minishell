@@ -94,3 +94,17 @@ t_token	*get_last_token(t_token *tokens)
 		tokens = tokens->next;
 	return (tokens);
 }
+
+/* LEAK FIX: Set start pointer for all commands in pipeline.
+** This allows exit_nice to free entire list from any cmd. */
+void	set_pipeline_start(t_command *head)
+{
+	t_command	*current;
+
+	current = head;
+	while (current)
+	{
+		current->start = head;
+		current = current->next;
+	}
+}

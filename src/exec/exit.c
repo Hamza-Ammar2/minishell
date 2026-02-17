@@ -13,9 +13,15 @@
 #include "../include/minishell.h"
 #include "../libft/libft.h"
 
+/* LEAK FIX: Use cmd->start to free entire command list in pipelines.
+** Previously only freed from current cmd forward, leaking earlier commands
+** in child processes (e.g., ls | blabla leaked 83 bytes for ls cmd). */
 void	exit_nice(t_shell *shell, t_command *cmd, int stat)
 {
-	free_commands(cmd);
+	if (cmd && cmd->start)
+		free_commands(cmd->start);
+	else
+		free_commands(cmd);
 	cleanup_shell(shell);
 	exit(stat);
 }
