@@ -36,9 +36,9 @@ char	**wraper(t_token **args, t_shell *shell)
 	{
 		expanded = tilde(args[j]->value, shell, args[j]->quote_type);
 		words = extract_words(words, expanded);
+		free(expanded);
         if (!words)
             return (perror("could not create arguments list1"), free_splits(words), NULL);
-        free(expanded);
 		j++;
 	}
     j = 0;

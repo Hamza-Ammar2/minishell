@@ -76,5 +76,7 @@ char    **extract_words(char **words, char *str)
     }
     if (end > start)
         words = append_word(words, ft_substr(str, start, end - start));
+    else if (end == start && !*str)
+        return (words = append_word(words, ft_strdup("")));
     return (words);
 }
