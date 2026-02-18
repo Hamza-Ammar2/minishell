@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpons <lpons@student.42.fr>                +#+  +:+       +#+        */
+/*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 02:47:09 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 02:53:35 by lpons            ###   ########.fr       */
+/*   Updated: 2026/02/18 00:35:29 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,12 +49,10 @@ int	init_lvl(t_shell *shell)
 
 	lvl_env = find_env(shell, "SHLVL");
 	if (!lvl_env)
-		return (export((char *[]){
-				"SHLVL=0", NULL}, shell));
+		return (exp_one(shell, "SHLVL=1"));
 	lvl = lvl_env->value;
 	if (!isvalid_lvl(lvl))
-		return (export((char *[]){
-				"SHLVL=0", NULL}, shell));
+		return (exp_one(shell, "SHLVL=1"));
 	if (*lvl != '+')
 		return (update_lvl(lvl, lvl_env));
 	lvl = ft_strdup(lvl_env->value + 1);

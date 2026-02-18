@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/14 06:18:31 by haammar           #+#    #+#             */
-/*   Updated: 2026/02/14 06:34:36 by haammar          ###   ########.fr       */
+/*   Updated: 2026/02/17 20:58:05 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ static void	print_exp(t_env **envs)
 		}
 		ft_fprintf(STDOUT_FILENO, "declare -x %s", envs[i]->key);
 		if (envs[i]->value)
-			ft_fprintf(STDOUT_FILENO, "=%s", envs[i]->value);
+			ft_fprintf(STDOUT_FILENO, "=\"%s\"", envs[i]->value);
 		write(STDOUT_FILENO, "\n", 1);
 		i++;
 	}

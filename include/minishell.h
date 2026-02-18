@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/25 15:02:35 by lpons             #+#    #+#             */
-/*   Updated: 2026/02/15 15:04:16 by haammar          ###   ########.fr       */
+/*   Updated: 2026/02/18 00:03:00 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -211,4 +211,9 @@ int						print_ptr(int fd, unsigned long ptr, char type);
 int						print_num(int fd, long n);
 int						print_str(int fd, char *s);
 int						ft_fprintf(int fd, const char *s, ...);
+
+/* WORD SPLITTING */
+char	*expand_word(t_shell *shell, char *str, int quote_type);
+char    **extract_words(char **words, char *str);
+char    **append_word(char **arr, char *str);
 #endif

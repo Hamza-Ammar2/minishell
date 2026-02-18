@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:01:54 by lpons             #+#    #+#             */
-/*   Updated: 2026/02/07 08:36:37 by haammar          ###   ########.fr       */
+/*   Updated: 2026/02/18 02:58:29 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,9 @@ static char	*get_dir(char *arg, t_shell *shell)
 		home = "";
 	else
 		home = home_env->value;
-	if ((!arg || ft_strcmp(arg, "--") == 0) && home_env)
+	if ((!arg || ft_strcmp(arg, "--") == 0) && home_env && home)
 		return (ft_strdup(home));
-	else if (!home_env)
+	else if ((!home_env || !home) && (!arg || ft_strcmp(arg, "--") == 0))
 		return (ft_fprintf(2, "cd: HOME not set\n"), NULL);
 	else if (ft_strcmp(arg, "-") == 0)
 	{
@@ -33,6 +33,8 @@ static char	*get_dir(char *arg, t_shell *shell)
 		if (!home_env)
 			return (ft_fprintf(2, "cd: OLDPWD not set\n"), NULL);
 		home = home_env->value;
+		if (!home)
+			return (ft_fprintf(2, "cd: OLDPWD not set\n"), NULL);
 		write(STDOUT_FILENO, home, ft_strlen(home));
 		write(STDOUT_FILENO, "\n", 1);
 		return (ft_strdup(home));

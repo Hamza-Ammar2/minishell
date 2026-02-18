@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 02:47:13 by lpons             #+#    #+#             */
-/*   Updated: 2026/02/13 23:49:14 by haammar          ###   ########.fr       */
+/*   Updated: 2026/02/18 03:05:38 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,6 +92,27 @@ char	**env2arr(t_env *env)
 	return (get_arr(env, envp));
 }
 
+static int	init_pwd(t_shell *shell)
+{
+	char	*pwd;
+	t_env	*pwd_env;
+
+	pwd = getcwd(NULL, 0);
+	if (!pwd)
+		return (perror("init_pwd: getcwd failed"), 0);
+	pwd_env = find_env(shell, "PWD");
+	if (pwd_env)
+	{
+		if (pwd_env->value)
+			free(pwd_env->value);
+		pwd_env->value = pwd;
+		return (1);
+	}
+	if (!add_env(shell, ft_strdup("PWD"), pwd))
+		return (free(pwd), 0);
+	return (1);
+}
+
 int	init_shell(t_shell *shell, char **argv, char **envp)
 {
 	char	*arg;
@@ -106,6 +127,8 @@ int	init_shell(t_shell *shell, char **argv, char **envp)
 			return (0);
 	}
 	if (!init_lvl(shell))
+		return (0);
+	if (!init_pwd(shell))
 		return (0);
 	shell->input = NULL;
 	shell->envp = envp;

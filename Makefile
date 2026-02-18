@@ -67,7 +67,10 @@ SRCS = $(SRC_DIR)/main.c \
 	   $(SRC_DIR)/exec/handle_quotes.c \
 	   $(SRC_DIR)/exec/here_doc_stuff_again.c \
 	   $(SRC_DIR)/exec/handle_quotes_hd.c \
-	   $(SRC_DIR)/exec/pipe.c
+	   $(SRC_DIR)/exec/pipe.c \
+	   $(SRC_DIR)/word_split/word_split.c \
+	   $(SRC_DIR)/word_split/exp_word.c \
+	   $(SRC_DIR)/word_split/wraper.c
 
 # ================================== OBJECTS ================================== #
 

@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 02:47:18 by lpons             #+#    #+#             */
-/*   Updated: 2026/02/13 23:35:04 by haammar          ###   ########.fr       */
+/*   Updated: 2026/02/18 02:46:48 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,8 +123,11 @@ void	shell_loop(t_shell *shell)
 		}
 		if (*shell->input)
 		{
+			//process_input(shell->input, shell);
 			if (isatty(STDIN_FILENO))
 				add_history(shell->input);
+			/* else if (shell->exit_status)
+				break ; */
 			process_input(shell->input, shell);
 		}
 		if (g_sig)

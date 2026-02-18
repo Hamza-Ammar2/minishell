@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:02:38 by lpons             #+#    #+#             */
-/*   Updated: 2026/02/14 08:03:52 by haammar          ###   ########.fr       */
+/*   Updated: 2026/02/18 01:35:35 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,8 @@ void	exec(t_command *cmds, t_shell *shell)
 	while (wait(NULL) > 0)
 		;
 	free_splits(paths);
+	if (!init_sig())
+		return (shell->exit_status = 1, (void)0);
 }
 
 static void	close_child(int fd[3][2])
@@ -130,6 +132,8 @@ static int	rec_exec(char **paths, int fd[3][2], t_command *cmds,
 		child_signal();
 		exec_single(cmds, shell, fd, paths);
 	}
+	signal(SIGINT, SIG_IGN);
+	signal(SIGQUIT, SIG_IGN);
 	restore(shell);
 	if (close_pipes(cmds, fd))
 		return (fd[2][1]);

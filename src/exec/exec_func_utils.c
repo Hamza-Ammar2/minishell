@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:02:21 by lpons             #+#    #+#             */
-/*   Updated: 2026/01/24 20:44:00 by haammar          ###   ########.fr       */
+/*   Updated: 2026/02/18 00:07:09 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ int	check_builtin(t_command *cmds, t_shell *shell, int fd[3][2])
 	return (0);
 }
 
-static char	*tilde(char *str, t_shell *shell, int quote_type)
+/* static char	*tilde(char *str, t_shell *shell, int quote_type)
 {
 	t_env	*home_env;
 	char	*home;
@@ -113,4 +113,4 @@ char	**wraper(t_token **args, t_shell *shell)
 	}
 	args_array[j] = NULL;
 	return (args_array);
-}
+} */
