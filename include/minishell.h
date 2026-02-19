@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/25 15:02:35 by lpons             #+#    #+#             */
-/*   Updated: 2026/02/18 00:03:00 by haammar          ###   ########.fr       */
+/*   Updated: 2026/02/19 21:33:40 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,6 +152,7 @@ char					**wraper(t_token **args, t_shell *shell);
 void					free_splits(char **splits);
 int						connect_pipes(t_command *cmd, int fd[3][2]);
 int						close_pipes(t_command *cmds, int fd[3][2]);
+void					close_child(int fd[3][2]);
 int						restore(t_shell *shell);
 char					*make_hd(void);
 

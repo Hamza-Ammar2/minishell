@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:02:29 by lpons             #+#    #+#             */
-/*   Updated: 2026/02/14 07:55:20 by haammar          ###   ########.fr       */
+/*   Updated: 2026/02/19 21:36:36 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ int	do_builtin(t_command *cmds, t_shell *shell, int fd[3][2])
 	restore(shell);
 	fd[2][0] += 1;
 	if (cb == -1)
-		fd[2][1] = 1;
+		fd[2][1] = shell->exit_status;
 	return (cb);
 }
 

@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:02:21 by lpons             #+#    #+#             */
-/*   Updated: 2026/02/18 00:07:09 by haammar          ###   ########.fr       */
+/*   Updated: 2026/02/19 21:43:20 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,14 +20,16 @@ static int	pce(t_command *cmds, t_shell *shell, int fd[3][2], char **args)
 		return (0);
 	if (connect_pipes(cmds, fd) == -1)
 		return (-1);
+	if (!fd[2][1])
+		close_child(fd);
 	if (!direct_io(shell, cmds))
 		return (-1);
 	if (ft_strcmp(args[0], "pwd") == 0)
-		fd[2][1] = pwd(&args[1]);
+		shell->exit_status = pwd(&args[1]);
 	else if (ft_strcmp(args[0], "cd") == 0)
-		fd[2][1] = cd(&args[1], shell);
+		shell->exit_status = cd(&args[1], shell);
 	else
-		fd[2][1] = export(&args[1], shell);
+		shell->exit_status = export(&args[1], shell);
 	return (1);
 }
 
@@ -38,14 +40,16 @@ static int	eeu(t_command *cmds, t_shell *shell, int fd[3][2], char **args)
 		return (0);
 	if (connect_pipes(cmds, fd) == -1)
 		return (-1);
+	if (!fd[2][1])
+		close_child(fd);
 	if (!direct_io(shell, cmds))
 		return (-1);
 	if (ft_strcmp(args[0], "env") == 0)
-		fd[2][1] = env(&args[1], shell);
+		shell->exit_status = env(&args[1], shell);
 	else if (ft_strcmp(args[0], "echo") == 0)
-		fd[2][1] = echo(&args[1], shell);
+		shell->exit_status = echo(&args[1], shell);
 	else
-		fd[2][1] = unset(shell, &args[1]);
+		shell->exit_status = unset(shell, &args[1]);
 	return (1);
 }
 
