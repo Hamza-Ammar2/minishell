@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:02:38 by lpons             #+#    #+#             */
-/*   Updated: 2026/02/19 21:49:54 by haammar          ###   ########.fr       */
+/*   Updated: 2026/02/19 23:21:03 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,15 +61,20 @@ void	exec(t_command *cmds, t_shell *shell)
 		return (shell->exit_status = 1, (void)0);
 }
 
-void	close_child(int fd[3][2])
+static char	**dumb_exit(t_command *cmd, t_shell *shell, char **paths)
 {
-	if (fd[2][0] > 0)
+	char	**args;
+
+	args = wraper(cmd->args, shell);
+	if (!args)
+		(free_splits(paths), exit_nice(shell, cmd, 1));
+	if (ft_strcmp(args[0], "exit") == 0)
 	{
-		close(fd[(fd[2][0] + 1) % 2][0]);
-		close(fd[(fd[2][0] + 1) % 2][1]);
+		free_splits(args);
+		free_splits(paths);
+		ft_exit(cmd->args, shell, cmd);
 	}
-	close(fd[fd[2][0] % 2][0]);
-	close(fd[fd[2][0] % 2][1]);
+	return (args);
 }
 
 static void	exec_single(t_command *cmd, t_shell *shell, int fd[3][2],
@@ -90,11 +95,8 @@ static void	exec_single(t_command *cmd, t_shell *shell, int fd[3][2],
 		(close_child(fd), free_splits(paths), exit_nice(shell, cmd, 1));
 	if (!cmd->args || !cmd->args[0])
 		(close_child(fd), free_splits(paths), exit_nice(shell, cmd, 0));
-	args = wraper(cmd->args, shell);
-	if (!args)
-		(close_child(fd), free_splits(paths), exit_nice(shell, cmd, 1));
 	close_child(fd);
-	ft_exit(cmd->args, shell, cmd);
+	args = dumb_exit(cmd, shell, paths);
 	str = get_path(paths, args[0]);
 	/* LEAK FIX: Free paths before exit_exec since it may call exit_nice */
 	free_splits(paths);

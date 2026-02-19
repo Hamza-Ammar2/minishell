@@ -6,7 +6,7 @@
 /*   By: haammar <haammar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 03:03:24 by lpons             #+#    #+#             */
-/*   Updated: 2026/02/19 21:01:38 by haammar          ###   ########.fr       */
+/*   Updated: 2026/02/19 23:15:11 by haammar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,4 +47,15 @@ int	close_pipes(t_command *cmds, int fd[3][2])
 		return (1);
 	}
 	return (0);
+}
+
+void	close_child(int fd[3][2])
+{
+	if (fd[2][0] > 0)
+	{
+		close(fd[(fd[2][0] + 1) % 2][0]);
+		close(fd[(fd[2][0] + 1) % 2][1]);
+	}
+	close(fd[fd[2][0] % 2][0]);
+	close(fd[fd[2][0] % 2][1]);
 }
