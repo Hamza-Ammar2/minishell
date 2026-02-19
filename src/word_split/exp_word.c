@@ -1,5 +1,3 @@
-
-
 #include "../include/minishell.h"
 #include "../libft/libft.h"
 
@@ -37,12 +35,12 @@ static char	*write_exp(char *res, t_shell *shell, char *str, int quote_type)
 	char	*expanded;
 	char	*raw;
 	char	*tmp;
-    int     i;
+	int		i;
 
-    i = get_next_quote(str + 1, quote_type) - str + 1;
-    if (quote_type == QUOTE_NONE)
-        i--;
-    raw = ft_substr(str, 0, i);
+	i = get_next_quote(str + 1, quote_type) - str + 1;
+	if (quote_type == QUOTE_NONE)
+		i--;
+	raw = ft_substr(str, 0, i);
 	if (!raw)
 		return (perror("could not expand string"), free(res), NULL);
 	expanded = expand_quo(shell, raw, quote_type);

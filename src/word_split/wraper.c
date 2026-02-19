@@ -1,5 +1,3 @@
-
-
 #include "../include/minishell.h"
 #include "../libft/libft.h"
 
@@ -24,32 +22,40 @@ static char	*tilde(char *str, t_shell *shell, int quote_type)
 	return (free(til), str);
 }
 
+static char	**expand_words(char **words, t_shell *shell)
+{
+	int		j;
+	char	*expanded;
+
+	j = 0;
+	while (words && words[j])
+	{
+		expanded = expand_str(shell, words[j], QUOTE_NONE);
+		if (!expanded)
+			return (free_splits(words), NULL);
+		free(words[j]);
+		words[j] = expanded;
+		j++;
+	}
+	return (words);
+}
+
 char	**wraper(t_token **args, t_shell *shell)
 {
 	int		j;
-	char    *expanded;
-    char    **words;
+	char	*expanded;
+	char	**words;
 
 	j = 0;
-    words = NULL;
+	words = NULL;
 	while (args[j])
 	{
 		expanded = tilde(args[j]->value, shell, args[j]->quote_type);
 		words = extract_words(words, expanded);
 		free(expanded);
-        if (!words)
-            return (perror("could not create arguments list1"), free_splits(words), NULL);
+		if (!words)
+			return (NULL);
 		j++;
 	}
-    j = 0;
-    while (words && words[j])
-    {
-        expanded = expand_str(shell, words[j], QUOTE_NONE);
-        if (!expanded)            
-            return (perror("could not create arguments list"), free_splits(words), NULL);
-        free(words[j]);
-        words[j] = expanded;
-        j++;
-    }
-	return (words);
+	return (expand_words(words, shell));
 }
