@@ -47,6 +47,13 @@ static void	ex1(t_shell *shell, t_command *cmds, char **args)
 	}
 }
 
+static void	free_str_args(char **args, char *str, char *cmd)
+{
+	if (str != cmd)
+		free(str);
+	free_splits(args);
+}
+
 /* LEAK FIX: Free str (path) in all error exit paths.
 ** Previously str was allocated by get_path() but never freed when
 ** exit_exec detected an error and called exit_nice.
@@ -67,18 +74,10 @@ int	exit_exec(t_shell *shell, t_command *cmds, char **args, char *str)
 		(free_splits(args), ft_fprintf(2, "command not found\n"),
 			exit_nice(shell, cmds, 127));
 	if (S_ISDIR(st.st_mode))
-	{
-		if (str != cmd)
-			free(str);
-		(free_splits(args), ft_fprintf(2, "Is a directory\n"),
+		(free_str_args(args, str, cmd), ft_fprintf(2, "Is a directory\n"),
 			exit_nice(shell, cmds, 126));
-	}
 	if (access(str, X_OK) != 0)
-	{
-		if (str != cmd)
-			free(str);
-		(free_splits(args), ft_fprintf(2, "Permission denied\n"),
+		(free_str_args(args, str, cmd), ft_fprintf(2, "Permission denied\n"),
 			exit_nice(shell, cmds, 126));
-	}
 	return (0);
 }

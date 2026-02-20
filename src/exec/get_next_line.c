@@ -64,42 +64,40 @@ static char	*iterread(int fd, char **buff, size_t *start, size_t *end)
 	}
 }
 
+static char	*gnl_setup(int fd, char **buff, size_t *start, size_t *end)
+{
+	char	*s;
+	char	*dup;
+
+	if (fd == -1)
+		return (free(*buff), *buff = NULL, *start = 0, *end = 0, (char *)0);
+	if (!*buff)
+	{
+		*buff = malloc(sizeof(char) * BUFFER_SIZE);
+		if (!*buff)
+			return (NULL);
+	}
+	if (!(*end > *start))
+		return (NULL);
+	s = find_char(*buff + *start, '\n', *end - *start);
+	if (!s)
+		return (NULL);
+	dup = append(0, *buff + *start, 0, (size_t)(s - (*buff + *start)) + 1);
+	*start = 1 + (size_t)(s - *buff);
+	if (!dup)
+		return (*start = 0, *end = 0, clean(0, buff, dup));
+	return (dup);
+}
+
 char	*get_next_line(int fd)
 {
 	static char		*buff;
 	static size_t	start;
 	static size_t	end;
 	char			*dup;
-	char			*s;
 
-	/* LEAK FIX: Allow cleanup by calling with fd = -1.
-	** This frees the static buffer to prevent memory leaks on exit. */
-	if (fd == -1)
-	{
-		if (buff)
-			free(buff);
-		buff = NULL;
-		start = 0;
-		end = 0;
-		return (NULL);
-	}
-	if (!buff)
-	{
-		buff = malloc(sizeof(char) * BUFFER_SIZE);
-		if (!buff)
-			return (0);
-	}
-	if (end > start)
-	{
-		s = find_char(buff + start, '\n', end - start);
-		if (s)
-		{
-			dup = append(0, buff + start, 0, (size_t)(s - (buff + start)) + 1);
-			start = 1 + (size_t)(s - buff);
-			if (!dup)
-				return (start = 0, end = 0, clean(0, &buff, dup));
-			return (dup);
-		}
-	}
+	dup = gnl_setup(fd, &buff, &start, &end);
+	if (!buff || dup)
+		return (dup);
 	return (iterread(fd, &buff, &start, &end));
 }

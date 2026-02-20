@@ -46,9 +46,6 @@ static int	process_exit_args(t_token **args, t_shell *shell, t_command *cmd)
 	char	*exit_arg;
 	char	*trimmed;
 
-	/* LEAK FIX: Use exit_nice instead of exit() to ensure proper cleanup.
-	** Previously exit() was called directly, skipping free_commands and
-	** cleanup_shell, causing ~4,550 bytes to leak on every shell exit. */
 	if (!args[1])
 		exit_nice(shell, cmd, shell->exit_status);
 	exit_arg = expand_str(shell, args[1]->value, args[1]->quote_type);

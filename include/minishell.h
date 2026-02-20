@@ -163,6 +163,7 @@ int						exit_exec(t_shell *shell, t_command *cmds, char **args,
 							char *str);
 int						strcmpy(const char *s1, const char *s2);
 void					exit_nice(t_shell *shell, t_command *cmd, int stat);
+void					free_str_env(char **envp, char *str, char **args);
 
 /* Built-in functions */
 int						do_builtin(t_command *cmds, t_shell *shell,
@@ -214,7 +215,7 @@ int						print_str(int fd, char *s);
 int						ft_fprintf(int fd, const char *s, ...);
 
 /* WORD SPLITTING */
-char	*expand_word(t_shell *shell, char *str, int quote_type);
-char    **extract_words(char **words, char *str);
-char    **append_word(char **arr, char *str);
+char					*expand_word(t_shell *shell, char *str, int quote_type);
+char					**extract_words(char **words, char *str);
+char					**append_word(char **arr, char *str);
 #endif

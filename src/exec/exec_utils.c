@@ -76,3 +76,11 @@ int	update_(t_command *cmd, t_shell *shell)
 		return (shell->exit_status = 1, free(arg), free(str), 1);
 	return (free(arg), free(str), 0);
 }
+
+void	free_str_env(char **envp, char *str, char **args)
+{
+	free_splits(envp);
+	if (str != args[0])
+		free(str);
+	free_splits(args);
+}

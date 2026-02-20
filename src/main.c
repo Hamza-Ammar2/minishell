@@ -15,20 +15,6 @@
 
 extern sig_atomic_t	g_sig;
 
-/*
-** 🔧 What the function Does
-** Entry point of the minishell program.
-**
-** 🔗 Role in the Program
-** Initializes the shell, runs the main loop, and cleans up
-** resources before exit.
-**
-** 🧩 Step-by-Step
-** 1. Initialize shell structure.
-** 2. Enter main shell loop.
-** 3. Cleanup allocated resources.
-** 4. Return exit status.
-*/
 int	main(int argc, char **argv, char **envp)
 {
 	t_shell	shell;
@@ -44,40 +30,27 @@ int	main(int argc, char **argv, char **envp)
 	return (shell.exit_status);
 }
 
-/*
-** 🔧 What the function Does
-** Processes user input: tokenize, parse, and execute.
-**
-** 🔗 Role in the Program
-** Handles the parsing pipeline for a single command.
-**
-** 🧩 Step-by-Step
-** 1. Tokenize input string.
-** 2. Parse tokens into command structure.
-** 3. Execute command (TODO).
-** 4. Free allocated resources.
-*/
+static int	tokenize_input(t_shell *shell, char *input, t_token **out)
+{
+	*out = tokenize(input);
+	if (!*out)
+		return (shell->exit_status = 2, 0);
+	if (!validate_syntax(*out))
+	{
+		free_tokens(*out);
+		return (shell->exit_status = 2, 0);
+	}
+	return (1);
+}
 
 void	process_input(char *input, t_shell *shell)
 {
 	t_token		*tokens;
 	t_command	*cmd;
 
-	tokens = tokenize(input);
-	if (!tokens)
-	{
-		shell->exit_status = 2;
+	if (!tokenize_input(shell, input, &tokens))
 		return ;
-	}
-	if (!validate_syntax(tokens))
-	{
-		free_tokens(tokens);
-		shell->exit_status = 2;
-		return ;
-	}
 	cmd = parse(tokens);
-	/* LEAK FIX: Store tokens in shell so cleanup_shell can free them
-	** if exit is called during execution. */
 	shell->cur_tokens = tokens;
 	if (cmd && here_doc(shell, cmd))
 	{
@@ -87,25 +60,15 @@ void	process_input(char *input, t_shell *shell)
 	else if (cmd)
 		free_commands(cmd);
 	free_tokens(tokens);
-	/* LEAK FIX: Clear cur_tokens after normal processing to avoid
-	** double-free if cleanup_shell is called later. */
 	shell->cur_tokens = NULL;
 }
 
-/*
-** 🔧 What the function Does
-** Runs the main interactive loop of the shell.
-**
-** 🔗 Role in the Program
-** Continuously reads user input and delegates processing.
-**
-** 🧩 Step-by-Step
-** 1. Display prompt and read input.
-** 2. Check for EOF (Ctrl+D).
-** 3. Add non-empty input to history.
-** 4. Process the input.
-** 5. Free input and repeat.
-*/
+static void	handle_input(t_shell *shell)
+{
+	if (isatty(STDIN_FILENO))
+		add_history(shell->input);
+	process_input(shell->input, shell);
+}
 
 void	shell_loop(t_shell *shell)
 {
@@ -122,19 +85,10 @@ void	shell_loop(t_shell *shell)
 			break ;
 		}
 		if (*shell->input)
-		{
-			//process_input(shell->input, shell);
-			if (isatty(STDIN_FILENO))
-				add_history(shell->input);
-			/* else if (shell->exit_status)
-				break ; */
-			process_input(shell->input, shell);
-		}
+			handle_input(shell);
 		if (g_sig)
 			shell->exit_status = 130;
 		free(shell->input);
-		/* EXTRA LEAK FIX: Set to NULL after free so cleanup_shell won't
-		** double-free. May revert if leak is from readline, not our code. */
 		shell->input = NULL;
 		g_sig = 0;
 	}

@@ -13,17 +13,6 @@
 #include "../include/minishell.h"
 #include "../libft/libft.h"
 
-/*
-** 🔧 What the function Does
-** Initializes the shell structure with default values.
-**
-** 🔗 Role in the Program
-** Sets up the initial state of the shell before entering the main loop.
-**
-** 🧩 Step-by-Step
-** 1. Set exit status to 0 (success).
-*/
-
 static void	fill_join(char *str1, char *str2, char *joined)
 {
 	size_t	i;
@@ -119,7 +108,6 @@ int	init_shell(t_shell *shell, char **argv, char **envp)
 
 	shell->exit_status = 0;
 	shell->env = NULL;
-	/* LEAK FIX: Initialize cur_tokens to NULL for cleanup_shell */
 	shell->cur_tokens = NULL;
 	if (*envp)
 	{

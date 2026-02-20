@@ -13,18 +13,6 @@
 #include "../../include/minishell.h"
 #include "../../libft/libft.h"
 
-/*
-** 🔧 What it Does
-** Appends a string segment to the growing word being built.
-**
-** 🔗 Role
-** Helper to concatenate parts of a word (e.g., "hel" + "" + "lo").
-**
-** 🧩 Step-by-Step
-** 1. If word is NULL, duplicate the segment as the new word.
-** 2. If segment is empty, return word unchanged.
-** 3. Otherwise, join word and segment, free old word, return new.
-*/
 static char	*append_segment(char *word, const char *segment)
 {
 	char	*result;
@@ -38,19 +26,6 @@ static char	*append_segment(char *word, const char *segment)
 	return (result);
 }
 
-/*
-** 🔧 What it Does
-** Extracts unquoted characters until hitting whitespace, operator, or quote.
-**
-** 🔗 Role
-** Reads the non-quoted part of a word (e.g., "hel" in hel""lo).
-**
-** 🧩 Step-by-Step
-** 1. Count characters until delimiter.
-** 2. Extract substring.
-** 3. Append to result.
-** 4. Return length consumed.
-*/
 static int	extract_unquoted_part(const char *input, char **result)
 {
 	int		len;
@@ -72,19 +47,6 @@ static int	extract_unquoted_part(const char *input, char **result)
 	return (len);
 }
 
-/*
-** 🔧 What it Does
-** Processes and appends a quoted part to the word being built.
-**
-** 🔗 Role
-** Handles quoted segments (e.g., "" or "world" in hel""lo"world").
-**
-** 🧩 Step-by-Step
-** 1. Extract quoted content using extract_quoted_word.
-** 2. Update quote_type if this is the first quoted part.
-** 3. Append quoted content to word.
-** 4. Update position pointer.
-*/
 static int	process_quoted_part(const char *input, int *i, char **word,
 		int *quote_type)
 {
@@ -103,26 +65,6 @@ static int	process_quoted_part(const char *input, int *i, char **word,
 	return (1);
 }
 
-/*
-** 🔧 What it Does
-** Extracts a complete word by consuming all adjacent parts.
-**
-** 🔗 Role
-** Main function that builds words from mixed quoted/unquoted segments.
-** Stops at whitespace or operators (unless inside quotes).
-**
-** 🧩 Step-by-Step
-** 1. Loop while not at whitespace/operator.
-** 2. If current char is quote, process quoted part.
-** 3. Otherwise, extract unquoted part.
-** 4. Continue until word is complete.
-** 5. Return the built word.
-**
-** Examples:
-** - hel""lo       -> "hello"
-** - "hello"world  -> "helloworld"
-** - hel lo        -> "hel" (stops at space)
-*/
 char	*extract_complete_word(const char *input, int *i, int *quote_type)
 {
 	char	*word;

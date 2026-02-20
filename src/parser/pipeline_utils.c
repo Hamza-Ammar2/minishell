@@ -12,18 +12,6 @@
 
 #include "../../include/minishell.h"
 
-/*
-** 🔧 What the function Does
-** Counts the number of pipe tokens in a token list.
-**
-** 🔗 Role in the Program
-** Determines if input contains a pipeline and how many commands exist.
-**
-** 🧩 Step-by-Step
-** 1. Traverse token list.
-** 2. Count TOKEN_PIPE tokens.
-** 3. Return total count.
-*/
 int	count_pipes(t_token *tokens)
 {
 	int	i;
@@ -38,18 +26,6 @@ int	count_pipes(t_token *tokens)
 	return (i);
 }
 
-/*
-** 🔧 What the function Does
-** Locates the next pipe token in the list.
-**
-** 🔗 Role in the Program
-** Helper for traversing and splitting commands at pipe boundaries.
-**
-** 🧩 Step-by-Step
-** 1. Traverse tokens until pipe found.
-** 2. Return pointer to pipe token.
-** 3. Return NULL if no pipe exists.
-*/
 t_token	*find_next_pipe(t_token *tokens)
 {
 	while (tokens)

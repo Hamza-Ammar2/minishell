@@ -38,8 +38,6 @@ int	close_pipes(t_command *cmds, int fd[3][2])
 		close(fd[(fd[2][0] + 1) % 2][0]);
 		close(fd[(fd[2][0] + 1) % 2][1]);
 	}
-	/* close(fd[(fd[2][0] + 1) % 2][0]);
-	close(fd[(fd[2][0] + 1) % 2][1]); */
 	if (!cmds->next || fd[2][1] < 0)
 	{
 		close(fd[fd[2][0] % 2][0]);

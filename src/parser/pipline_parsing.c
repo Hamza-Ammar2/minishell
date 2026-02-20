@@ -12,19 +12,6 @@
 
 #include "../../include/minishell.h"
 
-/*
-** 🔧 What the function Does
-** Extracts tokens up to the next pipe, creating a copy.
-**
-** 🔗 Role in the Program
-** Isolates tokens for a single command segment from pipeline.
-**
-** 🧩 Step-by-Step
-** 1. Copy tokens until pipe or end is reached.
-** 2. Advance original token pointer past the extracted segment.
-** 3. Skip pipe token if present.
-** 4. Return copied token list for the command.
-*/
 t_token	*extract_command_tokens(t_token **tokens)
 {
 	t_token	*head;
@@ -43,19 +30,6 @@ t_token	*extract_command_tokens(t_token **tokens)
 	return (head);
 }
 
-/*
-** 🔧 What the function Does
-** Fills command args array with token values, skipping redirects.
-**
-** 🔗 Role in the Program
-** Extracts executable command and arguments from token list.
-**
-** 🧩 Step-by-Step
-** 1. Traverse tokens until pipe or end.
-** 2. Copy WORD token values to args array.
-** 3. Skip redirect operators and their filenames.
-** 4. NULL-terminate the args array.
-*/
 static int	fill_command_args(t_command *cmd, t_token *tokens)
 {
 	int		i;
@@ -83,21 +57,6 @@ static int	fill_command_args(t_command *cmd, t_token *tokens)
 	return (0);
 }
 
-/*
-** 🔧 What the function Does
-** Creates a command structure from a token list segment.
-**
-** 🔗 Role in the Program
-** Converts tokens for one command into executable command structure.
-**
-** 🧩 Step-by-Step
-** 1. Allocate new command structure.
-** 2. Parse and attach redirections.
-** 3. Count arguments (excluding redirects).
-** 4. Allocate args array.
-** 5. Fill args with token values.
-** 6. Return completed command.
-*/
 static t_command	*create_pipeline_command(t_token *cmd_tokens)
 {
 	t_command	*cmd;
@@ -122,18 +81,6 @@ static t_command	*create_pipeline_command(t_token *cmd_tokens)
 	return (cmd);
 }
 
-/*
-** 🔧 What the function Does
-** Links a new command into the pipeline chain.
-**
-** 🔗 Role in the Program
-** Maintains linked list of commands in pipeline order.
-**
-** 🧩 Step-by-Step
-** 1. If first command, set as head.
-** 2. Otherwise, link to previous command's next.
-** 3. Update current pointer to new command.
-*/
 static void	link_command(t_command **head, t_command **current, t_command *new)
 {
 	if (!*head)
@@ -143,20 +90,6 @@ static void	link_command(t_command **head, t_command **current, t_command *new)
 	*current = new;
 }
 
-/*
-** 🔧 What the function Does
-** Parses token list into linked command structures for pipeline.
-**
-** 🔗 Role in the Program
-** Main pipeline parser - converts tokens into executable command chain.
-**
-** 🧩 Step-by-Step
-** 1. Create working copy of token pointer.
-** 2. Loop through tokens, extracting command segments.
-** 3. Create command structure for each segment.
-** 4. Link commands into pipeline chain.
-** 5. Return head of command list for executor.
-*/
 t_command	*parse_pipeline(t_token *tokens)
 {
 	t_command	*head;
